@@ -868,6 +868,7 @@ uv sync
 uv run pytest            # offline: replays recorded upstream responses
 uv run pytest -m live    # a few real calls per source
 uv run python scripts/record.py ssb_statbank   # re-record a source's fixtures
+uv run python scripts/build_recipes.py         # re-run the website's worked questions live
 uv run kildeverk site --out site/dist          # build the website
 ```
 

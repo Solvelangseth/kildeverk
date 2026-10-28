@@ -103,6 +103,37 @@ def _type(schema: dict[str, Any]) -> str:
     return schema.get("type") or schema.get("$ref", "object").rsplit("/", 1)[-1]
 
 
+RECIPES = Path(__file__).parent / "recipes.json"
+
+
+def _recipes() -> str:
+    """Worked questions, run live by scripts/build_recipes.py and stored with the code."""
+
+    if not RECIPES.exists():
+        return ""
+    stored = json.loads(RECIPES.read_text(encoding="utf-8"))
+    cards = "".join(
+        f"""
+      <article class="panel recipe">
+        <h3>{_e(r["question"])}</h3>
+        <p>{_e(r["answer"])}</p>
+        <pre><code>{_e(r["tool"])} {_e(json.dumps(r["arguments"], ensure_ascii=False))}</code></pre>
+        <p class="muted small">One call, {_e(r["upstream_calls"])} upstream requests. Sources:
+        {_e("; ".join(f"{s['publisher']} ({s['licence']})" for s in r["sources"]))}.</p>
+        <p class="small"><a href="#tool-{_e(r["tool"])}">Try <code>{_e(r["tool"])}</code></a></p>
+      </article>"""
+        for r in stored["recipes"]
+    )
+    return f"""
+  <section id="recipes">
+    <h2>Recipes</h2>
+    <p>Real questions, each answered with one call. Run on {_e(stored["built_at"][:10])}; the
+    figures are as the publishers had them then.</p>
+    <div class="recipes">{cards}
+    </div>
+  </section>"""
+
+
 def render(catalogue: dict[str, Any]) -> str:
     sources = catalogue["sources"]
     tools = catalogue["tools"]
@@ -128,6 +159,7 @@ def render(catalogue: dict[str, Any]) -> str:
         n_publishers=publishers,
         cards=cards,
         tools=tool_sections,
+        recipes=_recipes(),
         repo=REPO_URL,
     )
 
@@ -195,6 +227,10 @@ button.ghost {{ background: transparent; color: var(--accent); border: 1px solid
 .promises {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }}
 .promises h3 {{ margin: 0 0 4px; font-size: 1rem; }}
 .promises p {{ margin: 0; color: var(--muted); font-size: .95rem; }}
+.recipes {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }}
+.recipe h3 {{ margin: 0 0 8px; font-size: 1.05rem; }}
+.recipe p {{ margin: 0 0 8px; }}
+.recipe pre {{ white-space: pre-wrap; word-break: break-word; }}
 .cards {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 16px; }}
 .card header h3 {{ margin: 0; font-size: 1.1rem; }}
 .card header p {{ margin: 2px 0 0; font-size: .9rem; }}
@@ -232,6 +268,7 @@ footer {{ border-top: 1px solid var(--line); margin-top: 30px; padding: 22px 0 4
   <nav class="top">
     <a class="brand" href="#">Kildeverk</a>
     <a href="#connect">Connect</a>
+    <a href="#recipes">Recipes</a>
     <a href="#sources">Sources</a>
     <a href="#tools">Tools</a>
     <a href="/docs">API docs</a>
@@ -284,6 +321,8 @@ footer {{ border-top: 1px solid var(--line); margin-top: 30px; padding: 22px 0 4
       <div class="panel"><h3>Polite to publishers</h3><p>A budget below each published limit, caching, shared in-flight calls and conditional requests.</p></div>
     </div>
   </section>
+
+{recipes}
 
   <section id="sources">
     <h2>Sources</h2>
