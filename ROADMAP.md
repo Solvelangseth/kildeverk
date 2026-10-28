@@ -21,7 +21,7 @@ or a credential and cannot be done from the code alone.
       (Brreg), schools (NSR), traffic counting points and current warnings, for any code or name.
 - [x] Population history across reforms in `municipality_profile`, from SSB's series summed to
       today's borders (`agg_KommSummer`), so every municipality gets a ten-year change.
-- [ ] `compare_municipalities`: the same figures side by side for two to five municipalities.
+- [x] `compare_municipalities`: the same figures side by side for two to five municipalities.
 
 ## Making it better for agents
 

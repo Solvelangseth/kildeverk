@@ -273,6 +273,12 @@ class MunicipalityProfileOutput(BaseModel):
 def _pick(matches: list[dict[str, Any]], asked: str) -> tuple[str, str] | ToolError:
     """Today's (code, name) for what was asked, following reforms through Klass."""
 
+    if not matches:
+        return ToolError(
+            ErrorCode.NOT_FOUND,
+            f"No municipality, past or present, is called or numbered '{asked}'.",
+            next_call=NextCall(tool="regions_resolve", arguments={"query": asked[:3]}),
+        )
     exact = [m for m in matches if asked in (m["code"], m["name"].lower())] or matches
     current = {(m["code"], m["name"]) for m in exact if m["status"] == "current"}
     later = {
@@ -484,6 +490,92 @@ async def municipality_profile(
     )
 
 
+# --- compare_municipalities --------------------------------------------------------
+
+
+class CompareInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    municipalities: list[str] = Field(
+        min_length=2,
+        max_length=5,
+        description="Two to five codes (old or current) or names, e.g. ['Bergen', '0301'].",
+    )
+
+
+class ComparedRow(BaseModel):
+    code: str
+    name: str
+    population: int | None
+    population_change_1y_pct: float | None
+    population_change_since_pct: float | None
+    population_change_since: str | None
+    companies_registered: int | None
+    companies_per_1000: float | None
+    schools: int | None
+    traffic_points: int | None
+    warnings_in_force: int
+
+
+class CompareOutput(BaseModel):
+    rows: list[ComparedRow] = Field(description="Largest population first.")
+    failed: list[str] = Field(description="Municipalities that could not be profiled; see notes.")
+
+
+async def compare_municipalities(ctx: Context, args: CompareInput) -> Result[CompareOutput]:
+    asked = list(dict.fromkeys(m.strip() for m in args.municipalities))
+    profiles = await asyncio.gather(
+        *(_part(ctx, "municipality_profile", {"municipality": m}) for m in asked)
+    )
+    rows: list[ComparedRow] = []
+    failed: list[str] = []
+    notes: list[str] = []
+    provenance: list[Provenance] = []
+    seen: set[str] = set()
+    for name, profile in zip(asked, profiles, strict=True):
+        if isinstance(profile, ToolError):
+            failed.append(name)
+            notes.append(f"{name}: {profile.body.message}")
+            continue
+        d = profile["data"]
+        if d["code"] in seen:
+            notes.append(f"{name} is {d['code']} {d['name']}, already in the comparison.")
+            continue
+        seen.add(d["code"])
+        provenance.extend(Provenance.model_validate(p) for p in profile["provenance"])
+        notes.extend(
+            f"{d['name']}: {n}" for n in profile["notes"] if not n.startswith("School counts")
+        )
+        people = d["population"] or {}
+        companies = d["companies_registered"]
+        rows.append(
+            ComparedRow(
+                code=d["code"],
+                name=d["name"],
+                population=people.get("latest"),
+                population_change_1y_pct=people.get("change_1y_pct"),
+                population_change_since_pct=people.get("change_since_pct"),
+                population_change_since=people.get("change_since"),
+                companies_registered=companies,
+                companies_per_1000=round(companies / people["latest"] * 1000, 1)
+                if companies and people.get("latest")
+                else None,
+                schools=(d["schools"] or {}).get("total"),
+                traffic_points=d["traffic_points"],
+                warnings_in_force=len(d["warnings"]),
+            )
+        )
+    if len(rows) < 2 and not failed:
+        notes.append("Fewer than two distinct municipalities to compare.")
+    rows.sort(key=lambda r: r.population or 0, reverse=True)
+    notes.append("School counts include every unit the register calls a school.")
+    return Result(
+        data=CompareOutput(rows=rows, failed=failed),
+        provenance=provenance,
+        notes=notes,
+    )
+
+
 OPERATIONS = (
     Operation(
         name="place_overview",
@@ -533,5 +625,30 @@ OPERATIONS = (
         http_method="GET",
         http_path="/v1/municipalities/{municipality}/profile",
         examples=({"municipality": "4601"}, {"municipality": "1201"}, {"municipality": "Tromsø"}),
+    ),
+    Operation(
+        name="compare_municipalities",
+        title="Compare municipalities",
+        description=(
+            "Two to five Norwegian municipalities side by side: population and its change, "
+            "registered companies (also per 1,000 inhabitants), schools, traffic counting points "
+            "and warnings in force. Accepts codes, old or current, and names. Built on "
+            "municipality_profile, which gives each one in full."
+        ),
+        input_model=CompareInput,
+        output_model=CompareOutput,
+        handler=compare_municipalities,
+        source_ids=(
+            "ssb_klass",
+            "ssb_statbank",
+            "brreg",
+            "udir_nsr",
+            "vegvesen_traffic",
+            "nve_varsom",
+            "met_metalerts",
+        ),
+        http_method="POST",
+        http_path="/v1/municipalities/compare",
+        examples=({"municipalities": ["Bergen", "Trondheim", "Stavanger"]},),
     ),
 )

@@ -168,3 +168,8 @@ async def test_place_overview(live):
 async def test_municipality_profile(live):
     result = await OPS["municipality_profile"].invoke(live, {"municipality": "1201"})
     assert result["data"]["code"] == "4601" and result["data"]["population"]["latest"] > 250_000
+
+
+async def test_compare_municipalities(live):
+    result = await OPS["compare_municipalities"].invoke(live, {"municipalities": ["0301", "4601"]})
+    assert [r["code"] for r in result["data"]["rows"]] == ["0301", "4601"]

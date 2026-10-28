@@ -256,3 +256,52 @@ async def test_profile_combines_sources(ctx, monkeypatch):
     assert population_calls[0]["codelists"] == {"Region": "agg_KommSummer"}
     assert population_calls[0]["select"]["Region"] == ["K-4601"]
     assert len(result["provenance"]) >= 7
+
+
+def test_pick_with_no_match_says_so():
+    error = composite._pick([], "nowhereville")
+    assert error.body.code == "NOT_FOUND" and "past or present" in error.body.message
+
+
+async def test_compare_skips_duplicates_and_reports_failures(ctx, monkeypatch):
+    def profile(code, name, population, companies):
+        return {
+            "data": {
+                "code": code,
+                "name": name,
+                "population": {
+                    "latest": population,
+                    "change_1y_pct": 1.0,
+                    "change_since_pct": 5.0,
+                    "change_since": "2016",
+                },
+                "companies_registered": companies,
+                "schools": {"total": 10},
+                "traffic_points": 3,
+                "warnings": [],
+            },
+            "provenance": [_prov("ssb_statbank")],
+            "notes": [],
+        }
+
+    answers = {
+        "Bergen": profile("4601", "Bergen", 300000, 60000),
+        "1201": profile("4601", "Bergen", 300000, 60000),
+        "Stavanger": profile("1103", "Stavanger", 150000, 30000),
+    }
+
+    async def fake(ctx, tool, arguments):
+        name = arguments["municipality"]
+        if name not in answers:
+            return ToolError(ErrorCode.NOT_FOUND, f"No municipality is called '{name}'.")
+        return answers[name]
+
+    monkeypatch.setattr(composite, "_part", fake)
+    result = await OPS["compare_municipalities"].invoke(
+        ctx, {"municipalities": ["Stavanger", "Bergen", "1201", "Nowhere"]}
+    )
+    rows = result["data"]["rows"]
+    assert [r["code"] for r in rows] == ["4601", "1103"]
+    assert rows[0]["companies_per_1000"] == 200.0
+    assert result["data"]["failed"] == ["Nowhere"]
+    assert any("already in the comparison" in n for n in result["notes"])
