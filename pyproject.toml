@@ -1,6 +1,6 @@
 [project]
 name = "kildeverk"
-version = "0.1.0"
+version = "0.2.0"
 description = "Live Norwegian public data for AI agents and people: an MCP server and a JSON API with provenance on every result."
 readme = "README.md"
 license = "MIT"

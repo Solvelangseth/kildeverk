@@ -85,5 +85,5 @@ or a credential and cannot be done from the code alone.
 
 ## Release
 
-- [ ] Version 0.2.0 with a changelog.
+- [x] Version 0.2.0 with a changelog.
 - [ ] Publish to PyPI so `uvx kildeverk` works without a Git URL **(needs owner)**.
