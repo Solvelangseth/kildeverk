@@ -245,3 +245,18 @@ async def test_expires_header_sets_the_lifetime_when_the_source_asks():
     clock.now += 10
     await up.get_json(URL, ttl="default")
     assert len(calls) == 2
+
+
+async def test_usage_is_counted_per_tool(ctx):
+    from kildeverk.core.errors import ToolError
+    from kildeverk.sources.registry import operations
+
+    ops = {op.name: op for op in operations()}
+    await ops["sources_list"].invoke(ctx, {})
+    await ops["sources_list"].invoke(ctx, {})
+    with pytest.raises(ToolError):
+        await ops["statistics_describe_table"].invoke(ctx, {"table_id": "x"})
+    status = await ops["service_status"].invoke(ctx, {})
+    tools = {t["tool"]: t for t in status["data"]["tools"]}
+    assert tools["sources_list"]["calls"] == 2 and tools["sources_list"]["errors"] == {}
+    assert tools["statistics_describe_table"]["errors"] == {"INVALID_ARGUMENT": 1}

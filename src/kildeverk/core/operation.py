@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Literal
@@ -43,6 +44,27 @@ class Operation:
 
     async def invoke(self, ctx: Context, arguments: dict[str, Any] | BaseModel) -> dict[str, Any]:
         """Validate, run and serialise. Raises ToolError and nothing else."""
+
+        started = time.perf_counter()
+        try:
+            result = await self._invoke(ctx, arguments)
+        except ToolError as exc:
+            ctx.usage.record(
+                self.name,
+                ms=(time.perf_counter() - started) * 1000,
+                error=exc.body.code,
+                provenance=[],
+            )
+            raise
+        ctx.usage.record(
+            self.name,
+            ms=(time.perf_counter() - started) * 1000,
+            error=None,
+            provenance=result.get("provenance") or [],
+        )
+        return result
+
+    async def _invoke(self, ctx: Context, arguments: dict[str, Any] | BaseModel) -> dict[str, Any]:
 
         if isinstance(arguments, self.input_model):
             args = arguments

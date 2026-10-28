@@ -29,7 +29,7 @@ or a credential and cannot be done from the code alone.
       "profile a place" and "find a statistic and fetch it".
 - [ ] An evaluation set: 30-40 realistic questions with checkable answers, run against a model
       with only Kildeverk's tools, to measure which tools are found, misused or missing.
-- [ ] Count tool calls, errors and cache hits per tool, and show them in `service_status`.
+- [x] Count tool calls, errors and cache hits per tool, and show them in `service_status`.
 
 ## More from the same publishers
 

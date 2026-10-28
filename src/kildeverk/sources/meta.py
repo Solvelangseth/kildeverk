@@ -75,10 +75,24 @@ class UpstreamStatus(BaseModel):
     cache_entries_fresh: int
 
 
+class ToolStatus(BaseModel):
+    tool: str
+    calls: int = Field(
+        description="Since the service started, including calls made by tools that combine others."
+    )
+    errors: dict[str, int] = Field(description="Calls that failed, by error code.")
+    upstream_responses_cached: int
+    upstream_responses_fresh: int
+    average_ms: float
+
+
 class ServiceStatusOutput(BaseModel):
     deployment: str
     checked_at: datetime
     upstreams: list[UpstreamStatus]
+    tools: list[ToolStatus] = Field(
+        description="Tools called since the service started, busiest first."
+    )
 
 
 async def service_status(ctx: Context, args: NoInput) -> Result[ServiceStatusOutput]:
@@ -94,9 +108,26 @@ async def service_status(ctx: Context, args: NoInput) -> Result[ServiceStatusOut
         )
         for source_id, up in ctx.upstreams.items()
     ]
+    tools = sorted(
+        (
+            ToolStatus(
+                tool=name,
+                calls=u.calls,
+                errors=dict(u.errors),
+                upstream_responses_cached=u.cached_parts,
+                upstream_responses_fresh=u.fresh_parts,
+                average_ms=round(u.total_ms / u.calls, 1) if u.calls else 0.0,
+            )
+            for name, u in ctx.usage.tools.items()
+        ),
+        key=lambda t: -t.calls,
+    )
     return Result(
         data=ServiceStatusOutput(
-            deployment=ctx.settings.deployment, checked_at=datetime.now(UTC), upstreams=upstreams
+            deployment=ctx.settings.deployment,
+            checked_at=datetime.now(UTC),
+            upstreams=upstreams,
+            tools=tools,
         ),
         provenance=[],
     )
@@ -121,8 +152,9 @@ OPERATIONS = (
         name="service_status",
         title="Service status",
         description=(
-            "Show how much request budget is left for each upstream and how full the cache is. "
-            "Useful after a RATE_LIMITED error."
+            "Show how much request budget is left for each upstream, how full the cache is, and "
+            "how each tool has been used since the service started: calls, errors by code, cache "
+            "hits and average time. Useful after a RATE_LIMITED error."
         ),
         input_model=NoInput,
         output_model=ServiceStatusOutput,

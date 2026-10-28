@@ -9,6 +9,7 @@ import httpx
 
 from kildeverk.core.cache import ResponseCache
 from kildeverk.core.upstream import Upstream
+from kildeverk.core.usage import Usage
 from kildeverk.settings import Settings
 from kildeverk.sources.registry import SOURCES
 
@@ -31,6 +32,7 @@ class Context:
     cache: ResponseCache
     client: httpx.AsyncClient
     upstreams: dict[str, Upstream]
+    usage: Usage = field(default_factory=Usage)
     memo: dict[Any, Any] = field(default_factory=dict)
     """Derived structures worth keeping between calls, keyed by what they were built from."""
 
