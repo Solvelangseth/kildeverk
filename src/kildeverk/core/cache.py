@@ -86,6 +86,10 @@ class ResponseCache:
             )
         return entry
 
+    async def delete(self, key: str) -> None:
+        async with self._lock:
+            await asyncio.to_thread(self._db.execute, "DELETE FROM responses WHERE key = ?", (key,))
+
     async def stats(self) -> dict[str, dict[str, int]]:
         now = time.time()
         async with self._lock:

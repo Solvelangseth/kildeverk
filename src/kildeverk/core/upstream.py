@@ -78,9 +78,17 @@ class Upstream:
         self.upstream_calls = 0
 
     async def get_json(
-        self, url: str, *, params: dict[str, Any] | None = None, ttl: str, key_extra: str = ""
+        self,
+        url: str,
+        *,
+        params: dict[str, Any] | None = None,
+        ttl: str,
+        key_extra: str = "",
+        accept: str = "application/json",
     ) -> Fetched:
-        return await self._fetch("GET", url, params=params, body=None, ttl=ttl, key_extra=key_extra)
+        return await self._fetch(
+            "GET", url, params=params, body=None, ttl=ttl, key_extra=key_extra, accept=accept
+        )
 
     async def post_json(
         self,
@@ -92,7 +100,7 @@ class Upstream:
         key_extra: str = "",
     ) -> Fetched:
         return await self._fetch(
-            "POST", url, params=params, body=body, ttl=ttl, key_extra=key_extra
+            "POST", url, params=params, body=body, ttl=ttl, key_extra=key_extra, accept=None
         )
 
     def provenance(self, fetched: Fetched, *, title: str) -> Provenance:
@@ -123,13 +131,14 @@ class Upstream:
         body: Any,
         ttl: str,
         key_extra: str,
+        accept: str | None,
     ) -> Fetched:
         request = self.client.build_request(
             method,
             url,
             params=params,
             json=body,
-            headers={"User-Agent": self.user_agent, "Accept": "application/json"},
+            headers={"User-Agent": self.user_agent, "Accept": accept or "application/json"},
         )
         described = UpstreamRequest(method=method, url=str(request.url), body=body)
         key = _cache_key(described, key_extra)
@@ -229,6 +238,10 @@ class Upstream:
             )
 
         if status >= 400:
+            if status in (404, 410):
+                # Gone upstream means gone here: a publisher that withdraws a record (Brreg
+                # answers 410 for legal removals) asks that copies be removed too.
+                await self.cache.delete(key)
             raise UpstreamClientError(status, _detail(response), source_id=self.spec.id)
 
         try:

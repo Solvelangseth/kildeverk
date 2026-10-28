@@ -49,7 +49,35 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ("regions_list", {"level": "municipality"}),
         ("regions_list", {"level": "county"}),
     ],
+    "brreg": [
+        (
+            "companies_get",
+            {"org_number": "923609016", "include_subunits": True, "subunits_limit": 3},
+        ),
+        ("companies_get", {"org_number": "973861883"}),
+        ("companies_get", {"org_number": "974760673"}),
+        ("companies_get", {"org_number": "999999999"}),
+        ("companies_search", {"name": "equinor", "limit": 5}),
+        (
+            "companies_search",
+            {"municipality": ["4601"], "industry": ["62"], "sort": "most_employees", "limit": 5},
+        ),
+        ("companies_search", {"industry": ["62.010"]}),
+    ],
 }
+
+
+# Fields removed from recorded responses before they are written. The tools never
+# return them, and fixtures end up in a public repository.
+SCRUB = {"brreg": {"telefon", "mobil", "epostadresse"}}
+
+
+def _scrub(value, keys: set[str]):
+    if isinstance(value, dict):
+        return {k: _scrub(v, keys) for k, v in value.items() if k not in keys}
+    if isinstance(value, list):
+        return [_scrub(v, keys) for v in value]
+    return value
 
 
 async def record(source_id: str) -> None:
@@ -68,6 +96,15 @@ async def record(source_id: str) -> None:
             outcome = exc.body.code
         print(f"{tool} {json.dumps(arguments)} -> {outcome}")
     await ctx.aclose()
+
+    keys = SCRUB.get(source_id)
+    if keys:
+        for exchange in transport.exchanges:
+            try:
+                body = json.loads(exchange["response"])
+            except ValueError:
+                continue
+            exchange["response"] = json.dumps(_scrub(body, keys), ensure_ascii=False)
 
     out = FIXTURES / source_id / "cassette.json"
     out.parent.mkdir(parents=True, exist_ok=True)

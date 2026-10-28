@@ -3,16 +3,18 @@
 from __future__ import annotations
 
 from kildeverk.core.source import SourceSpec
+from kildeverk.sources.brreg.spec import SPEC as BRREG
 from kildeverk.sources.ssb_klass.spec import SPEC as SSB_KLASS
 from kildeverk.sources.ssb_statbank.spec import SPEC as SSB_STATBANK
 
-SOURCES: tuple[SourceSpec, ...] = (SSB_STATBANK, SSB_KLASS)
+SOURCES: tuple[SourceSpec, ...] = (SSB_STATBANK, SSB_KLASS, BRREG)
 
 
 def operations():
     # Imported late: handlers need Context, and Context needs SOURCES.
     from kildeverk.sources import meta
+    from kildeverk.sources.brreg.ops import OPERATIONS as BRREG_OPS
     from kildeverk.sources.ssb_klass.ops import OPERATIONS as SSB_KLASS_OPS
     from kildeverk.sources.ssb_statbank.ops import OPERATIONS as SSB_STATBANK_OPS
 
-    return (*SSB_STATBANK_OPS, *SSB_KLASS_OPS, *meta.OPERATIONS)
+    return (*SSB_STATBANK_OPS, *SSB_KLASS_OPS, *BRREG_OPS, *meta.OPERATIONS)

@@ -18,7 +18,7 @@ publishers whose data it reads.
 | --- | --- | --- |
 | [SSB Statbank](#ssb_statbank) | ✅ available | `statistics_search_tables`, `statistics_describe_table`, `statistics_get_data` |
 | [SSB Klass](#ssb_klass): regions and harmonisation across the 2020 and 2024 reforms | ✅ available | `regions_list`, `regions_resolve`, `regions_changes`, `regions_harmonise` |
-| Brønnøysund Register Centre (Enhetsregisteret) | planned | |
+| [Brønnøysund Register Centre (Enhetsregisteret)](#brreg) | ✅ available | `companies_search`, `companies_get` |
 | MET Norway (Locationforecast, Frost) | planned | |
 | NVE HydAPI | planned, once its terms are confirmed | |
 | Entur (stops, departures) | planned | |
@@ -205,6 +205,48 @@ Every answer lists each input code's mapping (`unchanged`, `renumbered`, `merged
 - Periods are read by year, so a change in the middle of a year is placed in that year.
 - Codes valid only before 1960 are unknown.
 - Codes for unknown or unspecified areas, such as `9999` "Uoppgitt", are listed like any other code.
+
+<a id="brreg"></a>
+### Enhetsregisteret (Brønnøysund Register Centre)
+
+**What it covers:** every registered legal entity in Norway, from the Central Coordinating Register
+for Legal Entities. That includes companies, sole proprietorships, associations, foundations and
+public bodies, together with their sub-units (establishments).
+- `companies_search` filters by name, municipality, industry, legal form, minimum employees and
+  registration date. Bankrupt entities are excluded unless you ask for them.
+- `companies_get` looks up one organisation number, whether it belongs to a main unit or a
+  sub-unit. It returns the legal form, industries, addresses, employees, share capital, register
+  memberships, bankruptcy and liquidation status, former names and, if asked, the sub-units.
+
+**Licence:** [NLOD 2.0](https://data.norge.no/nlod/en/2.0), as stated in
+[Brreg's API documentation](https://data.brreg.no/enhetsregisteret/api/dokumentasjon/no/index.html).
+
+**Rate limits:** Brreg publishes none, apart from the cap on paging below. Kildeverk spends at most
+60 calls per minute.
+
+**Caching:** entity lookups for 1 hour, searches for 15 minutes. Brreg sends no validators.
+
+**Behaviour worth knowing:**
+- Requests pin Brreg's versioned media types (`enhet.v2`, `underenhet.v2`), so a new response
+  version upstream cannot silently change these tools.
+- Organisation numbers are checked against their modulus-11 check digit before any request is made.
+- Brreg answers 410 when it has withdrawn an entity for legal reasons. In that case Kildeverk
+  refuses the lookup and deletes any cached copy, as Brreg asks.
+- The industry filter matches any of an entity's up to three industry codes, not only the main one.
+
+**Privacy:**
+- Roles (board members, managing directors, auditors) are not served, because they name people.
+- Phone numbers and e-mail addresses are dropped from every response and scrubbed from the test
+  fixtures, although Brreg publishes them.
+- Sole proprietorships are often named after their owner. That is how the public register works,
+  and Kildeverk shows those names as published.
+
+**Known gaps:**
+- Industry codes are SN2025, which Brreg switched to in 2025, so SN2007 codes such as `62.010` no
+  longer match. A two-digit division such as `62` does, and an empty result adds a note saying so.
+- One search pages through at most 10,000 results.
+- Financial statements, the register of beneficial owners and corporate group structure are not
+  included.
 
 ## Development
 

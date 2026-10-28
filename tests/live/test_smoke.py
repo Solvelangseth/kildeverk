@@ -55,3 +55,10 @@ async def test_klass_history_and_a_reform_conversion(live):
         "method": "summed",
         "sources": ["1508", "1580"],
     }
+
+
+async def test_brreg_lookup_and_search(live):
+    company = await OPS["companies_get"].invoke(live, {"org_number": "923609016"})
+    assert company["data"]["name"] == "EQUINOR ASA"
+    found = await OPS["companies_search"].invoke(live, {"name": "equinor", "limit": 3})
+    assert found["data"]["companies"]
