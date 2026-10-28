@@ -65,8 +65,9 @@ or a credential and cannot be done from the code alone.
 - [x] Put each tool's examples into the OpenAPI document, so `/docs` opens with ready requests.
 - [x] Offer each website recipe as an MCP prompt too, so a client can run the same question.
 
-- [ ] An Atom feed of warnings for a municipality (`/v1/feeds/warnings/{municipality}.atom`):
-      weather, flood, landslide and avalanche warnings in one feed any reader can follow.
+- [x] An Atom feed of warnings for a municipality (`/v1/feeds/warnings/{municipality}.atom`):
+      weather, flood and landslide warnings in one feed any reader can follow. Avalanche
+      forecasts still to add, mapped from municipality to forecasting region.
 - [ ] Citations as BibTeX and CSL-JSON: turn any result's provenance into references for a
       paper or report.
 

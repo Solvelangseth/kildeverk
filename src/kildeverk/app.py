@@ -12,7 +12,7 @@ from mcp.server.transport_security import TransportSecuritySettings
 from starlette.routing import Route
 
 from kildeverk import __version__
-from kildeverk.adapters import rest
+from kildeverk.adapters import feeds, rest
 from kildeverk.adapters.limits import ClientLimitMiddleware
 from kildeverk.adapters.mcp import build_mcp_server
 from kildeverk.context import Context, build_context
@@ -88,6 +88,7 @@ def create_app(settings: Settings | None = None, *, context: Context | None = No
         return {"status": "ok", "version": __version__}
 
     rest.install(app)
+    feeds.install(app)
     if settings.site_dir and settings.site_dir.is_dir():
         app.mount("/", StaticFiles(directory=settings.site_dir, html=True), name="site")
     else:
