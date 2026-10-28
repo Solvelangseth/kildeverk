@@ -155,3 +155,35 @@ def test_mcp_over_http(http):
     )
     assert listed.status_code == 200, listed.text
     assert {t["name"] for t in listed.json()["result"]["tools"]} == TOOL_NAMES
+
+
+async def test_mcp_resources_describe_every_source(ctx):
+    from kildeverk.sources.registry import SOURCES
+
+    async with Client(build_mcp_server(lambda: ctx)) as client:
+        listed = await client.list_resources()
+        uris = {str(r.uri) for r in listed.resources}
+        assert {"kildeverk://guide", "kildeverk://sources"} <= uris
+        assert {f"kildeverk://sources/{s.id}" for s in SOURCES} <= uris
+        guide = await client.read_resource("kildeverk://guide")
+        assert "place_overview" in guide.contents[0].text
+        one = await client.read_resource("kildeverk://sources/brreg")
+        assert json.loads(one.contents[0].text)["licence"]["id"] == "NLOD-2.0"
+
+
+async def test_mcp_prompts_fill_their_arguments(ctx):
+    async with Client(build_mcp_server(lambda: ctx)) as client:
+        names = {p.name for p in (await client.list_prompts()).prompts}
+        assert {
+            "profile_place",
+            "profile_municipality",
+            "find_statistic",
+            "compare_places",
+        } <= names
+        prompt = await client.get_prompt(
+            "find_statistic", {"topic": "house prices", "region": "Oslo"}
+        )
+        text = prompt.messages[0].content.text
+        assert "'house prices' for Oslo" in text and "statistics_search_tables" in text
+        bare = await client.get_prompt("find_statistic", {"topic": "unemployment"})
+        assert "'unemployment'. Search" in bare.messages[0].content.text

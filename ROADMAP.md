@@ -25,8 +25,8 @@ or a credential and cannot be done from the code alone.
 
 ## Making it better for agents
 
-- [ ] Expose the catalogue as MCP resources (one per source) and add a few MCP prompts, such as
-      "profile a place" and "find a statistic and fetch it".
+- [x] Expose the catalogue as MCP resources (a guide, all sources, one per source) and add MCP
+      prompts: profile a place, profile a municipality, find a statistic, compare places.
 - [ ] An evaluation set: 30-40 realistic questions with checkable answers, run against a model
       with only Kildeverk's tools, to measure which tools are found, misused or missing.
 - [x] Count tool calls, errors and cache hits per tool, and show them in `service_status`.

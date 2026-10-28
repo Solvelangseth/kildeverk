@@ -47,7 +47,12 @@ ownership, traffic counting points, and the warnings in force. Its population se
 summed to today's borders, so the change reaches back past the 2020 and 2024 reforms.
 `compare_municipalities` puts two to five of these side by side.
 
-Two tools describe the service itself: `sources_list` and `service_status`.
+Two tools describe the service itself: `sources_list` and `service_status`, which also counts
+calls, errors and cache hits per tool.
+
+Over MCP, the server also offers **resources**: `kildeverk://guide` (which tool answers which
+question), `kildeverk://sources`, and one `kildeverk://sources/<id>` per source. It offers four
+**prompts**: `profile_place`, `profile_municipality`, `find_statistic` and `compare_places`.
 
 No source is scraped, and no undocumented endpoint behind a website is used. Kildeverk is
 non-commercial. Every result names the licence its source states, or says that none is stated.
