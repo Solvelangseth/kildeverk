@@ -41,14 +41,16 @@ def build_feed(
     hazards: dict[str, Any] | None,
     notes: list[str],
     now: dt.datetime,
+    avalanche: list[dict[str, Any]] | None = None,
 ) -> bytes:
     feed = ET.Element("feed", xmlns=ATOM)
     self_url = f"{base_url}/v1/feeds/warnings/{code}.atom"
     ET.SubElement(feed, "id").text = self_url
     ET.SubElement(feed, "title").text = f"Warnings for {name} ({code})"
     ET.SubElement(feed, "subtitle").text = (
-        "Weather warnings from MET Norway (for the county) and flood and landslide warnings from "
-        "NVE (for the municipality), via Kildeverk. Check varsom.no and yr.no before acting."
+        "Weather warnings from MET Norway (for the county); flood and landslide warnings and "
+        "avalanche forecasts at moderate or above from NVE (for the municipality and its "
+        "forecasting regions), via Kildeverk. Check varsom.no and yr.no before acting."
     )
     ET.SubElement(feed, "link", rel="self", href=self_url)
     ET.SubElement(feed, "generator", uri=REPO_URL, version=__version__).text = "Kildeverk"
@@ -82,19 +84,59 @@ def build_feed(
             summary=" ".join(part for part in (w.get("warning"), w.get("advice")) if part) or "",
             link="https://www.varsom.no/",
         )
+    for f in avalanche or []:
+        stamp = f.get("published") or f"{f['date']}T00:00:00+00:00"
+        stamps.append(stamp)
+        _entry(
+            feed,
+            id_=f"urn:varsom:avalanche:{f['region_id']}:{f['date']}",
+            title=f"Avalanche danger {f['level']} ({f['level_name']}): {f['region']}",
+            updated=stamp,
+            summary=f.get("summary") or "",
+            link="https://www.varsom.no/",
+        )
     if not stamps:
         _entry(
             feed,
             id_=f"{self_url}#none-{now:%Y%m%d}",
             title=f"No warnings for {name} today",
             updated=now.isoformat(timespec="seconds"),
-            summary="No weather, flood or landslide warning at yellow or above is in force. "
-            + " ".join(notes),
+            summary="No weather, flood or landslide warning at yellow or above, and no avalanche "
+            "danger at moderate or above, is in force. " + " ".join(notes),
             link=None,
         )
     updated.text = max(stamps) if stamps else now.isoformat(timespec="seconds")
     ET.indent(feed)
     return b'<?xml version="1.0" encoding="utf-8"?>\n' + ET.tostring(feed, encoding="utf-8")
+
+
+AVALANCHE_FROM_LEVEL = 2  # moderate: the level from which Varsom asks people to take care
+
+
+async def _avalanche(ctx: Any, municipality: str) -> list[dict[str, Any]]:
+    """Today's avalanche forecasts at moderate or above for the regions covering a municipality.
+
+    Most municipalities are in no forecasting region; outside the season every level is 0.
+    """
+
+    from kildeverk.sources import composite
+    from kildeverk.sources.nve_varsom.ops import avalanche_regions_for
+
+    try:
+        regions = await avalanche_regions_for(ctx, municipality)
+    except ToolError:
+        return []
+    if not regions:
+        return []
+    summary = await composite._part(ctx, "hazards_avalanche", {})
+    if isinstance(summary, ToolError):
+        return []
+    today = min((f["date"] for f in summary["data"]["forecasts"]), default=None)
+    return [
+        f
+        for f in summary["data"]["forecasts"]
+        if f["region_id"] in regions and f["date"] == today and f["level"] >= AVALANCHE_FROM_LEVEL
+    ]
 
 
 def install(app: FastAPI) -> None:
@@ -109,12 +151,13 @@ def install(app: FastAPI) -> None:
                 ErrorCode.INVALID_ARGUMENT,
                 f"'{municipality}' is not a municipality; feeds are per municipality.",
             )
-        weather, hazards, region = await asyncio.gather(
+        weather, hazards, region, avalanche = await asyncio.gather(
             composite._part(ctx, "weather_warnings", {"county": code[:2]}),
             composite._part(ctx, "hazards_flood_landslide", {"municipality": code}),
             composite._part(
                 ctx, "regions_resolve", {"query": code, "level": "municipality", "limit": 1}
             ),
+            _avalanche(ctx, code),
         )
         notes = [
             f"{label} unavailable: {part.body.message}"
@@ -137,6 +180,7 @@ def install(app: FastAPI) -> None:
             hazards if isinstance(hazards, dict) else None,
             notes,
             dt.datetime.now(dt.UTC),
+            avalanche=avalanche,
         )
         return Response(
             body,

@@ -868,7 +868,8 @@ address; otherwise leave it empty.
 `/healthz` answers without calling any upstream, for platform health checks.
 
 `/v1/feeds/warnings/<municipality>.atom` is an Atom feed of the weather warnings for the
-municipality's county and the flood and landslide warnings for the municipality, for any feed
+municipality's county, the flood and landslide warnings for the municipality, and the avalanche
+forecasts at moderate or above for every forecasting region that covers part of it, for any feed
 reader. It takes a code (old or current) or a name, and is built from the same tools, so it shares
 their budgets and cache. On a quiet day it holds one entry saying there are no warnings.
 

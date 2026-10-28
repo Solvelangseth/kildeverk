@@ -160,6 +160,17 @@ async def _regions(ctx: Context) -> dict[int, str]:
     return {r["Id"]: r["Name"] for r in fetched.json or []}
 
 
+async def avalanche_regions_for(ctx: Context, municipality: str) -> dict[int, str]:
+    """The avalanche forecasting regions covering any part of a municipality (often several)."""
+
+    fetched = await ctx.upstream(SPEC.id).get_json(f"{AVALANCHE_URL}/Region", ttl="regions")
+    return {
+        r["Id"]: r["Name"]
+        for r in fetched.json or []
+        if any(str(m.get("Id")) == municipality for m in r.get("MunicipalityList") or [])
+    }
+
+
 def _heights(problem: dict[str, Any]) -> str | None:
     h1, h2 = problem.get("ExposedHeight1"), problem.get("ExposedHeight2")
     fill = problem.get("ExposedHeightFill")

@@ -83,6 +83,7 @@ def test_route_resolves_names_and_serves_atom(ctx, monkeypatch):
             "weather_warnings": WEATHER,
             "hazards_flood_landslide": HAZARDS,
             "regions_resolve": {"data": {"matches": [{"name": "Bergen"}]}},
+            "hazards_avalanche": {"data": {"forecasts": []}},
         }[tool]
 
     async def fake_region(ctx, value):
@@ -95,3 +96,50 @@ def test_route_resolves_names_and_serves_atom(ctx, monkeypatch):
     assert response.status_code == 200
     assert response.headers["content-type"].startswith("application/atom+xml")
     assert len(_parse(response.content).findall("a:entry", NS)) == 2
+
+
+AVALANCHE = [
+    {
+        "region_id": 3011,
+        "region": "Tromsø",
+        "date": "2026-03-10",
+        "level": 2,
+        "level_name": "moderate",
+        "summary": "Possible to trigger avalanches in wind slabs.",
+        "published": "2026-03-09T15:34:29+01:00",
+    }
+]
+
+
+def test_avalanche_forecasts_are_entries_too():
+    root = _parse(
+        build_feed("https://k.test", "5501", "Tromsø", None, None, [], NOW, avalanche=AVALANCHE)
+    )
+    [entry] = root.findall("a:entry", NS)
+    assert entry.findtext("a:title", namespaces=NS) == "Avalanche danger 2 (moderate): Tromsø"
+    assert entry.findtext("a:id", namespaces=NS) == "urn:varsom:avalanche:3011:2026-03-10"
+
+
+async def test_avalanche_regions_cover_a_municipality(ctx, monkeypatch):
+    from kildeverk.adapters import feeds
+
+    async def fake_regions(ctx, municipality):
+        return {3011: "Tromsø"} if municipality == "5501" else {}
+
+    async def fake_part(ctx, tool, arguments):
+        assert tool == "hazards_avalanche"
+        return {
+            "data": {
+                "forecasts": [
+                    {**AVALANCHE[0], "date": "2026-03-10"},
+                    {**AVALANCHE[0], "region_id": 3012, "region": "Lyngen", "level": 3},
+                    {**AVALANCHE[0], "date": "2026-03-11", "level": 4},
+                ]
+            }
+        }
+
+    monkeypatch.setattr("kildeverk.sources.nve_varsom.ops.avalanche_regions_for", fake_regions)
+    monkeypatch.setattr(composite, "_part", fake_part)
+    found = await feeds._avalanche(ctx, "5501")
+    assert [(f["region_id"], f["date"]) for f in found] == [(3011, "2026-03-10")]
+    assert await feeds._avalanche(ctx, "0301") == []

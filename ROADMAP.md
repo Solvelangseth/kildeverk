@@ -80,7 +80,7 @@ or a credential and cannot be done from the code alone.
 
 - [ ] A "Cite these sources" button under each "Try it" result on the website, using
       `cite_sources` on the result shown.
-- [ ] Avalanche forecasts in the warnings feed, mapping a municipality to its forecasting region.
+- [x] Avalanche forecasts in the warnings feed, mapping a municipality to its forecasting region.
 
 ## More from the same publishers
 
