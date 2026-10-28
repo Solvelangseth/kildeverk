@@ -1,0 +1,49 @@
+"""Everything a tool handler needs at run time, built once per process."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+import httpx
+
+from kildeverk.core.cache import ResponseCache
+from kildeverk.core.upstream import Upstream
+from kildeverk.settings import Settings
+from kildeverk.sources.registry import SOURCES
+
+
+@dataclass
+class Context:
+    settings: Settings
+    cache: ResponseCache
+    client: httpx.AsyncClient
+    upstreams: dict[str, Upstream]
+
+    def upstream(self, source_id: str) -> Upstream:
+        return self.upstreams[source_id]
+
+    async def aclose(self) -> None:
+        await self.client.aclose()
+        self.cache.close()
+
+
+def build_context(
+    settings: Settings | None = None,
+    *,
+    client: httpx.AsyncClient | None = None,
+    cache: ResponseCache | None = None,
+) -> Context:
+    settings = settings or Settings()
+    client = client or httpx.AsyncClient(timeout=settings.timeout_s, follow_redirects=True)
+    cache = cache or ResponseCache(settings.cache_path)
+    upstreams = {
+        spec.id: Upstream(
+            spec,
+            client=client,
+            cache=cache,
+            user_agent=settings.user_agent,
+            max_wait_s=settings.max_wait_s,
+        )
+        for spec in SOURCES
+    }
+    return Context(settings=settings, cache=cache, client=client, upstreams=upstreams)
