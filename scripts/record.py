@@ -64,6 +64,44 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ),
         ("companies_search", {"industry": ["62.010"]}),
     ],
+    "met_locationforecast": [
+        ("weather_forecast", {"lat": 60.3913, "lon": 5.3221, "hours": 24}),
+        ("weather_forecast", {"lat": 95, "lon": 5}),
+    ],
+    # Needs KILDEVERK_FROST_CLIENT_ID. Requests carry it as basic auth, and recorded
+    # exchanges keep no request headers, so it never reaches the fixtures.
+    "met_frost": [
+        ("weather_find_stations", {"lat": 60.3913, "lon": 5.3221, "limit": 3}),
+        ("weather_find_stations", {"name": "Blindern"}),
+        ("weather_station_elements", {"station": "SN50540", "element_search": "precipitation"}),
+        (
+            "weather_observations",
+            {
+                "station": "SN50540",
+                "elements": ["daily_mean_temperature", "daily_precipitation"],
+                "start": "2026-10-01",
+                "end": "2026-10-08",
+            },
+        ),
+        (
+            "weather_observations",
+            {
+                "station": "SN50540",
+                "elements": ["nonsense"],
+                "start": "2026-10-01",
+                "end": "2026-10-04",
+            },
+        ),
+        (
+            "weather_observations",
+            {
+                "station": "SN50540",
+                "elements": ["temperature"],
+                "start": "2030-10-01",
+                "end": "2030-10-04",
+            },
+        ),
+    ],
 }
 
 

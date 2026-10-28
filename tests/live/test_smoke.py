@@ -18,6 +18,7 @@ OPS = {op.name: op for op in operations()}
 
 @pytest.fixture
 async def live():
+    # Environment only (no .env file): CI passes the contact and the Frost id this way.
     ctx = build_context(Settings(_env_file=None), cache=ResponseCache(":memory:"))
     yield ctx
     await ctx.aclose()
@@ -62,3 +63,25 @@ async def test_brreg_lookup_and_search(live):
     assert company["data"]["name"] == "EQUINOR ASA"
     found = await OPS["companies_search"].invoke(live, {"name": "equinor", "limit": 3})
     assert found["data"]["companies"]
+
+
+async def test_met_forecast(live):
+    result = await OPS["weather_forecast"].invoke(live, {"lat": 59.9423, "lon": 10.72, "hours": 6})
+    assert len(result["data"]["points"]) >= 6
+
+
+async def test_frost_stations_and_observations(live):
+    if not live.settings.frost_client_id:
+        pytest.skip("KILDEVERK_FROST_CLIENT_ID is not set")
+    stations = await OPS["weather_find_stations"].invoke(live, {"name": "Blindern"})
+    assert "SN18700" in {s["id"] for s in stations["data"]["stations"]}
+    observed = await OPS["weather_observations"].invoke(
+        live,
+        {
+            "station": "SN18700",
+            "elements": ["daily_mean_temperature"],
+            "start": "2024-01-01",
+            "end": "2024-01-08",
+        },
+    )
+    assert observed["data"]["row_count"] == 7

@@ -25,6 +25,10 @@ class Settings(BaseSettings):
 
     timeout_s: float = 20.0
 
+    frost_client_id: str = ""
+    """Client id for MET Norway's Frost API (free at frost.met.no). Without it the
+    observation tools answer NOT_CONFIGURED; the forecast tool needs nothing."""
+
     @property
     def user_agent(self) -> str:
         contact = f"; {self.contact}" if self.contact else ""

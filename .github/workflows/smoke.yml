@@ -13,3 +13,4 @@ jobs:
       - run: uv run pytest -m live
         env:
           KILDEVERK_CONTACT: ${{ github.server_url }}/${{ github.repository }}
+          KILDEVERK_FROST_CLIENT_ID: ${{ secrets.FROST_CLIENT_ID }}

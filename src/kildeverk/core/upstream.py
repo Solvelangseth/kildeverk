@@ -20,7 +20,7 @@ from typing import Any
 import httpx
 
 from kildeverk.core.cache import Entry, ResponseCache
-from kildeverk.core.envelope import CacheInfo, Provenance, UpstreamRequest, citation
+from kildeverk.core.envelope import CacheInfo, Licence, Provenance, UpstreamRequest, citation
 from kildeverk.core.errors import ErrorCode, ToolError
 from kildeverk.core.ratelimit import TokenBucket
 from kildeverk.core.source import SourceSpec
@@ -43,10 +43,18 @@ class UpstreamClientError(ToolError):
     """Upstream answered 4xx. Sources catch this to explain it in their own terms."""
 
     def __init__(self, status: int, detail: str, *, source_id: str) -> None:
-        code = ErrorCode.NOT_FOUND if status == 404 else ErrorCode.INVALID_ARGUMENT
+        if status in (401, 403):
+            code = ErrorCode.NOT_CONFIGURED
+            message = (
+                f"The upstream service refused this service's credentials ({detail}). "
+                "Check the configured client id."
+            )
+        else:
+            code = ErrorCode.NOT_FOUND if status == 404 else ErrorCode.INVALID_ARGUMENT
+            message = f"The upstream service rejected the request: {detail}"
         super().__init__(
             code,
-            f"The upstream service rejected the request: {detail}",
+            message,
             source_id=source_id,
             upstream_status=status,
         )
@@ -63,9 +71,11 @@ class Upstream:
         cache: ResponseCache,
         user_agent: str,
         max_wait_s: float = 5.0,
+        auth: httpx.Auth | None = None,
         clock=time.time,
     ) -> None:
         self.spec = spec
+        self.auth = auth
         self.client = client
         self.cache = cache
         self.user_agent = user_agent
@@ -103,13 +113,18 @@ class Upstream:
             "POST", url, params=params, body=body, ttl=ttl, key_extra=key_extra, accept=None
         )
 
-    def provenance(self, fetched: Fetched, *, title: str) -> Provenance:
+    def provenance(
+        self, fetched: Fetched, *, title: str, licence: Licence | None = None
+    ) -> Provenance:
+        """`licence` overrides the spec's when the response itself states a different one."""
+
         spec = self.spec
+        licence = licence or spec.licence
         return Provenance(
             source_id=spec.id,
             source_name=spec.name,
             publisher=spec.publisher,
-            licence=spec.licence,
+            licence=licence,
             request=fetched.request,
             retrieved_at=fetched.retrieved_at,
             cache=fetched.cache,
@@ -118,7 +133,7 @@ class Upstream:
                 title=title,
                 retrieved_at=fetched.retrieved_at,
                 url=fetched.request.url,
-                licence=spec.licence,
+                licence=licence,
             ),
         )
 
@@ -179,7 +194,7 @@ class Upstream:
 
         self.upstream_calls += 1
         try:
-            response = await self.client.send(request)
+            response = await self.client.send(request, auth=self.auth or httpx.USE_CLIENT_DEFAULT)
         except httpx.TimeoutException:
             if stale is not None:
                 return self._serve_stale(stale, described, "upstream timed out")
@@ -254,6 +269,10 @@ class Upstream:
                 upstream_status=status,
             ) from None
 
+        if status == 203:
+            # MET's convention: 203 means this API version is deprecated and will be retired.
+            log.warning("%s marked %s as deprecated (HTTP 203)", self.spec.id, described.url)
+
         validators = {}
         if etag := response.headers.get("etag"):
             validators["etag"] = etag
@@ -323,8 +342,10 @@ def _detail(response: httpx.Response) -> str:
     except ValueError:
         text = response.text.strip()
         return text[:200] if text else f"HTTP {response.status_code}"
+    if isinstance(body, dict) and isinstance(body.get("error"), dict):
+        body = body["error"]
     if isinstance(body, dict):
-        for field_name in ("title", "message", "detail", "error"):
+        for field_name in ("reason", "title", "message", "detail", "error"):
             value = body.get(field_name)
             if isinstance(value, str) and value.strip():
                 return value.strip()[:200]

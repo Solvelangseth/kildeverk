@@ -19,7 +19,8 @@ publishers whose data it reads.
 | [SSB Statbank](#ssb_statbank) | ✅ available | `statistics_search_tables`, `statistics_describe_table`, `statistics_get_data` |
 | [SSB Klass](#ssb_klass): regions and harmonisation across the 2020 and 2024 reforms | ✅ available | `regions_list`, `regions_resolve`, `regions_changes`, `regions_harmonise` |
 | [Brønnøysund Register Centre (Enhetsregisteret)](#brreg) | ✅ available | `companies_search`, `companies_get` |
-| MET Norway (Locationforecast, Frost) | planned | |
+| [MET Norway Locationforecast](#met_locationforecast) | ✅ available | `weather_forecast` |
+| [MET Norway Frost](#met_frost): needs a free client id | ✅ available | `weather_find_stations`, `weather_station_elements`, `weather_observations` |
 | NVE HydAPI | planned, once its terms are confirmed | |
 | Entur (stops, departures) | planned | |
 | Kartverket (addresses, place names, elevation) | planned | |
@@ -247,6 +248,74 @@ public bodies, together with their sub-units (establishments).
 - One search pages through at most 10,000 results.
 - Financial statements, the register of beneficial owners and corporate group structure are not
   included.
+
+<a id="met_locationforecast"></a>
+### MET Norway Locationforecast
+
+**What it covers:** a weather forecast for any point. It gives temperature, precipitation, wind,
+cloud, humidity, pressure and a weather symbol: hourly for about the first 2.5 days, then 6-hourly up
+to about 10 days. `weather_forecast` needs no configuration.
+
+**Licence:** [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), also offered under NLOD 2.0,
+per [MET's licence page](https://api.met.no/doc/License). Credit goes to MET Norway.
+
+**Following MET's [terms of service](https://api.met.no/doc/TermsOfService):**
+- **User-Agent:** every request identifies Kildeverk and its contact (`KILDEVERK_CONTACT`).
+- **Caching:** a response is cached until its `Expires` time and then revalidated with
+  `If-Modified-Since`, which MET answers with 304 when nothing changed.
+- **Coordinates:** rounded to 3 decimals (about 110 m). MET allows at most 4. Rounding further lets
+  nearby requests share one cached forecast.
+- **Request rate:** at most 60 calls a minute, far below MET's 20 requests a second.
+- **Deprecation:** MET signals a deprecated API version with HTTP 203; Kildeverk logs it as a
+  warning.
+
+**Known gaps:**
+- Only the compact product is used, so there are no percentile (uncertainty) values.
+- Weather warnings (MetAlerts) and ocean forecasts are not included.
+- Each precipitation value covers its own `precipitation_hours` (1, 6 or 12). Add up only
+  non-overlapping periods.
+
+<a id="met_frost"></a>
+### MET Norway Frost
+
+**What it covers:** MET Norway's observation archive.
+- `weather_find_stations` finds stations near a point or by name.
+- `weather_station_elements` lists what a station measures, at which resolutions, and since when.
+- `weather_observations` returns hourly readings and daily or monthly aggregates over a period.
+  Friendly names cover the common cases (`daily_mean_temperature`, `daily_precipitation`,
+  `snow_depth`, …), and any Frost element id works too.
+
+**Setup:** Frost needs a free client id from
+[frost.met.no](https://frost.met.no/auth/requestCredentials.html). Set it as
+`KILDEVERK_FROST_CLIENT_ID`. Without it, these three tools answer `NOT_CONFIGURED` and the forecast
+still works. The id is sent as HTTP basic auth and never appears in URLs, provenance or fixtures.
+
+**Licence:** every Frost response states
+[CC BY 3.0 Norway](https://creativecommons.org/licenses/by/3.0/no/), and each result cites the
+licence its own response states. MET's [general licence page](https://api.met.no/doc/License) says
+NLOD 2.0 and CC BY 4.0 "unless specified otherwise". Both are attribution licences that allow
+redistribution.
+
+**Rate limits:** Frost publishes none. Kildeverk spends at most 30 calls a minute.
+
+**Caching:**
+- Station lists and element lists: 24 hours.
+- Observations for periods ending more than two days ago: 24 hours.
+- More recent observations: 10 minutes.
+
+**Behaviour worth knowing:**
+- Requests ask for each element's default series (`timeoffsets=default`, `levels=default`).
+  Without that, Frost also returns alternatives, such as daily precipitation counted from 18 UTC
+  as well as from 06 UTC, and they look like duplicates.
+- Each row carries `time_offset`, so the measured period is explicit. Daily precipitation with
+  `PT6H` runs from 06 UTC to 06 UTC.
+- An element the station doesn't measure returns `INVALID_ARGUMENT`, with a `next_call` to
+  `weather_station_elements`. A period with no data returns `NOT_FOUND` with Frost's own reason.
+
+**Known gaps:**
+- Only open data: series that need Frost's client secret are not available.
+- The newest observations can take an hour or more to appear.
+- At most ten years per call and 10,000 rows per answer.
 
 ## Development
 

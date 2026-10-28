@@ -39,6 +39,9 @@ def build_context(
     settings = settings or Settings()
     client = client or httpx.AsyncClient(timeout=settings.timeout_s, follow_redirects=True)
     cache = cache or ResponseCache(settings.cache_path)
+    credentials: dict[str, httpx.Auth] = {}
+    if settings.frost_client_id:
+        credentials["met_frost"] = httpx.BasicAuth(settings.frost_client_id, "")
     upstreams = {
         spec.id: Upstream(
             spec,
@@ -46,6 +49,7 @@ def build_context(
             cache=cache,
             user_agent=settings.user_agent,
             max_wait_s=settings.max_wait_s,
+            auth=credentials.get(spec.id),
         )
         for spec in SOURCES
     }
