@@ -44,6 +44,11 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ),
         ("statistics_get_data", {"table_id": "07459", "codelists": {"Region": "agg_Fylker2024"}}),
     ],
+    # Every region tool reads the same two responses per level, so these cover them all.
+    "ssb_klass": [
+        ("regions_list", {"level": "municipality"}),
+        ("regions_list", {"level": "county"}),
+    ],
 }
 
 

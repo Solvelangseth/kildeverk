@@ -17,7 +17,7 @@ publishers whose data it reads.
 | Source | Status | Tools |
 | --- | --- | --- |
 | [SSB Statbank](#ssb_statbank) | ✅ available | `statistics_search_tables`, `statistics_describe_table`, `statistics_get_data` |
-| SSB Klass (regions, harmonisation across the 2020 and 2024 reforms) | planned | |
+| [SSB Klass](#ssb_klass): regions and harmonisation across the 2020 and 2024 reforms | ✅ available | `regions_list`, `regions_resolve`, `regions_changes`, `regions_harmonise` |
 | Brønnøysund Register Centre (Enhetsregisteret) | planned | |
 | MET Norway (Locationforecast, Frost) | planned | |
 | NVE HydAPI | planned, once its terms are confirmed | |
@@ -155,6 +155,56 @@ Kildeverk spends at most 25 per minute and returns at most 10,000 rows per call.
   terms need `lang: "no"`. The tool adds a note saying so when an English search finds nothing.
 - Codes in dimensions queried through a codelist are not checked locally; SSB checks them.
 - Only SSB's Statbank is included, not PxWeb databases run by other agencies.
+
+<a id="ssb_klass"></a>
+### SSB Klass: regions and their history
+
+**What it covers:** every Norwegian municipality and county code since 1960, read from Statistics
+Norway's classification service Klass:
+- names and validity periods for every code;
+- every recorded change: mergers, splits, renumberings and renamings, with their dates;
+- conversion of a regional series to the borders of another date.
+
+**Licence:** [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), stated in the
+[Klass API guide](https://data.ssb.no/api/klass/v1/api-guide.html#_license).
+
+**Rate limits:** Klass publishes none. Kildeverk holds itself to the same 25 calls per minute as for
+Statbank. Every region tool reads the same two responses per level (all codes and all changes since
+1960), and both are cached for 24 hours. In practice that means a handful of upstream calls per day.
+
+**How harmonisation works (`regions_harmonise`):**
+
+The history is a graph of *units*. A unit is one code over one stretch of time during which its
+territory, as far as Klass records it, did not change. A code alone is not enough, for two reasons:
+- Codes are reused: `0712` was Skoger until 1964 and Larvik from 2018.
+- A code can keep its number while its territory grows: Stavanger kept `1103` when it absorbed
+  Finnøy and Rennesøy in 2020.
+
+Each input row is placed in the unit that was valid in its year, then followed through the
+recorded changes to the target date, forwards or backwards in time.
+
+| Situation | What happens |
+| --- | --- |
+| Code unchanged, or only renumbered (1201 Bergen → 4601) | value carried over |
+| Several regions merged into one, every piece present, additive measure | values summed |
+| A piece of a merger is missing from the input | not converted; the reason names the missing codes |
+| A region was split (Snillfjord 2020, Ålesund 2024, Viken 2024) | not converted: Klass does not say how values divided, and nothing is estimated |
+| Going back across a merger (2024 Stavanger → 2019 borders) | the same as a split, so not converted |
+| Rates, shares and averages (`measure: "non_additive"`) | renumbered, never summed |
+| Zero for a code in a year it did not exist | dropped as an SSB placeholder, and counted |
+| Values for the same area from two border vintages in one period | not converted, so nothing is counted twice |
+
+Every answer lists each input code's mapping (`unchanged`, `renumbered`, `merged`, `split` or
+`no_successor`) and every row it could not convert, with the reason.
+
+**Known gaps:**
+- Klass records changes of code, not every small boundary adjustment between municipalities that
+  kept their codes. Those transfers are invisible here.
+- A split is never converted, even approximately. Population-weighted estimates may come later,
+  clearly marked as estimates.
+- Periods are read by year, so a change in the middle of a year is placed in that year.
+- Codes valid only before 1960 are unknown.
+- Codes for unknown or unspecified areas, such as `9999` "Uoppgitt", are listed like any other code.
 
 ## Development
 

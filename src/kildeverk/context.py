@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Any
 
 import httpx
 
@@ -18,6 +19,8 @@ class Context:
     cache: ResponseCache
     client: httpx.AsyncClient
     upstreams: dict[str, Upstream]
+    memo: dict[Any, Any] = field(default_factory=dict)
+    """Derived structures worth keeping between calls, keyed by what they were built from."""
 
     def upstream(self, source_id: str) -> Upstream:
         return self.upstreams[source_id]
