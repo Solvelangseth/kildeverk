@@ -82,7 +82,7 @@ or a credential and cannot be done from the code alone.
       `cite_sources` on the result shown.
 - [x] Avalanche forecasts in the warnings feed, mapping a municipality to its forecasting region.
 
-- [ ] A "Subscribe" link on the website for any municipality's warnings feed, with a name box
+- [x] A "Subscribe" link on the website for any municipality's warnings feed, with a name box
       that resolves to the feed URL.
 - [ ] Show per-tool health on the website from the daily live run: green when a tool's examples
       passed today, with the date of the last failure.

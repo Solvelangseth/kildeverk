@@ -222,6 +222,8 @@ h2 + p {{ color: var(--muted); margin-top: 0; max-width: 46rem; }}
 .panel h3 {{ margin: 0 0 8px; font-size: 1.05rem; }}
 pre {{ background: var(--code-bg); padding: 12px; border-radius: 8px; overflow-x: auto; margin: 8px 0 0; }}
 .copyline {{ display: flex; gap: 8px; align-items: center; }}
+.copyline input {{ flex: 1; min-width: 0; font: inherit; padding: 7px 10px; border-radius: 7px;
+  border: 1px solid var(--line); background: var(--code-bg); color: var(--ink); }}
 .copyline code {{ flex: 1; padding: 8px 10px; overflow-x: auto; white-space: nowrap; }}
 button {{ font: inherit; border: 0; border-radius: 7px; padding: 7px 14px; cursor: pointer;
   background: var(--accent); color: var(--accent-ink); font-weight: 600; }}
@@ -312,6 +314,15 @@ footer {{ border-top: 1px solid var(--line); margin-top: 30px; padding: 22px 0 4
            "kildeverk", "serve"]}}}}}}</code></pre>
         <p class="muted small">Your own upstream budget and cache. MIT licensed.</p>
       </div>
+      <div class="panel">
+        <h3>Warnings for your municipality</h3>
+        <form id="feed-form" class="copyline">
+          <input id="feed-name" type="text" placeholder="e.g. Tromsø or 4601" aria-label="Municipality name or number">
+          <button type="submit">Get feed</button>
+        </form>
+        <p id="feed-result" class="small" hidden></p>
+        <p class="muted small">Weather, flood, landslide and avalanche warnings in one Atom feed, for any feed reader.</p>
+      </div>
     </div>
   </section>
 
@@ -388,6 +399,32 @@ footer {{ border-top: 1px solid var(--line); margin-top: 30px; padding: 22px 0 4
     }}
     return fetch(t.url);
   }}
+
+  // Check the name resolves (the feed answers JSON errors) before offering the link.
+  var feedForm = document.getElementById("feed-form");
+  if (feedForm) feedForm.addEventListener("submit", function (e) {{
+    e.preventDefault();
+    var name = document.getElementById("feed-name").value.trim();
+    var result = document.getElementById("feed-result");
+    if (!name) return;
+    var url = "/v1/feeds/warnings/" + encodeURIComponent(name) + ".atom";
+    fetch(url).then(function (r) {{
+      result.hidden = false;
+      if (r.ok) return r.text().then(function (xml) {{
+        var doc = new DOMParser().parseFromString(xml, "application/xml");
+        var title = (doc.querySelector("feed > title") || {{}}).textContent || "Warnings";
+        // The feed's own self link uses the municipality number, so it survives spelling.
+        var self = doc.querySelector('feed > link[rel="self"]');
+        var full = self ? self.getAttribute("href") : (origin + url);
+        result.innerHTML = "";
+        var a = document.createElement("a"); a.href = full; a.textContent = full;
+        result.append(title + ": ", a);
+      }});
+      return r.json().then(function (body) {{
+        result.textContent = (body.error && body.error.message) || "No feed for that name.";
+      }});
+    }});
+  }});
 
   function shellQuote(text) {{ return "'" + text.replace(/'/g, "'\\''") + "'"; }}
 
