@@ -146,6 +146,9 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ("transit_departures", {"stop": "NSR:StopPlace:999999999"}),
     ],
     "kartverket": [
+        ("regions_at_point", {"lat": 60.39, "lon": 5.32}),
+        ("regions_at_point", {"lat": 59.0, "lon": 5.0}),
+        ("regions_at_point", {"lat": 66.0, "lon": 1.0}),
         ("addresses_search", {"query": "Karl Johans gate 22 Oslo"}),
         ("addresses_search", {"lat": 59.9139, "lon": 10.7522, "radius_m": 50}),
         ("addresses_search", {"postcode": "0184", "limit": 3}),
@@ -219,6 +222,47 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ("catalog_search", {"query": "vær", "kind": "data_services"}),
         ("catalog_search", {"themes": ["TRAN"], "formats": ["CSV"], "limit": 5}),
         ("catalog_search", {"query": "qqxxzzvvyy"}),
+    ],
+    "met_metalerts": [
+        ("weather_warnings", {"month": "2023-08", "min_level": 3}),
+        ("weather_warnings", {"month": "2023-08", "county": "03"}),
+        ("weather_warnings", {"month": "2023-08", "lat": 60.17, "lon": 10.25, "min_level": 1}),
+        ("weather_warnings", {"month": "2023-08", "domain": "marine", "min_level": 4}),
+    ],
+    "kartverket_sea_level": [
+        (
+            "sea_level",
+            {"lat": 60.396, "lon": 5.32, "start": "2026-10-27T00:00", "end": "2026-10-27T06:00"},
+        ),
+        (
+            "sea_level",
+            {
+                "station": "BGO",
+                "kind": "tide_table",
+                "start": "2026-10-27T00:00",
+                "end": "2026-10-29T00:00",
+            },
+        ),
+        (
+            "sea_level",
+            {
+                "lat": 59.91,
+                "lon": 10.73,
+                "reference": "mean_sea_level",
+                "start": "2026-10-01T00:00",
+                "end": "2026-10-01T03:00",
+            },
+        ),
+        ("sea_level", {"lat": 61.5, "lon": 9.0, "start": "2026-10-27T00:00"}),
+        ("sea_level", {"station": "XXX", "start": "2026-10-27T00:00"}),
+        (
+            "sea_level",
+            {"lat": 63.0, "lon": 7.5, "start": "2026-10-27T00:00", "end": "2026-10-27T03:00"},
+        ),
+    ],
+    "nve_reservoirs": [
+        ("energy_reservoirs", {}),
+        ("energy_reservoirs", {"areas": ["NO2"], "from_year": 2022, "to_year": 2022}),
     ],
 }
 

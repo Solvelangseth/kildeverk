@@ -1,6 +1,36 @@
 [
  {
   "method": "GET",
+  "url": "https://api.kartverket.no/kommuneinfo/v1/punkt?nord=60.39&ost=5.32&koordsys=4258",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "response": "{\"fylkesnavn\":\"Vestland\",\"fylkesnummer\":\"46\",\"kommunenavn\":\"Bergen\",\"kommunenummer\":\"4601\"}\n"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.kartverket.no/kommuneinfo/v1/punkt?nord=59.0&ost=5.0&koordsys=4258",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "response": "{\"fylkesnavn\":\"Rogaland\",\"fylkesnummer\":\"11\",\"kommunenavn\":\"Karm\\u00f8y\",\"kommunenummer\":\"1149\"}\n"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.kartverket.no/kommuneinfo/v1/punkt?nord=66.0&ost=1.0&koordsys=4258",
+  "body": "",
+  "status": 404,
+  "headers": {
+   "content-type": "text/html; charset=utf-8"
+  },
+  "response": "<!doctype html>\n<html lang=en>\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>Ingen treff, sjekk parameterene.</p>\n"
+ },
+ {
+  "method": "GET",
   "url": "https://ws.geonorge.no/adresser/v1/sok?utkoordsys=4258&treffPerSide=10&sok=Karl+Johans+gate+22+Oslo",
   "body": "",
   "status": 200,

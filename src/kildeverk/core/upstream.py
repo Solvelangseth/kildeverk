@@ -12,6 +12,7 @@ import hashlib
 import json
 import logging
 import time
+import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
@@ -33,6 +34,7 @@ DEFAULT_RETRY_AFTER_S = 60.0
 @dataclass
 class Fetched:
     json: Any
+    """The parsed body: JSON values, or the root element for an XML upstream."""
     request: UpstreamRequest
     retrieved_at: datetime
     cache: CacheInfo
@@ -100,6 +102,22 @@ class Upstream:
             "GET", url, params=params, body=None, ttl=ttl, key_extra=key_extra, accept=accept
         )
 
+    async def get_xml(
+        self, url: str, *, params: dict[str, Any] | None = None, ttl: str, key_extra: str = ""
+    ) -> Fetched:
+        """For the few upstreams that only speak XML; `json` holds the root element."""
+
+        return await self._fetch(
+            "GET",
+            url,
+            params=params,
+            body=None,
+            ttl=ttl,
+            key_extra=key_extra,
+            accept="application/xml",
+            fmt="xml",
+        )
+
     async def post_json(
         self,
         url: str,
@@ -147,6 +165,7 @@ class Upstream:
         ttl: str,
         key_extra: str,
         accept: str | None,
+        fmt: str = "json",
     ) -> Fetched:
         request = self.client.build_request(
             method,
@@ -160,11 +179,11 @@ class Upstream:
 
         entry = await self.cache.get(key)
         if entry is not None and entry.fresh(self._clock()):
-            return self._from_entry(entry, described, hit=True)
+            return self._from_entry(entry, described, hit=True, fmt=fmt)
 
         task = self._inflight.get(key)
         if task is None:
-            task = asyncio.ensure_future(self._send(request, described, key, entry, ttl))
+            task = asyncio.ensure_future(self._send(request, described, key, entry, ttl, fmt))
             self._inflight[key] = task
             task.add_done_callback(lambda _: self._inflight.pop(key, None))
         return await asyncio.shield(task)
@@ -176,13 +195,14 @@ class Upstream:
         key: str,
         stale: Entry | None,
         ttl: str,
+        fmt: str = "json",
     ) -> Fetched:
         try:
             await self.bucket.acquire(max_wait_s=self.max_wait_s)
         except ToolError:
             if stale is not None:
                 return self._serve_stale(
-                    stale, described, "this service's request budget is used up"
+                    stale, described, "this service's request budget is used up", fmt
                 )
             raise
 
@@ -197,7 +217,7 @@ class Upstream:
             response = await self.client.send(request, auth=self.auth or httpx.USE_CLIENT_DEFAULT)
         except httpx.TimeoutException:
             if stale is not None:
-                return self._serve_stale(stale, described, "upstream timed out")
+                return self._serve_stale(stale, described, "upstream timed out", fmt)
             raise ToolError(
                 ErrorCode.UPSTREAM_TIMEOUT,
                 f"{self.spec.name} did not answer in time. Retry in a little while.",
@@ -207,7 +227,7 @@ class Upstream:
         except httpx.TransportError as exc:
             log.warning("transport error from %s: %s", self.spec.id, exc)
             if stale is not None:
-                return self._serve_stale(stale, described, "upstream could not be reached")
+                return self._serve_stale(stale, described, "upstream could not be reached", fmt)
             raise ToolError(
                 ErrorCode.UPSTREAM_UNAVAILABLE,
                 f"{self.spec.name} could not be reached. Retry in a little while.",
@@ -224,13 +244,13 @@ class Upstream:
                 validators=stale.validators,
                 ttl_s=self._ttl(ttl, response),
             )
-            return self._from_entry(entry, described, hit=True)
+            return self._from_entry(entry, described, hit=True, fmt=fmt)
 
         if status == 429:
             wait = _retry_after(response) or DEFAULT_RETRY_AFTER_S
             self.bucket.block_for(wait)
             if stale is not None:
-                return self._serve_stale(stale, described, "upstream rate limit reached")
+                return self._serve_stale(stale, described, "upstream rate limit reached", fmt)
             raise ToolError(
                 ErrorCode.RATE_LIMITED,
                 f"{self.spec.name} is rate limiting requests. Wait {wait:.0f} seconds and repeat "
@@ -243,7 +263,7 @@ class Upstream:
         if status >= 500:
             log.warning("%s answered %s for %s", self.spec.id, status, described.url)
             if stale is not None:
-                return self._serve_stale(stale, described, f"upstream answered {status}")
+                return self._serve_stale(stale, described, f"upstream answered {status}", fmt)
             raise ToolError(
                 ErrorCode.UPSTREAM_UNAVAILABLE,
                 f"{self.spec.name} is having problems (HTTP {status}). Retry in a little while.",
@@ -260,11 +280,12 @@ class Upstream:
             raise UpstreamClientError(status, _detail(response), source_id=self.spec.id)
 
         try:
-            json.loads(response.content)
-        except ValueError:
+            _parse(response.content, fmt)
+        except (ValueError, ET.ParseError):
             raise ToolError(
                 ErrorCode.UPSTREAM_CHANGED,
-                f"{self.spec.name} returned something that is not JSON. Its API may have changed.",
+                f"{self.spec.name} returned something that is not {fmt.upper()}. Its API may "
+                "have changed.",
                 source_id=self.spec.id,
                 upstream_status=status,
             ) from None
@@ -286,7 +307,7 @@ class Upstream:
             ttl_s=self._ttl(ttl, response),
             retrieved_at=self._clock(),
         )
-        return self._from_entry(entry, described, hit=False)
+        return self._from_entry(entry, described, hit=False, fmt=fmt)
 
     def _ttl(self, kind: str, response: httpx.Response) -> float:
         ttl = float(self.spec.cache_ttls_s[kind])
@@ -297,22 +318,31 @@ class Upstream:
                 pass
         return ttl
 
-    def _from_entry(self, entry: Entry, described: UpstreamRequest, *, hit: bool) -> Fetched:
+    def _from_entry(
+        self, entry: Entry, described: UpstreamRequest, *, hit: bool, fmt: str = "json"
+    ) -> Fetched:
         return Fetched(
-            json=json.loads(entry.body),
+            json=_parse(entry.body, fmt),
             request=described,
             retrieved_at=datetime.fromtimestamp(entry.retrieved_at, UTC),
             cache=CacheInfo(hit=hit, age_s=round(max(0.0, self._clock() - entry.retrieved_at), 1)),
         )
 
-    def _serve_stale(self, entry: Entry, described: UpstreamRequest, why: str) -> Fetched:
-        fetched = self._from_entry(entry, described, hit=True)
+    def _serve_stale(
+        self, entry: Entry, described: UpstreamRequest, why: str, fmt: str = "json"
+    ) -> Fetched:
+        fetched = self._from_entry(entry, described, hit=True, fmt=fmt)
         fetched.cache.stale = True
         fetched.notes.append(
             f"Served an expired cached copy from {fetched.retrieved_at:%Y-%m-%d %H:%M} UTC "
             f"because {why}."
         )
         return fetched
+
+
+def _parse(body: bytes, fmt: str) -> Any:
+    # Python's expat refuses external entities and entity expansion attacks by default.
+    return ET.fromstring(body) if fmt == "xml" else json.loads(body)
 
 
 def _cache_key(request: UpstreamRequest, extra: str) -> str:

@@ -20,14 +20,17 @@ publishers whose data it reads.
 | [SSB Klass](#ssb_klass): regions and harmonisation across the 2020 and 2024 reforms | ✅ available | `regions_list`, `regions_resolve`, `regions_changes`, `regions_harmonise` |
 | [Brønnøysund Register Centre (Enhetsregisteret)](#brreg) | ✅ available | `companies_search`, `companies_get` |
 | [MET Norway Locationforecast](#met_locationforecast) | ✅ available | `weather_forecast` |
+| [MET Norway MetAlerts](#met_metalerts): weather warnings | ✅ available | `weather_warnings` |
 | [MET Norway Frost](#met_frost): needs a free client id | ✅ available | `weather_find_stations`, `weather_station_elements`, `weather_observations` |
 | [NVE HydAPI](#nve_hydapi): needs a free key | ✅ available | `water_find_stations`, `water_observations` |
 | [Entur Geocoder](#entur_geocoder): stop places | ✅ available | `transit_find_stops` |
 | [Entur Journey Planner](#entur_journeyplanner): departures | ✅ available | `transit_departures` |
-| [Kartverket](#kartverket): addresses, place names, elevation | ✅ available | `addresses_search`, `places_search`, `terrain_elevation` |
+| [Kartverket](#kartverket): addresses, place names, elevation, municipality at a point | ✅ available | `addresses_search`, `places_search`, `terrain_elevation`, `regions_at_point` |
+| [Kartverket water level and tides](#kartverket_sea_level) | ✅ available | `sea_level` |
 | [Norges Bank](#norges_bank): exchange rates and the policy rate | ✅ available | `currency_exchange_rates`, `rates_policy_rate` |
 | [NVE Varsom](#nve_varsom): flood, landslide and avalanche warnings | ✅ available | `hazards_flood_landslide`, `hazards_avalanche` |
 | [data.norge.no](#datanorge): the national data catalogue | ✅ available | `catalog_search` |
+| [NVE reservoir statistics](#nve_reservoirs): hydropower reservoir fill | ✅ available | `energy_reservoirs` |
 
 Two tools describe the service itself: `sources_list` and `service_status`.
 
@@ -276,6 +279,32 @@ per [MET's licence page](https://api.met.no/doc/License). Credit goes to MET Nor
 - Each precipitation value covers its own `precipitation_hours` (1, 6 or 12). Add up only
   non-overlapping periods.
 
+<a id="met_metalerts"></a>
+### MET Norway MetAlerts: weather warnings
+
+**What it covers:** MET Norway's official weather warnings for land and sea.
+- `weather_warnings` gives the warnings in force or announced now, or those of any past month from
+  the archive. They cover wind, gale, rain, snow, ice, storm surge, forest fire danger, polar lows
+  and more. You can filter by point, county, or land and sea. Each warning has its level, area,
+  counties, period, description, consequences and advice, and a link to MET's page for it.
+
+For flood, landslide and avalanche warnings, which NVE issues, use [NVE Varsom](#nve_varsom).
+
+**Licence:** [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) (also NLOD), as for the
+forecast.
+
+**Rate limits and caching:** shared with the forecast's rules: Kildeverk honours `Expires`, and
+caches current warnings for 5 minutes and archive months for 24 hours.
+
+**Behaviour worth knowing:**
+- The archive keeps every revision of a warning. Kildeverk returns the latest revision of each and
+  says how many earlier ones it left out. Cancelled warnings are left out too.
+- A revision can raise or lower the level. `level` is the latest; `highest_level` is the highest
+  any revision reached. Filtering and sorting use `highest_level`, so the August 2023 storm Hans
+  warning that was eased to orange at the end still shows as the red warning it was.
+- County numbers are those in force when the warning was issued. Before 2024 that means the
+  2020-2023 counties; [SSB Klass](#ssb_klass) can map them.
+
 <a id="met_frost"></a>
 ### MET Norway Frost
 
@@ -435,6 +464,10 @@ identical questions costs one upstream call; the result says when it came from t
   language the register holds, including Sámi and Kven names.
 - `terrain_elevation` gives the height above sea level at up to 50 points. Lakes give their surface
   height, and the sea gives its depth as a negative value. Each value says which model it came from.
+- `regions_at_point` tells you which municipality and county a coordinate lies in. Its codes work in
+  every tool that filters by municipality or county, so it joins a location to statistics,
+  companies, addresses and warnings. Municipalities include their sea territory; a point beyond it,
+  abroad, or on Svalbard or Jan Mayen (which have no municipalities) answers `NOT_FOUND`.
 
 **Licence:** [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), per Kartverket's
 [terms of use](https://www.kartverket.no/api-og-data/vilkar-for-bruk), which ask for the credit
@@ -575,6 +608,68 @@ service run for people using data.norge.no.
 **Known gaps:**
 - Concepts, information models and public services in the catalogue are not searched.
 - How complete and accurate an entry is depends on its publisher.
+
+<a id="kartverket_sea_level"></a>
+### Kartverket: water level and tides
+
+**What it covers:** sea level along the Norwegian coast from Kartverket's Hydrographic Service.
+- `sea_level` gives, for any coastal point or tide gauge, the observed water level, the tidal
+  prediction, the effect of wind and air pressure, and a forecast for the next few days. With
+  `kind: "tide_table"` it gives the times and heights of high and low water instead. Heights can be
+  above chart datum (as in tide tables and sea charts), mean sea level, or NN2000.
+
+Observations exist only at the roughly 25 permanent tide gauges. Elsewhere every value is modelled
+from the nearest gauge, and the result names that gauge and says how it was adjusted.
+
+**Licence:** [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The
+[API protocol](https://vannstand.kartverket.no/tideapi_en.html) asks that the Norwegian Mapping
+Authority, Hydrographic Service, be credited.
+
+**Rate limits:** none published, but Kartverket asks users to cache and not to poll heavily.
+Kildeverk spends at most 20 calls a minute.
+
+**Caching:**
+- Periods reaching into the last day: 15 minutes.
+- Older periods: 24 hours.
+- Calls without a period round "now" to the hour, so they share a cached response within the hour.
+
+**Behaviour worth knowing:**
+- This API answers in XML; Kildeverk's upstream gateway parses it with the same cache, budget and
+  provenance as every JSON source.
+- Times are Norwegian local time with their offset. The API reads requested times as UTC+1 all
+  year, so Kildeverk converts them; without that, summer periods would start an hour late.
+- A point inland or far offshore answers `NOT_FOUND` with Kartverket's reason.
+- Water level periods can be up to 31 days, tide tables up to a year.
+
+**Known gaps:**
+- Return levels (the 20-, 200- and 1000-year storm surge) are not exposed yet.
+
+<a id="nve_reservoirs"></a>
+### NVE reservoir statistics: hydropower reservoir fill
+
+**What it covers:** how full Norway's hydropower reservoirs are. NVE measures the 490 largest
+reservoirs every week.
+- `energy_reservoirs` gives the fill in per cent and TWh, the capacity, and the change from the week
+  before. Areas are the whole country, the electricity price areas NO1-NO5, or the watercourse
+  regions VASS1-VASS4. Each week also carries the lowest, median and highest fill for the same week
+  over the last 20 years. By default it gives the latest week and the date of the next publication;
+  give years for history back to 1995.
+
+**Licence:** [NLOD](https://data.norge.no/nlod/en/2.0), stated in
+[NVE's API documentation](https://api.nve.no/doc/magasinstatistikk/).
+
+**Rate limits:** none published. Kildeverk spends at most 10 calls a minute.
+
+**Caching:** the latest week for 1 hour; the full history and the 20-year range for 6 hours.
+
+**Behaviour worth knowing:**
+- Figures are published on Wednesdays for the week before. A week's date is the Sunday its
+  measurements refer to.
+- History comes from one upstream response covering every area since 1995, so any range of years
+  costs the same single cached call.
+
+**Known gaps:**
+- Individual reservoirs are not published, only area totals.
 
 ## Development
 

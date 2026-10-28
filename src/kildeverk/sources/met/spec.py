@@ -4,6 +4,7 @@ from kildeverk.core.source import Budget, SourceSpec
 PUBLISHER = "Norwegian Meteorological Institute (MET Norway)"
 
 FORECAST_URL = "https://api.met.no/weatherapi/locationforecast/2.0/compact"
+METALERTS_URL = "https://api.met.no/weatherapi/metalerts/2.0"
 FROST_URL = "https://frost.met.no"
 FROST_CREDENTIALS_URL = "https://frost.met.no/auth/requestCredentials.html"
 
@@ -79,5 +80,37 @@ FROST = SourceSpec(
             "Frost states CC BY 3.0 Norway on every response, while MET's general licence page "
             "says NLOD 2.0 and CC BY 4.0; results cite what Frost states"
         ),
+    ],
+)
+
+METALERTS = SourceSpec(
+    id="met_metalerts",
+    name="MET Norway MetAlerts",
+    publisher=PUBLISHER,
+    homepage="https://api.met.no/",
+    docs_url="https://api.met.no/weatherapi/metalerts/2.0/documentation",
+    terms_url="https://api.met.no/doc/License",
+    licence=LOCATIONFORECAST.licence,
+    budget=Budget(
+        rate_per_s=50 / 60,
+        capacity=10,
+        upstream_limit="20 requests per second per application; respect Expires; "
+        "identify with User-Agent",
+    ),
+    cache_ttls_s={"current": 300, "archive": 86_400},
+    honour_expires=True,
+    covers=[
+        (
+            "Official weather warnings for land and sea: wind, gale, rain, snow, ice, storm "
+            "surge, forest fire danger, polar lows and more, with level, area and advice"
+        ),
+        "The archive of past warnings, month by month",
+    ],
+    known_gaps=[
+        (
+            "County codes are those in force when a warning was issued, so warnings before 2024 "
+            "use the 2020 counties"
+        ),
+        "Warning areas are returned as names, not polygons",
     ],
 )

@@ -9,7 +9,7 @@ from typing import Any
 
 from kildeverk.context import Context
 from kildeverk.core.envelope import Result
-from kildeverk.core.errors import ErrorCode, ToolError
+from kildeverk.core.errors import ErrorCode, NextCall, ToolError
 from kildeverk.core.operation import Operation
 from kildeverk.core.upstream import UpstreamClientError
 from kildeverk.sources.kartverket.models import (
@@ -25,8 +25,16 @@ from kildeverk.sources.kartverket.models import (
     PlaceName,
     PlaceSearchInput,
     PlaceSearchOutput,
+    RegionsAtPointInput,
+    RegionsAtPointOutput,
 )
-from kildeverk.sources.kartverket.spec import ADDRESSES_URL, ELEVATION_URL, PLACES_URL, SPEC
+from kildeverk.sources.kartverket.spec import (
+    ADDRESSES_URL,
+    ELEVATION_URL,
+    MUNICIPALITY_URL,
+    PLACES_URL,
+    SPEC,
+)
 
 # Coordinates in and out are plain WGS84-compatible latitude and longitude (ETRS89).
 CRS = 4258
@@ -295,6 +303,40 @@ async def elevation(ctx: Context, args: ElevationInput) -> Result[ElevationOutpu
     )
 
 
+# --- regions_at_point --------------------------------------------------------------
+
+
+async def regions_at_point(ctx: Context, args: RegionsAtPointInput) -> Result[RegionsAtPointOutput]:
+    up = ctx.upstream(SPEC.id)
+    params = {"nord": round(args.lat, 5), "ost": round(args.lon, 5), "koordsys": CRS}
+    try:
+        fetched = await up.get_json(f"{MUNICIPALITY_URL}/punkt", params=params, ttl="boundaries")
+    except UpstreamClientError as exc:
+        if exc.status != 404:
+            raise _rejected(exc, "municipality") from None
+        raise ToolError(
+            ErrorCode.NOT_FOUND,
+            f"({args.lat}, {args.lon}) is in no Norwegian municipality: it is outside the "
+            "territorial sea, abroad, or on Svalbard or Jan Mayen, which have none.",
+            next_call=NextCall(
+                tool="places_search", arguments={"lat": args.lat, "lon": args.lon, "radius_m": 5000}
+            ),
+            source_id=SPEC.id,
+            upstream_status=404,
+        ) from None
+    body = fetched.json
+    return Result(
+        data=RegionsAtPointOutput(
+            municipality_code=body["kommunenummer"],
+            municipality=body["kommunenavn"],
+            county_code=body["fylkesnummer"],
+            county=body["fylkesnavn"],
+        ),
+        provenance=[up.provenance(fetched, title="Kartverket municipality at point")],
+        notes=[*fetched.notes, "Municipalities include their sea territory out to the baseline."],
+    )
+
+
 OPERATIONS = (
     Operation(
         name="addresses_search",
@@ -351,5 +393,21 @@ OPERATIONS = (
         http_method="POST",
         http_path="/v1/terrain/elevation",
         examples=({"points": [{"lat": 61.63644, "lon": 8.31248}, {"lat": 59.91, "lon": 10.75}]},),
+    ),
+    Operation(
+        name="regions_at_point",
+        title="Municipality and county at a point",
+        description=(
+            "Which municipality and county a coordinate lies in, by Kartverket's current "
+            "boundaries. The codes plug straight into the statistics, company, address, warning "
+            "and region tools, so this joins a location to everything filed by municipality."
+        ),
+        input_model=RegionsAtPointInput,
+        output_model=RegionsAtPointOutput,
+        handler=regions_at_point,
+        source_ids=(SPEC.id,),
+        http_method="GET",
+        http_path="/v1/regions/at-point",
+        examples=({"lat": 60.39, "lon": 5.32}, {"lat": 69.65, "lon": 18.96}),
     ),
 )

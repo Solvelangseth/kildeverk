@@ -4,6 +4,7 @@ from kildeverk.core.source import Budget, SourceSpec
 ADDRESSES_URL = "https://ws.geonorge.no/adresser/v1"
 PLACES_URL = "https://api.kartverket.no/stedsnavn/v1"
 ELEVATION_URL = "https://ws.geonorge.no/hoydedata/v1"
+MUNICIPALITY_URL = "https://api.kartverket.no/kommuneinfo/v1"
 
 SPEC = SourceSpec(
     id="kartverket",
@@ -19,7 +20,13 @@ SPEC = SourceSpec(
     ),
     # Kartverket publishes no request limit for these APIs, so this stays modest.
     budget=Budget(rate_per_s=25 / 60, capacity=5, upstream_limit="none published"),
-    cache_ttls_s={"addresses": 86_400, "places": 86_400, "types": 604_800, "elevation": 604_800},
+    cache_ttls_s={
+        "addresses": 86_400,
+        "places": 86_400,
+        "types": 604_800,
+        "elevation": 604_800,
+        "boundaries": 86_400,
+    },
     covers=[
         (
             "Every official address in Norway from the cadastre: search by text, postcode or "
@@ -30,6 +37,7 @@ SPEC = SourceSpec(
             "approved spelling and language (Norwegian, Sámi, Kven)"
         ),
         "Terrain elevation, lake surface height and sea depth at up to 50 points",
+        "Which municipality and county a point lies in, sea territory included",
     ],
     known_gaps=[
         "The address API returns at most the first 10,000 matches, and place names the first 5,000",

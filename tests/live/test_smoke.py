@@ -135,3 +135,14 @@ async def test_varsom_warnings_and_avalanche_summary(live):
 async def test_datanorge_search(live):
     result = await OPS["catalog_search"].invoke(live, {"query": "befolkning", "limit": 3})
     assert result["data"]["entries"]
+
+
+async def test_quick_wins(live):
+    warnings = await OPS["weather_warnings"].invoke(live, {})
+    assert warnings["provenance"]
+    place = await OPS["regions_at_point"].invoke(live, {"lat": 59.91, "lon": 10.75})
+    assert place["data"]["municipality_code"] == "0301"
+    sea = await OPS["sea_level"].invoke(live, {"station": "OSL"})
+    assert sea["data"]["series"]
+    reservoirs = await OPS["energy_reservoirs"].invoke(live, {"areas": ["NO"]})
+    assert 0 < reservoirs["data"]["rows"][0]["fill_pct"] <= 100

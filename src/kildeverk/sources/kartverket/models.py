@@ -180,3 +180,22 @@ class Elevation(BaseModel):
 
 class ElevationOutput(BaseModel):
     points: list[Elevation]
+
+
+# --- regions_at_point --------------------------------------------------------------
+
+
+class RegionsAtPointInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    lat: float = Field(ge=57, le=72)
+    lon: float = Field(ge=-1, le=33)
+
+
+class RegionsAtPointOutput(BaseModel):
+    municipality_code: str = Field(
+        description="Current code; works with every *_municipality filter."
+    )
+    municipality: str
+    county_code: str
+    county: str
