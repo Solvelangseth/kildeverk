@@ -46,7 +46,7 @@ SOURCES: tuple[SourceSpec, ...] = (
 
 def operations():
     # Imported late: handlers need Context, and Context needs SOURCES.
-    from kildeverk.sources import meta
+    from kildeverk.sources import composite, meta
     from kildeverk.sources.brreg.ops import OPERATIONS as BRREG_OPS
     from kildeverk.sources.datanorge.ops import OPERATIONS as DATANORGE_OPS
     from kildeverk.sources.entur.ops import OPERATIONS as ENTUR_OPS
@@ -81,5 +81,6 @@ def operations():
         *STORTINGET_OPS,
         *VEGVESEN_TRAFFIC_OPS,
         *UDIR_NSR_OPS,
+        *composite.OPERATIONS,
         *meta.OPERATIONS,
     )

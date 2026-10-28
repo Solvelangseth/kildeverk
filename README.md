@@ -36,6 +36,12 @@ publishers whose data it reads.
 | [Statens vegvesen traffic data](#vegvesen_traffic) | ✅ available | `traffic_find_points`, `traffic_volumes` |
 | [National School Register](#udir_nsr) | ✅ available | `schools_search`, `schools_get` |
 
+One tool combines sources: `place_overview` takes a coordinate and returns its municipality and
+county, elevation, the weather now and over the next six hours, weather, flood and landslide
+warnings in force, the nearest stops and named places nearby, and ready-made follow-up calls. It
+calls the other tools, so each part keeps its own provenance, budget and cache, and a part that
+fails becomes a note while the rest still answers.
+
 Two tools describe the service itself: `sources_list` and `service_status`.
 
 No source is scraped, and no undocumented endpoint behind a website is used. Kildeverk is

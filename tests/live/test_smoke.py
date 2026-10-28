@@ -157,3 +157,9 @@ async def test_new_publishers(live):
     assert points["data"]["points"]
     schools = await OPS["schools_search"].invoke(live, {"name": "Alvøen"})
     assert schools["data"]["schools"]
+
+
+async def test_place_overview(live):
+    result = await OPS["place_overview"].invoke(live, {"lat": 59.9139, "lon": 10.7522})
+    assert result["data"]["municipality"]["code"] == "0301"
+    assert result["data"]["weather"] and result["data"]["nearest_stops"]
