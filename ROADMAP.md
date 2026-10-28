@@ -48,6 +48,10 @@ or a credential and cannot be done from the code alone.
 - [x] Make every literal `next_call` runnable as given: a test finds each one in the code and
       validates it against its tool's input model.
 
+- [ ] Run every tool's own examples live in the daily smoke job, so a change upstream shows up
+      against the exact calls the docs and website advertise.
+- [ ] "Copy as curl" and "copy as MCP call" buttons next to each "Try it" on the website.
+
 ## More from the same publishers
 
 - [ ] Entur journey planning from A to B.
