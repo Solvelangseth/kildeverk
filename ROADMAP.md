@@ -34,6 +34,11 @@ or a credential and cannot be done from the code alone.
 - [x] Accept municipality and county names wherever a code is accepted (`companies_search`,
       `schools_search`, `hazards_flood_landslide`, …), resolved through Klass, so an agent can
       skip a lookup call. Results say what a name was resolved to.
+- [ ] `statistics_series`: one statistic for one region over time in a single call, choosing
+      SSB's series summed to today's borders where one exists and harmonising older codes
+      otherwise, so "how has X changed in Y since 2010" never stops at a reform.
+- [ ] A changelog page on the website, generated from the registry's history, so returning
+      users see new tools and sources.
 - [ ] A `compact` option on the tools with large results, returning only the fields most answers
       need, to save agents' context.
 - [x] Make every literal `next_call` runnable as given: a test finds each one in the code and
