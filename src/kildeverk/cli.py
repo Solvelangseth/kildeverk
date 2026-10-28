@@ -1,4 +1,5 @@
-"""`kildeverk serve` (stdio by default, or --http), `kildeverk call`, `kildeverk catalogue`."""
+"""`kildeverk serve` (stdio by default, or --http), `kildeverk call`, `kildeverk catalogue`,
+`kildeverk site`."""
 
 from __future__ import annotations
 
@@ -76,6 +77,9 @@ def main(argv: list[str] | None = None) -> int:
 
     sub.add_parser("catalogue", help="Print the source and tool catalogue as JSON.")
 
+    site = sub.add_parser("site", help="Build the static website from the catalogue.")
+    site.add_argument("--out", default="site/dist", help="Directory to write it to.")
+
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, stream=sys.stderr)
     logging.getLogger("httpx").setLevel(logging.WARNING)
@@ -87,6 +91,13 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "call":
         return asyncio.run(_call(args.tool, args.arguments))
+    if args.command == "site":
+        from pathlib import Path
+
+        from kildeverk.site import build_site
+
+        print(build_site(Path(args.out)))
+        return 0
     _catalogue()
     return 0
 

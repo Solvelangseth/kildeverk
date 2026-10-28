@@ -1,0 +1,40 @@
+# Fly.io: one small machine in Stockholm, the response cache on a 1 GB volume.
+# First deploy: see "Deploy your own" in the README.
+app = "kildeverk"
+primary_region = "arn"
+
+[build]
+
+[env]
+  KILDEVERK_CLIENT_IP_HEADER = "Fly-Client-IP"
+  KILDEVERK_CLIENT_LIMIT_PER_MINUTE = "60"
+  KILDEVERK_CLIENT_LIMIT_BURST = "20"
+
+[[mounts]]
+  source = "kildeverk_cache"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  # One machine, always on: the SQLite cache and the upstream budgets live in it, and MCP
+  # clients should not wait for a cold start.
+  auto_stop_machines = "off"
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 50
+    hard_limit = 100
+
+  [[http_service.checks]]
+    method = "GET"
+    path = "/healthz"
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

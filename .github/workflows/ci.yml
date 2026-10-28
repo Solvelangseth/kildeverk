@@ -13,3 +13,16 @@ jobs:
       - run: uv run ruff check src tests scripts
       - run: uv run ruff format --check src tests scripts
       - run: uv run pytest
+  image:
+    # Builds the deployable image and checks that it serves its health check and website.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t kildeverk .
+      - run: docker run -d --name kv -p 8080:8080 kildeverk
+      - run: |
+          for i in $(seq 1 30); do curl -fsS localhost:8080/healthz && break; sleep 1; done
+          curl -fsS localhost:8080/ | grep -q "<title>Kildeverk</title>"
+          curl -fsS localhost:8080/v1/sources | grep -q '"ssb_statbank"'
+      - if: failure()
+        run: docker logs kv

@@ -6,12 +6,14 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from mcp.server.streamable_http_manager import StreamableHTTPASGIApp, StreamableHTTPSessionManager
 from mcp.server.transport_security import TransportSecuritySettings
 from starlette.routing import Route
 
 from kildeverk import __version__
 from kildeverk.adapters import rest
+from kildeverk.adapters.limits import ClientLimitMiddleware
 from kildeverk.adapters.mcp import build_mcp_server
 from kildeverk.context import Context, build_context
 from kildeverk.settings import Settings
@@ -57,11 +59,19 @@ def create_app(settings: Settings | None = None, *, context: Context | None = No
         allow_headers=["Content-Type", "Accept", "Mcp-Protocol-Version", "Mcp-Session-Id"],
         expose_headers=["Retry-After", "Mcp-Session-Id"],
     )
+    if settings.deployment == "public":
+        # Added last, so it runs first: a limited request never reaches CORS or a handler.
+        app.add_middleware(
+            ClientLimitMiddleware,
+            per_minute=settings.client_limit_per_minute,
+            burst=settings.client_limit_burst,
+            client_ip_header=settings.client_ip_header,
+        )
     app.router.routes.append(
         Route("/mcp", StreamableHTTPASGIApp(sessions), methods=["GET", "POST", "DELETE"])
     )
 
-    @app.get("/", include_in_schema=False)
+    @app.get("/v1", include_in_schema=False)
     async def index() -> dict[str, str]:
         return {
             "name": "kildeverk",
@@ -72,5 +82,14 @@ def create_app(settings: Settings | None = None, *, context: Context | None = No
             "sources": "/v1/sources",
         }
 
+    @app.get("/healthz", include_in_schema=False)
+    async def health() -> dict[str, str]:
+        # For the platform's checks: answers without touching any upstream.
+        return {"status": "ok", "version": __version__}
+
     rest.install(app)
+    if settings.site_dir and settings.site_dir.is_dir():
+        app.mount("/", StaticFiles(directory=settings.site_dir, html=True), name="site")
+    else:
+        app.add_api_route("/", index, include_in_schema=False)
     return app

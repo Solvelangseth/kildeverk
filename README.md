@@ -1,8 +1,9 @@
 # Kildeverk
 
 Live Norwegian public data for AI agents and people. Kildeverk is an MCP server
-and a read-only JSON API over a small set of official Norwegian data services.
-Every result says exactly where it came from.
+and a read-only JSON API over 18 official data services from 11 Norwegian publishers:
+statistics, companies, weather, water, warnings, transport, maps, the sea, money,
+energy, parliament, roads and schools. Every result says exactly where it came from.
 
 - **One set of tools, two front doors.** The same handlers serve MCP (streamable HTTP or stdio) and REST.
 - **Provenance on every result:** the source, its licence, the exact upstream URL, when it was retrieved, and a citation line you can paste.
@@ -43,6 +44,19 @@ non-commercial. Every result names the licence its source states, or says that n
 Kildeverk reads live data. It does not mirror or archive anything beyond a short-lived response cache.
 
 ## Use it
+
+### The hosted service
+
+The hosted service is not live yet. Everything needed to run it is in this repository (see
+[Deploy your own](#deploy-your-own)), and this section will give its address once it is up.
+
+A public deployment differs from a local one in three ways:
+- **Each client address gets its own budget:** 60 calls a minute with bursts of 20, across the
+  JSON API and MCP. Above it, calls answer HTTP 429 with a `RATE_LIMITED` error and `Retry-After`.
+  The upstream budgets are shared by everyone, and this keeps one busy client from spending them.
+- **The website** is served at `/`, built from the same registry as the tools, with a "Try it"
+  button for every tool. The JSON index moves to `/v1`.
+- **Keys:** Frost and HydAPI tools work only if the deployment has its own keys set.
 
 ### Locally, over stdio
 
@@ -764,6 +778,49 @@ private, and Norwegian schools abroad.
 - Kindergartens are in a different register and are not included.
 - Pupil numbers are the register's latest figure, not a time series.
 
+<a id="deploy-your-own"></a>
+## Deploy your own
+
+The service is one process with one SQLite cache, so it runs on one small machine. The
+[Dockerfile](Dockerfile) builds the website into the image; [fly.toml](fly.toml) runs it on
+[Fly.io](https://fly.io) in Stockholm with a 1 GB volume for the cache, for a few euros a month.
+
+```sh
+fly launch --no-deploy --copy-config --name <your-app>   # or keep app = "kildeverk" if free
+fly volumes create kildeverk_cache --size 1 --region arn
+fly secrets set KILDEVERK_CONTACT=you@example.com        # required by MET Norway
+fly secrets set KILDEVERK_FROST_CLIENT_ID=... KILDEVERK_NVE_API_KEY=...   # optional
+fly deploy
+```
+
+Anywhere else that runs a container works the same way. Mount a volume at `/data`, and set
+`KILDEVERK_CLIENT_IP_HEADER` only if a proxy in front overwrites that header with the caller's
+address; otherwise leave it empty.
+
+| Setting | Default | What it does |
+| --- | --- | --- |
+| `KILDEVERK_DEPLOYMENT` | `local` (`public` in the image) | `public` turns on per-client limits and allows any Host header |
+| `KILDEVERK_CONTACT` | empty | Added to the User-Agent; MET Norway requires one |
+| `KILDEVERK_CACHE_PATH` | `~/.cache/kildeverk/responses.sqlite` | The response cache |
+| `KILDEVERK_SITE_DIR` | none | A built website to serve at `/` (`kildeverk site --out <dir>`) |
+| `KILDEVERK_CLIENT_LIMIT_PER_MINUTE`, `_BURST` | 60, 20 | Per-client budget on a public deployment |
+| `KILDEVERK_CLIENT_IP_HEADER` | empty | Trusted proxy header naming the caller, e.g. `Fly-Client-IP` |
+| `KILDEVERK_FROST_CLIENT_ID`, `KILDEVERK_NVE_API_KEY` | empty | Keys for Frost and HydAPI |
+| `KILDEVERK_ENTUR_CLIENT_NAME` | `kildeverk-<deployment>` | Sent to Entur as `ET-Client-Name` |
+
+`/healthz` answers without calling any upstream, for platform health checks.
+
+## What it is not
+
+- **Not a mirror.** Kildeverk reads live data and caches responses briefly. If a publisher is down
+  and nothing is cached, the call fails with a retryable error.
+- **Not a guarantee.** One person runs it, on one machine, with no SLA. Warnings and forecasts in
+  particular should be checked with their publisher before anyone acts on them.
+- **Not complete.** Each source's section lists what is left out. Much of the text, such as case
+  titles and avalanche assessments, is in Norwegian, because that is how it is published.
+- **Not a single budget per user.** On the hosted service, the upstream budgets are shared. Heavy
+  use is better served by a local install, which has budgets of its own.
+
 ## Development
 
 ```sh
@@ -771,11 +828,12 @@ uv sync
 uv run pytest            # offline: replays recorded upstream responses
 uv run pytest -m live    # a few real calls per source
 uv run python scripts/record.py ssb_statbank   # re-record a source's fixtures
+uv run kildeverk site --out site/dist          # build the website
 ```
 
 Each source lives in `src/kildeverk/sources/<id>/`:
 - `spec.py`: licence, limits, cache lifetimes, coverage and gaps.
-- `models.py`: pydantic input and output models.
+- `models.py`: pydantic input and output models (in `ops.py` for the smaller sources).
 - `ops.py`: the handlers and the operation declarations.
 
 `sources/registry.py` is the only place a source or tool is registered. The MCP tool list, the REST

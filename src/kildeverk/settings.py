@@ -33,6 +33,18 @@ class Settings(BaseSettings):
     """Key for NVE's HydAPI (free at hydapi.nve.no). Without it the water tools answer
     NOT_CONFIGURED."""
 
+    client_limit_per_minute: float = 60
+    """Calls per minute one client address may make to a public deployment."""
+
+    client_limit_burst: float = 20
+
+    client_ip_header: str = ""
+    """Header a trusted proxy puts the caller's address in, e.g. 'Fly-Client-IP'. Empty means
+    the connection's own address. Only set this behind a proxy that overwrites the header."""
+
+    site_dir: Path | None = None
+    """A built website to serve at '/' (see `kildeverk site`). Without one, '/' answers JSON."""
+
     entur_client_name: str = ""
     """Sent to Entur as ET-Client-Name, which it requires in the form
     '<company>-<application>'. Defaults to 'kildeverk-<deployment>'."""
