@@ -18,6 +18,9 @@ from kildeverk.sources.nve_reservoirs.spec import SPEC as NVE_RESERVOIRS
 from kildeverk.sources.nve_varsom.spec import SPEC as NVE_VARSOM
 from kildeverk.sources.ssb_klass.spec import SPEC as SSB_KLASS
 from kildeverk.sources.ssb_statbank.spec import SPEC as SSB_STATBANK
+from kildeverk.sources.stortinget.spec import SPEC as STORTINGET
+from kildeverk.sources.udir_nsr.spec import SPEC as UDIR_NSR
+from kildeverk.sources.vegvesen_traffic.spec import SPEC as VEGVESEN_TRAFFIC
 
 SOURCES: tuple[SourceSpec, ...] = (
     SSB_STATBANK,
@@ -35,6 +38,9 @@ SOURCES: tuple[SourceSpec, ...] = (
     DATANORGE,
     KARTVERKET_SEA,
     NVE_RESERVOIRS,
+    STORTINGET,
+    VEGVESEN_TRAFFIC,
+    UDIR_NSR,
 )
 
 
@@ -54,6 +60,9 @@ def operations():
     from kildeverk.sources.nve_varsom.ops import OPERATIONS as NVE_VARSOM_OPS
     from kildeverk.sources.ssb_klass.ops import OPERATIONS as SSB_KLASS_OPS
     from kildeverk.sources.ssb_statbank.ops import OPERATIONS as SSB_STATBANK_OPS
+    from kildeverk.sources.stortinget.ops import OPERATIONS as STORTINGET_OPS
+    from kildeverk.sources.udir_nsr.ops import OPERATIONS as UDIR_NSR_OPS
+    from kildeverk.sources.vegvesen_traffic.ops import OPERATIONS as VEGVESEN_TRAFFIC_OPS
 
     return (
         *SSB_STATBANK_OPS,
@@ -69,5 +78,8 @@ def operations():
         *DATANORGE_OPS,
         *KARTVERKET_SEA_OPS,
         *NVE_RESERVOIRS_OPS,
+        *STORTINGET_OPS,
+        *VEGVESEN_TRAFFIC_OPS,
+        *UDIR_NSR_OPS,
         *meta.OPERATIONS,
     )

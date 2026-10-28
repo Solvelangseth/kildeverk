@@ -146,3 +146,14 @@ async def test_quick_wins(live):
     assert sea["data"]["series"]
     reservoirs = await OPS["energy_reservoirs"].invoke(live, {"areas": ["NO"]})
     assert 0 < reservoirs["data"]["rows"][0]["fill_pct"] <= 100
+
+
+async def test_new_publishers(live):
+    cases = await OPS["parliament_cases"].invoke(live, {"limit": 3})
+    assert cases["data"]["session"]
+    members = await OPS["parliament_members"].invoke(live, {})
+    assert members["data"]["count"] >= 169
+    points = await OPS["traffic_find_points"].invoke(live, {"name": "Nygårdstunnelen"})
+    assert points["data"]["points"]
+    schools = await OPS["schools_search"].invoke(live, {"name": "Alvøen"})
+    assert schools["data"]["schools"]

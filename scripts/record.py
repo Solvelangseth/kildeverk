@@ -264,12 +264,65 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ("energy_reservoirs", {}),
         ("energy_reservoirs", {"areas": ["NO2"], "from_year": 2022, "to_year": 2022}),
     ],
+    "stortinget": [
+        ("parliament_cases", {"query": "energipriser", "session": "2025-2026"}),
+        ("parliament_cases", {"session": "2025-2026", "type": "law", "limit": 5}),
+        ("parliament_cases", {"session": "1850-1851"}),
+        ("parliament_case", {"case_id": 200084}),
+        ("parliament_case", {"case_id": 107200}),
+        ("parliament_case", {"case_id": 1}),
+        ("parliament_members", {"period": "2021-2025", "party": "SV"}),
+        ("parliament_members", {"period": "2025-2029"}),
+    ],
+    "vegvesen_traffic": [
+        ("traffic_find_points", {"name": "Nygårdstunnelen"}),
+        ("traffic_find_points", {"lat": 59.91, "lon": 10.75, "radius_km": 1}),
+        ("traffic_find_points", {"municipality": "4601", "road": "E39", "limit": 5}),
+        ("traffic_volumes", {"point": "09194V804833", "start": "2026-10-19", "end": "2026-10-25"}),
+        (
+            "traffic_volumes",
+            {
+                "point": "09194V804833",
+                "resolution": "hourly",
+                "start": "2026-10-20",
+                "end": "2026-10-24",
+            },
+        ),
+        (
+            "traffic_volumes",
+            {"point": "09194V804833", "resolution": "annual", "start": "2015-01-01"},
+        ),
+        ("traffic_volumes", {"point": "00000V000000", "start": "2026-10-19"}),
+    ],
+    "udir_nsr": [
+        ("schools_search", {"municipality": "4601", "level": "secondary"}),
+        ("schools_search", {"name": "Alvøen"}),
+        ("schools_search", {"county": "03", "ownership": "private", "level": "primary"}),
+        ("schools_get", {"org_number": "874738352"}),
+        ("schools_get", {"org_number": "999999999"}),
+    ],
 }
 
 
 # Fields removed from recorded responses before they are written. The tools never
-# return them, and fixtures end up in a public repository.
-SCRUB = {"brreg": {"telefon", "mobil", "epostadresse"}}
+# return them, and fixtures end up in a public repository: contact details and birth
+# dates, plus bulk that only makes fixtures large (geometries, per-object timestamps).
+SCRUB = {
+    "brreg": {"telefon", "mobil", "epostadresse"},
+    "stortinget": {"epost", "foedselsdato", "doedsdato", "respons_dato_tid", "versjon"},
+    "met_metalerts": {"geometry", "resources"},
+}
+
+
+def _reservoir_years(url: str, body):
+    # The full history is one response since 1995; the tests only read 2022.
+    if url.endswith("/HentOffentligData") and isinstance(body, list):
+        return [row for row in body if row.get("iso_aar") == 2022]
+    return body
+
+
+# Whole-response trims, for responses too large to keep in full.
+TRIM = {"nve_reservoirs": _reservoir_years}
 
 
 def _scrub(value, keys: set[str]):
@@ -298,13 +351,18 @@ async def record(source_id: str) -> None:
     await ctx.aclose()
 
     keys = SCRUB.get(source_id)
-    if keys:
+    trim = TRIM.get(source_id)
+    if keys or trim:
         for exchange in transport.exchanges:
             try:
                 body = json.loads(exchange["response"])
             except ValueError:
                 continue
-            exchange["response"] = json.dumps(_scrub(body, keys), ensure_ascii=False)
+            if keys:
+                body = _scrub(body, keys)
+            if trim:
+                body = trim(exchange["url"].split("?")[0], body)
+            exchange["response"] = json.dumps(body, ensure_ascii=False)
 
     out = FIXTURES / source_id / "cassette.json"
     out.parent.mkdir(parents=True, exist_ok=True)

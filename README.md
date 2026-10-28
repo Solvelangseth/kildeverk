@@ -31,6 +31,9 @@ publishers whose data it reads.
 | [NVE Varsom](#nve_varsom): flood, landslide and avalanche warnings | ✅ available | `hazards_flood_landslide`, `hazards_avalanche` |
 | [data.norge.no](#datanorge): the national data catalogue | ✅ available | `catalog_search` |
 | [NVE reservoir statistics](#nve_reservoirs): hydropower reservoir fill | ✅ available | `energy_reservoirs` |
+| [Stortinget](#stortinget): cases, votes and members | ✅ available | `parliament_cases`, `parliament_case`, `parliament_members` |
+| [Statens vegvesen traffic data](#vegvesen_traffic) | ✅ available | `traffic_find_points`, `traffic_volumes` |
+| [National School Register](#udir_nsr) | ✅ available | `schools_search`, `schools_get` |
 
 Two tools describe the service itself: `sources_list` and `service_status`.
 
@@ -670,6 +673,96 @@ reservoirs every week.
 
 **Known gaps:**
 - Individual reservoirs are not published, only area totals.
+
+<a id="stortinget"></a>
+### Stortinget: cases, votes and members
+
+**What it covers:** the Norwegian parliament's own open data.
+- `parliament_cases` lists the cases in a session (the current one by default): bills, budgets,
+  members' proposals and more. You can filter by words in the title, type, status or committee.
+- `parliament_case` gives one case: committee, rapporteurs, topics, the decision, and every vote on
+  it. Each vote has its result and counts and, when recorded by name, how each party voted.
+- `parliament_members` lists the members sitting today, or those of an electoral period, with
+  party, constituency and committees, and a count per party.
+
+**Licence:** [NLOD](https://data.norge.no/nlod/en/2.0), per Stortinget's
+[terms of use](https://data.stortinget.no/om-datatjenesten/bruksvilkar/). The terms require
+Stortinget to be named as the source, and say data must not be presented in a misleading way.
+
+**Rate limits:** 100 calls a minute, answered with 429 above that. Kildeverk spends at most 50.
+
+**Caching:**
+- Case lists, cases and votes: 1 hour.
+- Sessions and members: 24 hours.
+
+**Behaviour worth knowing:**
+- Titles and decisions are in Norwegian. Search with Norwegian words (`strømpris`, `skatt`).
+- Many votes are by acclamation. They have no counts and no names, and the result says so.
+- The party breakdown counts each representative's recorded vote as for, against or absent, and
+  matches Stortinget's own totals.
+- `dealt_with` means the committee has dealt with the case, as Stortinget defines it.
+- Stortinget answers an unknown case id with HTTP 500. Kildeverk reports that as `NOT_FOUND`,
+  saying the id probably does not exist.
+- Members' e-mail addresses and birth dates are never returned, and are scrubbed from fixtures.
+
+**Known gaps:**
+- Committees are given only for members sitting today, not for past periods.
+- Questions to ministers, hearings and debates are not exposed yet.
+
+<a id="vegvesen_traffic"></a>
+### Statens vegvesen: traffic counts
+
+**What it covers:** the Norwegian Public Roads Administration's traffic registration points,
+about 10,000 of them on roads and cycle paths.
+- `traffic_find_points` finds points by name, municipality, county, road (`E39`, `Rv7`) or
+  distance from a point, for vehicles or bicycles.
+- `traffic_volumes` gives vehicles per hour or per day at a point, by direction and split into
+  light and heavy vehicles, with how much of each period was counted. With `resolution: "annual"`
+  it gives the annual average daily traffic (ÅDT) for every year the point has counted.
+
+**Licence:** [NLOD](https://data.norge.no/nlod/en/2.0), per Statens vegvesen's
+[data catalogue](https://dataut.vegvesen.no/en/dataset/trafikkdata). No key is needed.
+
+**Rate limits:** none published. Kildeverk spends at most 25 calls a minute.
+
+**Caching:**
+- Point lists and annual averages: 24 hours.
+- Counts for periods ending in the last two days: 15 minutes.
+- Older counts: 24 hours.
+
+**Behaviour worth knowing:**
+- The full list of points is a 5 MB response, so searches are narrowed upstream by name or county.
+  A search near a point first asks [Kartverket](#kartverket) which county the point is in, and
+  then says that points across the county border are not included. Provenance lists both calls.
+- Light vehicles are under 5.6 m, heavy ones 5.6 m or longer. Vehicles whose length was not
+  measured are in neither group, so the two can sum to a little less than the total.
+- Rows covering under 95% of their period are flagged in a note; their counts are incomplete.
+- The API pages at 100 rows, so hourly periods are capped at 7 days and daily ones at a year.
+
+**Known gaps:**
+- Hourly is the finest resolution; single vehicles and speeds are not public.
+- Traffic indices and the national road database (NVDB) are not exposed yet.
+
+<a id="udir_nsr"></a>
+### National School Register (NSR)
+
+**What it covers:** Udir's register of every primary and secondary school in Norway, public and
+private, and Norwegian schools abroad.
+- `schools_search` finds schools by name, municipality or county, optionally one level (`primary`
+  or `secondary`) or kind of ownership.
+- `schools_get` gives one school: pupils, staff, grades, owner, Bokmål or Nynorsk, address,
+  position, website, and when it opened or closed.
+
+**Licence:** [NLOD](https://data.norge.no/nlod/en/2.0), stated in the
+[API documentation](https://data-nsr.udir.no/swagger/index.html).
+
+**Rate limits:** none published. Kildeverk spends at most 25 calls a minute.
+
+**Caching:** 6 hours. NSR imports from the Central Coordinating Register each night.
+
+**Known gaps:**
+- Kindergartens are in a different register and are not included.
+- Pupil numbers are the register's latest figure, not a time series.
 
 ## Development
 
