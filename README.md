@@ -21,17 +21,20 @@ publishers whose data it reads.
 | [Brønnøysund Register Centre (Enhetsregisteret)](#brreg) | ✅ available | `companies_search`, `companies_get` |
 | [MET Norway Locationforecast](#met_locationforecast) | ✅ available | `weather_forecast` |
 | [MET Norway Frost](#met_frost): needs a free client id | ✅ available | `weather_find_stations`, `weather_station_elements`, `weather_observations` |
-| NVE HydAPI | planned, once its terms are confirmed | |
+| [NVE HydAPI](#nve_hydapi): needs a free key | ✅ available | `water_find_stations`, `water_observations` |
 | Entur (stops, departures) | planned | |
 | Kartverket (addresses, place names, elevation) | planned | |
 
 Two tools describe the service itself: `sources_list` and `service_status`.
 
-**Not included, and why:**
-- Norges Bank's own open-data pages state no licence. It will be added if the bank confirms the terms.
-- data.norge.no's search API is documented as internal and liable to change, and it states no licence for its metadata.
-- NVE's flood and landslide warning API states no licence.
-- No source is scraped, and no undocumented endpoint behind a website is used.
+**Not yet included:**
+- Norges Bank (exchange rates and the policy rate). Its open-data pages state no licence, so its
+  results will say "licence not stated" rather than name one.
+- NVE's flood and landslide warnings (Varsom). These also state no licence.
+- data.norge.no's dataset search, which is documented as internal and liable to change.
+
+No source is scraped, and no undocumented endpoint behind a website is used. Kildeverk is
+non-commercial. Every result names the licence its source states, or says that none is stated.
 
 Kildeverk reads live data. It does not mirror or archive anything beyond a short-lived response cache.
 
@@ -316,6 +319,50 @@ redistribution.
 - Only open data: series that need Frost's client secret are not available.
 - The newest observations can take an hour or more to appear.
 - At most ten years per call and 10,000 rows per answer.
+
+<a id="nve_hydapi"></a>
+### NVE HydAPI
+
+**What it covers:** hydrological observations from the Norwegian Water Resources and Energy
+Directorate, covering rivers, lakes, reservoirs, snow and groundwater.
+- `water_find_stations` finds stations by name, municipality code, county, or distance from a point.
+  It can be limited to stations measuring a given parameter. Each station lists its series, with
+  their resolutions and years, its catchment area, whether the catchment is regulated, and flood
+  statistics: peak discharge for the mean annual flood and the 5-, 10-, 20- and 50-year floods.
+- `water_observations` returns daily or hourly means, or raw readings, for one parameter. Leave out
+  the period to get the latest value. Friendly names cover the common parameters (`discharge`,
+  `water_level`, `water_temperature`, `snow_depth`, `groundwater_level`, …), and any HydAPI
+  parameter number works too.
+
+**Setup:** HydAPI needs a free key from [hydapi.nve.no](https://hydapi.nve.no/Users). Set it as
+`KILDEVERK_NVE_API_KEY`. Without it, these tools answer `NOT_CONFIGURED`. The key is sent as the
+`X-API-Key` header and never appears in URLs, provenance or fixtures.
+
+**Licence:** [NLOD](https://data.norge.no/nlod/en/2.0), stated in the
+[HydAPI documentation](https://hydapi.nve.no/UserDocumentation/) and on every response. NVE asks to
+be named as the source of the data.
+
+**Rate limits:** 5 requests per second per key, reported in the `x-rate-limit-*` headers, plus a cap
+on data points per request. Kildeverk spends at most 60 calls a minute.
+
+**Caching:**
+- Station metadata: 4 hours, which is how often NVE updates it.
+- Observations for periods ending more than two days ago: 24 hours.
+- Recent observations and latest values: 10 minutes.
+
+**Behaviour worth knowing:**
+- Every value carries `quality`: `uncontrolled`, `primary_controlled` or `secondary_controlled`.
+  New data is uncontrolled and can still change, and the result says so in a note.
+- HydAPI's `Active` flag reads backwards (0 means active stations only). Kildeverk exposes it as
+  `include_closed`.
+- Searching around a point uses a square WKT polygon in HydAPI's (latitude longitude) order. Results
+  are then sorted by true distance and cut to the radius.
+
+**Known gaps:**
+- Rating curves and percentiles are not exposed yet.
+- Flood and landslide warnings (Varsom) come from a different NVE service and are not included.
+- Station metadata names parameters in Norwegian. The `alias` field gives the English name that
+  `water_observations` accepts.
 
 ## Development
 

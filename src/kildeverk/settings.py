@@ -29,6 +29,10 @@ class Settings(BaseSettings):
     """Client id for MET Norway's Frost API (free at frost.met.no). Without it the
     observation tools answer NOT_CONFIGURED; the forecast tool needs nothing."""
 
+    nve_api_key: str = ""
+    """Key for NVE's HydAPI (free at hydapi.nve.no). Without it the water tools answer
+    NOT_CONFIGURED."""
+
     @property
     def user_agent(self) -> str:
         contact = f"; {self.contact}" if self.contact else ""

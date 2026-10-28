@@ -102,6 +102,29 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
             },
         ),
     ],
+    # Needs KILDEVERK_NVE_API_KEY, sent as a header and never recorded.
+    "nve_hydapi": [
+        ("water_find_stations", {"name": "Bulken"}),
+        ("water_find_stations", {"station": "62.5.0"}),
+        (
+            "water_find_stations",
+            {"lat": 60.63, "lon": 6.42, "radius_km": 15, "parameter": "discharge"},
+        ),
+        (
+            "water_observations",
+            {
+                "station": "62.5.0",
+                "parameter": "discharge",
+                "start": "2026-10-01",
+                "end": "2026-10-08",
+            },
+        ),
+        (
+            "water_observations",
+            {"station": "62.5.0", "parameter": "water_level", "resolution": "hourly"},
+        ),
+        ("water_observations", {"station": "62.5.0", "parameter": "snow_depth"}),
+    ],
 }
 
 

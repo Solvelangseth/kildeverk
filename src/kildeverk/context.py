@@ -13,6 +13,18 @@ from kildeverk.settings import Settings
 from kildeverk.sources.registry import SOURCES
 
 
+class HeaderAuth(httpx.Auth):
+    """A key sent in a request header, so it never appears in a URL or in provenance."""
+
+    def __init__(self, header: str, value: str) -> None:
+        self.header = header
+        self.value = value
+
+    def auth_flow(self, request: httpx.Request):
+        request.headers[self.header] = self.value
+        yield request
+
+
 @dataclass
 class Context:
     settings: Settings
@@ -42,6 +54,8 @@ def build_context(
     credentials: dict[str, httpx.Auth] = {}
     if settings.frost_client_id:
         credentials["met_frost"] = httpx.BasicAuth(settings.frost_client_id, "")
+    if settings.nve_api_key:
+        credentials["nve_hydapi"] = HeaderAuth("X-API-Key", settings.nve_api_key)
     upstreams = {
         spec.id: Upstream(
             spec,

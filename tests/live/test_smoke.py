@@ -85,3 +85,14 @@ async def test_frost_stations_and_observations(live):
         },
     )
     assert observed["data"]["row_count"] == 7
+
+
+async def test_nve_station_and_latest_discharge(live):
+    if not live.settings.nve_api_key:
+        pytest.skip("KILDEVERK_NVE_API_KEY is not set")
+    found = await OPS["water_find_stations"].invoke(live, {"station": "62.5.0"})
+    assert found["data"]["stations"][0]["name"].startswith("Bulken")
+    latest = await OPS["water_observations"].invoke(
+        live, {"station": "62.5.0", "parameter": "discharge"}
+    )
+    assert latest["data"]["row_count"] == 1

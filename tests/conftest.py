@@ -22,8 +22,8 @@ def replay() -> ReplayTransport:
 @pytest.fixture
 async def ctx(replay: ReplayTransport) -> AsyncIterator[Context]:
     context = build_context(
-        # A placeholder id: replayed requests never reach Frost.
-        Settings(_env_file=None, frost_client_id="test-client"),
+        # Placeholder credentials: replayed requests never reach Frost or HydAPI.
+        Settings(_env_file=None, frost_client_id="test-client", nve_api_key="test-key"),
         client=httpx.AsyncClient(transport=replay),
         cache=ResponseCache(":memory:"),
     )
