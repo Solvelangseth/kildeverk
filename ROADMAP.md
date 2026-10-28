@@ -27,8 +27,11 @@ or a credential and cannot be done from the code alone.
 
 - [x] Expose the catalogue as MCP resources (a guide, all sources, one per source) and add MCP
       prompts: profile a place, profile a municipality, find a statistic, compare places.
-- [ ] An evaluation set: 30-40 realistic questions with checkable answers, run against a model
-      with only Kildeverk's tools, to measure which tools are found, misused or missing.
+- [x] An evaluation set: 32 realistic questions across every source, each with a reference call,
+      live-built truth (`eval/truth.json`) and a scorer that reads numbers in both conventions.
+- [ ] The eval runner: ask a model each question with only Kildeverk's tools over MCP, score the
+      submitted answers, and report accuracy, tools used and calls per question, against a
+      no-tools baseline.
 - [x] Count tool calls, errors and cache hits per tool, and show them in `service_status`.
 
 - [x] Accept municipality and county names wherever a code is accepted (`companies_search`,

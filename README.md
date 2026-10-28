@@ -894,6 +894,11 @@ uv run python scripts/build_recipes.py         # re-run the website's worked que
 uv run kildeverk site --out site/dist          # build the website
 ```
 
+`eval/` holds an evaluation set: 32 questions an agent should answer with these tools, each with
+the reference call that answers it, live-built truth (`uv run python -m eval.build_truth`) and a
+scorer. Questions about fixed periods keep their answers; those marked `moves` follow the latest
+figures and need truth rebuilt before a run.
+
 Each source lives in `src/kildeverk/sources/<id>/`:
 - `spec.py`: licence, limits, cache lifetimes, coverage and gaps.
 - `models.py`: pydantic input and output models (in `ops.py` for the smaller sources).
