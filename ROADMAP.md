@@ -37,6 +37,10 @@ or a credential and cannot be done from the code alone.
 - [x] `statistics_series`: one statistic for one region over time in a single call, choosing
       SSB's series summed to today's borders where one exists and harmonising older codes
       otherwise, so "how has X changed in Y since 2010" never stops at a reform.
+- [ ] `statistics_rank`: every municipality or county on one statistic for one year, ranked,
+      with the country's figure for reference ("which municipalities grew fastest?").
+- [ ] Per-capita figures in `compare_municipalities` for any SSB measure, using the population
+      series already fetched.
 - [ ] A changelog page on the website, generated from the registry's history, so returning
       users see new tools and sources.
 - [ ] A `compact` option on the tools with large results, returning only the fields most answers
