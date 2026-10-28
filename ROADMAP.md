@@ -62,8 +62,8 @@ or a credential and cannot be done from the code alone.
 - [x] A `summary` on every result: publishers, licences, upstream responses, cache hits, stale
       parts and the oldest retrieval time.
 
-- [ ] Put each tool's examples into the OpenAPI document, so `/docs` opens with ready requests.
-- [ ] Offer each website recipe as an MCP prompt too, so a client can run the same question.
+- [x] Put each tool's examples into the OpenAPI document, so `/docs` opens with ready requests.
+- [x] Offer each website recipe as an MCP prompt too, so a client can run the same question.
 
 ## More from the same publishers
 

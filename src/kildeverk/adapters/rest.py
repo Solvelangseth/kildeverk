@@ -125,6 +125,8 @@ def build_openapi(app: FastAPI) -> dict[str, Any]:
             },
         }
         path_params = {part[1:-1] for part in op.http_path.split("/") if part.startswith("{")}
+        # The tool's own examples, so /docs opens with requests that work as they are.
+        first = op.examples[0] if op.examples else {}
         if op.http_method == "GET":
             operation["parameters"] = [
                 {
@@ -133,14 +135,21 @@ def build_openapi(app: FastAPI) -> dict[str, Any]:
                     "required": name in path_params or name in resolved.get("required", []),
                     "schema": prop,
                     "description": prop.get("description", ""),
+                    **({"example": first[name]} if name in first else {}),
                 }
                 for name, prop in resolved.get("properties", {}).items()
             ]
         else:
-            operation["requestBody"] = {
-                "required": True,
-                "content": {"application/json": {"schema": input_schema}},
-            }
+            content: dict[str, Any] = {"schema": input_schema}
+            if op.examples:
+                content["examples"] = {
+                    f"example_{n}": {
+                        "summary": json.dumps(example, ensure_ascii=False)[:80],
+                        "value": example,
+                    }
+                    for n, example in enumerate(op.examples, 1)
+                }
+            operation["requestBody"] = {"required": True, "content": {"application/json": content}}
         paths.setdefault(op.http_path, {})[op.http_method.lower()] = operation
 
     app.openapi_schema = {

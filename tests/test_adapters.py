@@ -187,3 +187,22 @@ async def test_mcp_prompts_fill_their_arguments(ctx):
         assert "'house prices' for Oslo" in text and "statistics_search_tables" in text
         bare = await client.get_prompt("find_statistic", {"topic": "unemployment"})
         assert "'unemployment'. Search" in bare.messages[0].content.text
+
+
+def test_openapi_carries_each_tools_examples(http):
+    spec = http.get("/openapi.json").json()
+    get = spec["paths"]["/v1/statistics/tables"]["get"]
+    query = {p["name"]: p for p in get["parameters"]}
+    assert query["query"]["example"] == "population municipality"
+    post = spec["paths"]["/v1/statistics/series"]["post"]
+    examples = post["requestBody"]["content"]["application/json"]["examples"]
+    assert examples["example_1"]["value"]["region"] == "Tromsø"
+
+
+async def test_website_recipes_are_mcp_prompts(ctx):
+    async with Client(build_mcp_server(lambda: ctx)) as client:
+        names = {p.name for p in (await client.list_prompts()).prompts}
+        assert {"recipe_place_overview", "recipe_statistics_rank"} <= names
+        prompt = await client.get_prompt("recipe_statistics_rank", {})
+        text = prompt.messages[0].content.text
+        assert text.startswith("Which municipalities have grown fastest") and '"07459"' in text

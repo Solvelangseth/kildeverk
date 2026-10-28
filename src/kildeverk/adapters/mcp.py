@@ -105,6 +105,28 @@ def _result(payload: dict[str, Any], *, is_error: bool = False) -> types.CallToo
     )
 
 
+def _recipe_prompts() -> dict[str, tuple[str, str]]:
+    """name -> (description, text) for each stored website recipe."""
+
+    from kildeverk.site import RECIPES
+
+    if not RECIPES.exists():
+        return {}
+    stored = json.loads(RECIPES.read_text(encoding="utf-8"))
+    prompts = {}
+    for recipe in stored["recipes"]:
+        arguments = json.dumps(recipe["arguments"], ensure_ascii=False)
+        prompts[f"recipe_{recipe['tool']}"] = (
+            f"Worked example: {recipe['question']}",
+            (
+                f"{recipe['question']} Answer with Kildeverk: call {recipe['tool']} with {arguments}, "
+                "make any follow-up calls its result suggests, and cite each source with the "
+                "citation line from its provenance."
+            ),
+        )
+    return prompts
+
+
 def build_mcp_server(get_context: Callable[[], Context]) -> Server:
     ops = {op.name: op for op in operations()}
     tools = [
@@ -202,12 +224,29 @@ def build_mcp_server(get_context: Callable[[], Context]) -> Server:
         for name, (description, arguments, _) in PROMPTS.items()
     ]
 
+    # The website's worked questions, as ready prompts with no arguments.
+    recipes = _recipe_prompts()
+    prompts += [
+        types.Prompt(name=name, description=description, arguments=[])
+        for name, (description, _) in recipes.items()
+    ]
+
     async def on_list_prompts(_ctx: Any, _params: Any) -> types.ListPromptsResult:
         return types.ListPromptsResult(prompts=prompts)
 
     async def on_get_prompt(
         _ctx: Any, params: types.GetPromptRequestParams
     ) -> types.GetPromptResult:
+        if params.name in recipes:
+            description, text = recipes[params.name]
+            return types.GetPromptResult(
+                description=description,
+                messages=[
+                    types.PromptMessage(
+                        role="user", content=types.TextContent(type="text", text=text)
+                    )
+                ],
+            )
         if params.name not in PROMPTS:
             raise ValueError(f"No prompt {params.name}. List them with prompts/list.")
         description, arguments, template = PROMPTS[params.name]

@@ -72,7 +72,9 @@ a former one that was divided, is an error that lists the codes.
 
 Over MCP, the server also offers **resources**: `kildeverk://guide` (which tool answers which
 question), `kildeverk://sources`, and one `kildeverk://sources/<id>` per source. It offers four
-**prompts**: `profile_place`, `profile_municipality`, `find_statistic` and `compare_places`.
+**prompts**: `profile_place`, `profile_municipality`, `find_statistic` and `compare_places`, plus
+one `recipe_<tool>` prompt for each worked question on the website. The OpenAPI document carries
+each tool's examples, so `/docs` opens with requests that work as they are.
 
 No source is scraped, and no undocumented endpoint behind a website is used. Kildeverk is
 non-commercial. Every result names the licence its source states, or says that none is stated.
