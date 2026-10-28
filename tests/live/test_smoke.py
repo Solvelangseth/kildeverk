@@ -105,3 +105,14 @@ async def test_entur_stop_and_departures(live):
         live, {"stop": "NSR:StopPlace:59872", "limit": 3}
     )
     assert departures["data"]["departures"]
+
+
+async def test_kartverket_address_place_and_elevation(live):
+    address = await OPS["addresses_search"].invoke(live, {"query": "Karl Johans gate 22 Oslo"})
+    assert address["data"]["addresses"][0]["postcode"] == "0026"
+    place = await OPS["places_search"].invoke(live, {"query": "Galdhøpiggen"})
+    assert place["data"]["places"][0]["type"] == "Fjell"
+    height = await OPS["terrain_elevation"].invoke(
+        live, {"points": [{"lat": 61.63644, "lon": 8.31248}]}
+    )
+    assert 2400 < height["data"]["points"][0]["elevation_m"] < 2500

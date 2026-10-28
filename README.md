@@ -24,7 +24,7 @@ publishers whose data it reads.
 | [NVE HydAPI](#nve_hydapi): needs a free key | ✅ available | `water_find_stations`, `water_observations` |
 | [Entur Geocoder](#entur_geocoder): stop places | ✅ available | `transit_find_stops` |
 | [Entur Journey Planner](#entur_journeyplanner): departures | ✅ available | `transit_departures` |
-| Kartverket (addresses, place names, elevation) | planned | |
+| [Kartverket](#kartverket): addresses, place names, elevation | ✅ available | `addresses_search`, `places_search`, `terrain_elevation` |
 
 Two tools describe the service itself: `sources_list` and `service_status`.
 
@@ -423,6 +423,47 @@ identical questions costs one upstream call; the result says when it came from t
 **Known gaps:**
 - Journey planning from A to B is not exposed yet.
 - Groups of stop places (all of "Oslo", say) are not searched; use a stop place or a quay.
+
+<a id="kartverket"></a>
+### Kartverket: addresses, place names and elevation
+
+**What it covers:** three open APIs from the Norwegian Mapping Authority.
+- `addresses_search` finds official addresses from the cadastre. You can search by free text
+  (`Munkegata 1 Trondheim`), postcode or municipality code, or find the addresses nearest a point.
+  Each address has its coordinates, postcode, municipality and property numbers (gnr/bnr/fnr).
+- `places_search` searches the central place-name register (SSR) for mountains, lakes, rivers,
+  islands, farms, towns and more. You can search by name, with wildcards or fuzzy matching, or near
+  a point, and filter by kind of place, municipality or county. Each place lists every spelling and
+  language the register holds, including Sámi and Kven names.
+- `terrain_elevation` gives the height above sea level at up to 50 points. Lakes give their surface
+  height, and the sea gives its depth as a negative value. Each value says which model it came from.
+
+**Licence:** [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), per Kartverket's
+[terms of use](https://www.kartverket.no/api-og-data/vilkar-for-bruk), which ask for the credit
+"© Kartverket". The place-name register also has database protection, and Kartverket asks that
+systematic use credit SSR, so place results carry a note saying so.
+
+**Rate limits:** none published. Kildeverk spends at most 25 calls a minute.
+
+**Caching:**
+- Addresses and place names: 24 hours.
+- Elevation and the list of kinds of place: 7 days.
+
+**Behaviour worth knowing:**
+- Kinds of place are named in Norwegian, as the register names them: `Fjell` (mountain), `Innsjø`
+  (lake), `Elv` (river), `Øy` (island), `Gard` (farm). An unknown kind is answered with close
+  matches.
+- The address API returns at most 10,000 matches and the place-name API 5,000; results say how many
+  matched in total.
+- Searching near a point cannot be combined with a text search. Point searches for place names
+  return no municipality or county, because the API leaves them out there.
+- Depths are interpolated from depth contours and must not be used for navigation.
+- The elevation API takes coordinates as (east, north); Kildeverk takes `lat` and `lon` and
+  converts them.
+
+**Known gaps:**
+- Property data beyond the address, such as owners and areas, is not included.
+- Points outside Norway and its waters have no elevation.
 
 ## Development
 

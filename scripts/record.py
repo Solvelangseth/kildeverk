@@ -145,6 +145,30 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ),
         ("transit_departures", {"stop": "NSR:StopPlace:999999999"}),
     ],
+    "kartverket": [
+        ("addresses_search", {"query": "Karl Johans gate 22 Oslo"}),
+        ("addresses_search", {"lat": 59.9139, "lon": 10.7522, "radius_m": 50}),
+        ("addresses_search", {"postcode": "0184", "limit": 3}),
+        ("addresses_search", {"query": "Munkegata 1 Trondhiem", "fuzzy": True, "limit": 3}),
+        ("addresses_search", {"query": "qqxxzzvv"}),
+        ("places_search", {"query": "Galdhøpiggen"}),
+        ("places_search", {"query": "Kautokeino", "limit": 3}),
+        ("places_search", {"query": "Storvatnet", "type": "Innsjø", "county": "50"}),
+        ("places_search", {"query": "Storvatnet", "type": "Innsjoe"}),
+        ("places_search", {"lat": 61.636, "lon": 8.312, "radius_m": 1000}),
+        ("places_search", {"lat": 61.636, "lon": 8.312, "radius_m": 3000, "type": "Fjell"}),
+        (
+            "terrain_elevation",
+            {
+                "points": [
+                    {"lat": 61.63644, "lon": 8.31248},
+                    {"lat": 59.91, "lon": 10.75},
+                    {"lat": 60.0, "lon": 3.0},
+                    {"lat": 59.85, "lon": 10.6},
+                ]
+            },
+        ),
+    ],
 }
 
 

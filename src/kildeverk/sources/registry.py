@@ -6,6 +6,7 @@ from kildeverk.core.source import SourceSpec
 from kildeverk.sources.brreg.spec import SPEC as BRREG
 from kildeverk.sources.entur.spec import GEOCODER as ENTUR_GEOCODER
 from kildeverk.sources.entur.spec import JOURNEY_PLANNER as ENTUR_JOURNEY_PLANNER
+from kildeverk.sources.kartverket.spec import SPEC as KARTVERKET
 from kildeverk.sources.met.spec import FROST as MET_FROST
 from kildeverk.sources.met.spec import LOCATIONFORECAST as MET_LOCATIONFORECAST
 from kildeverk.sources.nve_hydapi.spec import SPEC as NVE_HYDAPI
@@ -21,6 +22,7 @@ SOURCES: tuple[SourceSpec, ...] = (
     NVE_HYDAPI,
     ENTUR_GEOCODER,
     ENTUR_JOURNEY_PLANNER,
+    KARTVERKET,
 )
 
 
@@ -29,6 +31,7 @@ def operations():
     from kildeverk.sources import meta
     from kildeverk.sources.brreg.ops import OPERATIONS as BRREG_OPS
     from kildeverk.sources.entur.ops import OPERATIONS as ENTUR_OPS
+    from kildeverk.sources.kartverket.ops import OPERATIONS as KARTVERKET_OPS
     from kildeverk.sources.met.ops import OPERATIONS as MET_OPS
     from kildeverk.sources.nve_hydapi.ops import OPERATIONS as NVE_OPS
     from kildeverk.sources.ssb_klass.ops import OPERATIONS as SSB_KLASS_OPS
@@ -41,5 +44,6 @@ def operations():
         *MET_OPS,
         *NVE_OPS,
         *ENTUR_OPS,
+        *KARTVERKET_OPS,
         *meta.OPERATIONS,
     )
