@@ -87,8 +87,10 @@ def _tool_block(tool: dict[str, Any]) -> str:
             <button type="button" class="run">Try it</button>
             <button type="button" class="ghost copy-curl">Copy as curl</button>
             <button type="button" class="ghost copy-mcp">Copy as MCP call</button>
+            <button type="button" class="ghost cite" hidden>Cite these sources</button>
           </div>
           <pre class="out" hidden></pre>
+          <pre class="bib" hidden></pre>
         </div>
       </article>"""
 
@@ -257,6 +259,7 @@ td {{ border-top: 1px solid var(--line); padding: 6px 8px 6px 0; vertical-align:
 .try textarea {{ width: 100%; min-height: 4.5em; resize: vertical; background: var(--code-bg); color: var(--ink);
   border: 1px solid var(--line); border-radius: 8px; padding: 10px; }}
 .try .actions {{ display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }}
+.bib {{ max-height: 300px; overflow: auto; }}
 .out {{ max-height: 420px; overflow: auto; }}
 .out.error {{ outline: 2px solid var(--err); }}
 footer {{ border-top: 1px solid var(--line); margin-top: 30px; padding: 22px 0 40px; color: var(--muted); font-size: .9rem; }}
@@ -416,6 +419,19 @@ footer {{ border-top: 1px solid var(--line); margin-top: 30px; padding: 22px 0 4
       var a = args(); if (a === null) return;
       navigator.clipboard.writeText(asCurl(area.dataset.method, area.dataset.path, a)).then(function () {{ flash(e.target, "Copied"); }});
     }});
+    // After a result with provenance: turn it into BibTeX with cite_sources, on this server.
+    var last = null, citeButton = box.querySelector(".cite"), bib = box.querySelector(".bib");
+    citeButton.addEventListener("click", function () {{
+      if (!last) return;
+      citeButton.disabled = true;
+      fetch("/v1/cite", {{ method: "POST", headers: {{ "Content-Type": "application/json" }}, body: JSON.stringify({{ provenance: last, style: "bibtex" }}) }})
+        .then(function (r) {{ return r.json(); }})
+        .then(function (body) {{
+          bib.hidden = false;
+          bib.textContent = body.data ? body.data.bibtex : JSON.stringify(body, null, 2);
+        }})
+        .finally(function () {{ citeButton.disabled = false; }});
+    }});
     box.querySelector(".copy-mcp").addEventListener("click", function (e) {{
       var a = args(); if (a === null) return;
       navigator.clipboard.writeText(asMcp(area.dataset.tool, a)).then(function () {{ flash(e.target, "Copied"); }});
@@ -430,6 +446,9 @@ footer {{ border-top: 1px solid var(--line); margin-top: 30px; padding: 22px 0 4
         .then(function (res) {{
           out.hidden = false;
           out.className = res[0] >= 400 ? "out error" : "out";
+          last = res[0] < 400 && res[1].provenance && res[1].provenance.length ? res[1].provenance : null;
+          citeButton.hidden = !last;
+          bib.hidden = true;
           var text = JSON.stringify(res[1], null, 2);
           out.textContent = text.length > 20000 ? text.slice(0, 20000) + "\\n… (cut here; the full result is longer)" : text;
         }})

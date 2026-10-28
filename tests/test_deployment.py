@@ -83,4 +83,5 @@ def test_site_lists_every_source_and_tool(tmp_path: Path):
     assert (tmp_path / "catalogue.json").exists()
     assert html.count('class="ghost copy-curl"') == len(operations())
     assert 'data-tool="place_overview"' in html
+    assert html.count('class="ghost cite" hidden') == len(operations())
     assert html.count('class="panel recipe"') >= 3 and 'id="recipes"' in html
