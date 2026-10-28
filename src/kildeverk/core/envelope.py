@@ -33,6 +33,7 @@ class Provenance(BaseModel):
     source_id: str
     source_name: str
     publisher: str
+    title: str | None = Field(default=None, description="What was fetched, in a few words.")
     licence: Licence
     request: UpstreamRequest
     retrieved_at: datetime = Field(description="When the upstream response was retrieved, in UTC.")

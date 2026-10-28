@@ -142,6 +142,7 @@ class Upstream:
             source_id=spec.id,
             source_name=spec.name,
             publisher=spec.publisher,
+            title=title,
             licence=licence,
             request=fetched.request,
             retrieved_at=fetched.retrieved_at,

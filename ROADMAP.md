@@ -68,8 +68,12 @@ or a credential and cannot be done from the code alone.
 - [x] An Atom feed of warnings for a municipality (`/v1/feeds/warnings/{municipality}.atom`):
       weather, flood and landslide warnings in one feed any reader can follow. Avalanche
       forecasts still to add, mapped from municipality to forecasting region.
-- [ ] Citations as BibTeX and CSL-JSON: turn any result's provenance into references for a
+- [x] Citations as BibTeX and CSL-JSON: turn any result's provenance into references for a
       paper or report.
+
+- [ ] A "Cite these sources" button under each "Try it" result on the website, using
+      `cite_sources` on the result shown.
+- [ ] Avalanche forecasts in the warnings feed, mapping a municipality to its forecasting region.
 
 ## More from the same publishers
 

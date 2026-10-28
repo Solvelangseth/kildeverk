@@ -60,6 +60,9 @@ fastest since 2015?"), and `min_value` to leave out tiny municipalities whose pe
 When the newest year is listed before its figures exist, it ranks the newest year that has them,
 and says so.
 
+`cite_sources` turns the `provenance` of any result into references, as BibTeX and as CSL-JSON
+for Zotero, Pandoc and citation processors. It runs locally and fetches nothing.
+
 Two tools describe the service itself: `sources_list` and `service_status`, which also counts
 calls, errors and cache hits per tool.
 
