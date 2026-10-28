@@ -47,6 +47,13 @@ ownership, traffic counting points, and the warnings in force. Its population se
 summed to today's borders, so the change reaches back past the 2020 and 2024 reforms.
 `compare_municipalities` puts two to five of these side by side.
 
+`statistics_series` gives one SSB statistic for Norway, a county or a municipality over every
+year in one call. Where SSB publishes a series summed to today's borders, it uses that. Where it
+does not, `measure_kind` lets Kildeverk rebuild the earlier years itself with
+[SSB Klass](#ssb_klass): counts and totals (`additive`) are summed from the regions that became
+today's one, and rates and shares (`non_additive`) follow one-to-one renumberings only. The result
+says which method it used and from which codes.
+
 Two tools describe the service itself: `sources_list` and `service_status`, which also counts
 calls, errors and cache hits per tool.
 

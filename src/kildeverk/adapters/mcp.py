@@ -28,8 +28,8 @@ GUIDE = """# Choosing a Kildeverk tool
 - **A municipality:** `municipality_profile` (any code, old or current, or a name).
   Several: `compare_municipalities`.
 - **A statistic:** `statistics_search_tables` (try Norwegian words too), then
-  `statistics_describe_table` for codes, then `statistics_get_data`. To compare years across the
-  2020 and 2024 reforms, pass the rows to `regions_harmonise`.
+  `statistics_describe_table` for codes, then `statistics_get_data`. For one region over time,
+  `statistics_series` does it in one call and keeps the series unbroken across the reforms.
 - **A company:** `companies_search`, then `companies_get`.
 - **Weather:** `weather_forecast` ahead; `weather_find_stations` and `weather_observations` for
   what was measured; `weather_warnings` for official warnings.

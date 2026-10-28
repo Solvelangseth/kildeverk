@@ -301,6 +301,32 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ("schools_get", {"org_number": "874738352"}),
         ("schools_get", {"org_number": "999999999"}),
     ],
+    # Not a source: statistics_series, which reads SSB Statbank and Klass together.
+    "statistics_series": [
+        ("statistics_series", {"table_id": "07459", "region": "Tromsø", "from_year": 2010}),
+        ("statistics_series", {"table_id": "07459", "region": "1201", "from_year": 2015}),
+        (
+            "statistics_series",
+            {
+                "table_id": "11342",
+                "region": "5501",
+                "measure": "FolkeLandArealKm2",
+                "measure_kind": "non_additive",
+            },
+        ),
+        (
+            "statistics_series",
+            {
+                "table_id": "06913",
+                "region": "Tromsø",
+                "measure": "Levende",
+                "from_year": 2015,
+                "measure_kind": "additive",
+            },
+        ),
+        ("statistics_series", {"table_id": "11342", "region": "5501"}),
+        ("statistics_series", {"table_id": "12558", "region": "5501", "measure": "AntHush"}),
+    ],
 }
 
 

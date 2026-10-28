@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import asyncio
 import datetime as dt
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -576,6 +576,354 @@ async def compare_municipalities(ctx: Context, args: CompareInput) -> Result[Com
     )
 
 
+# --- statistics_series -------------------------------------------------------------
+
+# SSB's codelists that sum older regions into today's, and the prefix their codes carry.
+SUMMED_CODELISTS = {"municipality": ("agg_KommSummer", "K-"), "county": ("agg_KommFylker", "F-")}
+
+
+class SeriesInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    table_id: str = Field(pattern=r"^\d{5}$", description="SSB table, e.g. '07459'.")
+    region: str = Field(
+        min_length=1,
+        max_length=60,
+        description="'0' for Norway, a county or municipality code (old or current), or a name.",
+    )
+    measure: str | None = Field(
+        default=None,
+        description="The ContentsCode value, when the table has more than one measure.",
+    )
+    filters: dict[str, list[str]] = Field(
+        default_factory=dict,
+        description="Codes for the table's other dimensions, e.g. {'Kjonn': ['2']}. Dimensions "
+        "left out are summed where SSB allows it.",
+    )
+    from_year: int | None = Field(default=None, ge=1800, le=2100)
+    to_year: int | None = Field(default=None, ge=1800, le=2100)
+    measure_kind: Literal["additive", "non_additive"] | None = Field(
+        default=None,
+        description="When SSB has no series for today's borders: 'additive' (counts, totals) lets "
+        "Kildeverk rebuild earlier years by summing the regions that became this one; "
+        "'non_additive' (rates, shares) follows renumberings only. Leave out to get the "
+        "region's own series as published.",
+    )
+
+
+class SeriesPoint(BaseModel):
+    period: str
+    value: float | int | None
+    status: str | None = None
+
+
+class SeriesOutput(BaseModel):
+    table_id: str
+    title: str
+    region_code: str
+    region_name: str | None
+    measure: str | None
+    method: str = Field(
+        description="'summed_to_todays_borders' (SSB's series for today's region, older "
+        "regions included), 'harmonised' (rebuilt here from the regions that became this one) "
+        "or 'as_published' (the code's own series)."
+    )
+    points: list[SeriesPoint]
+
+
+async def _region_for_series(ctx: Context, value: str) -> tuple[str, str, str | None]:
+    """(code, level, note) for '0', a code, or a name tried as municipality then county."""
+
+    from kildeverk.sources.ssb_klass.names import resolve_region
+
+    value = value.strip()
+    if value == "0":
+        return "0", "country", None
+    if value.isdigit():
+        level = "municipality" if len(value) == 4 else "county"
+        resolved = await _part(ctx, "regions_resolve", {"query": value, "level": level, "limit": 5})
+        if isinstance(resolved, dict):
+            picked = _pick(resolved["data"]["matches"], value)
+            if not isinstance(picked, ToolError) and picked[0] != value:
+                return picked[0], level, f"{value} is today {picked[0]} {picked[1]}."
+        return value, level, None
+    for level in ("municipality", "county"):
+        try:
+            resolved = await resolve_region(ctx, value, level)  # type: ignore[arg-type]
+        except ToolError as exc:
+            if exc.body.code == "AMBIGUOUS":
+                raise
+            continue
+        return resolved.code, level, resolved.note
+    raise ToolError(
+        ErrorCode.NOT_FOUND,
+        f"No municipality or county is called '{value}'.",
+        next_call=NextCall(tool="regions_resolve", arguments={"query": value}),
+    )
+
+
+async def _harmonised_series(
+    ctx: Context,
+    args: SeriesInput,
+    code: str,
+    level: str,
+    region_dim: str,
+    time_dim: str,
+    select: dict[str, Any],
+    first_year: int | None,
+) -> tuple[list[SeriesPoint], list[Provenance], list[str]] | None:
+    """Rebuild a series under today's borders from the regions that became `code`."""
+
+    from kildeverk.sources.ssb_klass.ops import _history, _today
+
+    history, klass_provenance, _ = await _history(ctx, level)
+    today = _today()
+    sources = {code}
+    for units in history.units.values():
+        for unit in units:
+            # SSB refuses a whole request naming a code its table does not have, so only codes
+            # still in use when the table starts are asked for.
+            if unit.valid_to is None or (first_year and unit.valid_to.year <= first_year):
+                continue
+            if code in {t.code for t in history.map_to(unit, today).targets}:
+                sources.add(unit.code)
+    if len(sources) == 1:
+        return None
+    fetched = await _part(
+        ctx,
+        "statistics_get_data",
+        {
+            "table_id": args.table_id,
+            "select": {**select, region_dim: sorted(sources)},
+            "max_rows": 10000,
+        },
+    )
+    if isinstance(fetched, ToolError):
+        return None
+    rows = [
+        {"region": r[region_dim], "period": str(r[time_dim]), "value": r["value"]}
+        for r in fetched["data"]["rows"]
+        if isinstance(r.get("value"), int | float)
+    ]
+    if not rows:
+        return None
+    # A rate cannot be summed over merged regions, so for non-additive measures each source
+    # is harmonised alone and only its one-to-one renumberings are kept. Both run locally on
+    # the cached Klass history, with no extra upstream calls.
+    batches = (
+        [rows]
+        if args.measure_kind == "additive"
+        else [[r for r in rows if r["region"] == source] for source in sorted(sources)]
+    )
+    converted: dict[str, float] = {}
+    gaps: set[str] = set()
+    harmonise_provenance: list[dict[str, Any]] = []
+    for batch in batches:
+        if not batch:
+            continue
+        harmonised = await _part(
+            ctx,
+            "regions_harmonise",
+            {"level": level, "target": "latest", "measure": args.measure_kind, "rows": batch},
+        )
+        if isinstance(harmonised, ToolError):
+            continue
+        harmonise_provenance = harmonised["provenance"]
+        for r in harmonised["data"]["rows"]:
+            if r["region"] == code:
+                converted.setdefault(r["period"], r["value"])
+        gaps |= {u["period"] for u in harmonised["data"]["unconverted"]}
+    if not converted:
+        return None
+    points = [
+        SeriesPoint(period=period, value=value)
+        for period, value in sorted(converted.items())
+        if not (args.to_year and period[:4].isdigit() and int(period[:4]) > args.to_year)
+    ]
+    gaps -= set(converted)
+    notes = [
+        (
+            f"Rebuilt under today's borders from {len(sources)} codes ({', '.join(sorted(sources))}) "
+            f"with regions_harmonise ({args.measure_kind})."
+        )
+    ]
+    if gaps:
+        notes.append(
+            f"{len(gaps)} periods could not be converted exactly (a region was divided) and are "
+            "left out."
+        )
+    provenance = [
+        *klass_provenance,
+        *(Provenance.model_validate(p) for p in fetched["provenance"]),
+        *(Provenance.model_validate(p) for p in harmonise_provenance),
+    ]
+    return points, provenance, notes
+
+
+async def statistics_series(ctx: Context, args: SeriesInput) -> Result[SeriesOutput]:
+    code, level, region_note = await _region_for_series(ctx, args.region)
+    described = await _part(
+        ctx, "statistics_describe_table", {"table_id": args.table_id, "values_limit": 50}
+    )
+    if isinstance(described, ToolError):
+        raise described
+    table = described["data"]
+    dims = {d["role"]: d for d in table["dimensions"] if d["role"] in ("region", "time", "measure")}
+    if "region" not in dims or "time" not in dims:
+        raise ToolError(
+            ErrorCode.INVALID_ARGUMENT,
+            f"Table {args.table_id} has no region or no time dimension, so it has no series by region.",
+            next_call=NextCall(
+                tool="statistics_search_tables", arguments={"query": table["title"][:40]}
+            ),
+        )
+    region_dim, time_dim = dims["region"]["code"], dims["time"]["code"]
+
+    select: dict[str, Any] = {k: v for k, v in args.filters.items()}
+    measure_dim = dims.get("measure")
+    if measure_dim:
+        measures = [v["code"] for v in measure_dim["values"]]
+        if args.measure:
+            select[measure_dim["code"]] = [args.measure]
+        elif len(measures) == 1:
+            select[measure_dim["code"]] = measures
+        else:
+            options = ", ".join(f"{v['code']} ({v['label']})" for v in measure_dim["values"][:12])
+            raise ToolError(
+                ErrorCode.AMBIGUOUS,
+                f"Table {args.table_id} has several measures; choose one with `measure`: {options}.",
+                next_call=NextCall(
+                    tool="statistics_series",
+                    arguments={
+                        "table_id": args.table_id,
+                        "region": args.region,
+                        "measure": measures[0],
+                    },
+                ),
+            )
+    for d in table["dimensions"]:
+        if (
+            d["code"] not in select
+            and d["code"] not in (region_dim, time_dim)
+            and not d["can_omit"]
+        ):
+            raise ToolError(
+                ErrorCode.INVALID_ARGUMENT,
+                f"Table {args.table_id} needs a value for {d['code']} ({d['label']}); pass it in "
+                f"`filters`, e.g. {{'{d['code']}': ['{d['values'][0]['code']}']}}.",
+                next_call=NextCall(
+                    tool="statistics_describe_table", arguments={"table_id": args.table_id}
+                ),
+            )
+    if args.from_year:
+        select[time_dim] = {"from": str(args.from_year)}
+    else:
+        select[time_dim] = "*"
+
+    notes = [region_note] if region_note else []
+    provenance = [Provenance.model_validate(p) for p in described["provenance"]]
+    method = "as_published"
+    fetched: dict[str, Any] | ToolError | None = None
+    summed = SUMMED_CODELISTS.get(level)
+    available = {c["id"] for c in dims["region"].get("codelists") or []}
+    if summed and summed[0] in available:
+        fetched = await _part(
+            ctx,
+            "statistics_get_data",
+            {
+                "table_id": args.table_id,
+                "codelists": {region_dim: summed[0]},
+                "select": {**select, region_dim: [summed[1] + code]},
+                "max_rows": 10000,
+            },
+        )
+        if isinstance(fetched, dict) and fetched["data"]["rows"]:
+            method = "summed_to_todays_borders"
+        else:
+            fetched = None
+    if fetched is None:
+        fetched = await _part(
+            ctx,
+            "statistics_get_data",
+            {
+                "table_id": args.table_id,
+                "select": {**select, region_dim: [code]},
+                "max_rows": 10000,
+            },
+        )
+    if isinstance(fetched, ToolError):
+        raise fetched
+    provenance.extend(Provenance.model_validate(p) for p in fetched["provenance"])
+    notes.extend(fetched["notes"])
+
+    rows = fetched["data"]["rows"]
+    periods: dict[str, list[dict[str, Any]]] = {}
+    for row in rows:
+        periods.setdefault(str(row[time_dim]), []).append(row)
+    if any(len(r) > 1 for r in periods.values()):
+        notes.append(
+            "Several rows per period: a dimension in `filters` has more than one value. Values "
+            "are summed per period; ask for one value per dimension for a single series."
+        )
+    points = []
+    for period in sorted(periods):
+        group = periods[period]
+        values = [r.get("value") for r in group if isinstance(r.get("value"), int | float)]
+        status = next((r.get("status") for r in group if r.get("status")), None)
+        if args.to_year and period[:4].isdigit() and int(period[:4]) > args.to_year:
+            continue
+        points.append(
+            SeriesPoint(period=period, value=sum(values) if values else None, status=status)
+        )
+    if method == "as_published" and args.measure_kind and level in SUMMED_CODELISTS:
+        first = str(table.get("first_period") or "")[:4]
+        rebuilt = await _harmonised_series(
+            ctx,
+            args,
+            code,
+            level,
+            region_dim,
+            time_dim,
+            select,
+            int(first) if first.isdigit() else None,
+        )
+        if rebuilt is not None:
+            rebuilt_points, rebuilt_provenance, rebuilt_notes = rebuilt
+            if len(rebuilt_points) > len([p for p in points if p.value]):
+                points, method = rebuilt_points, "harmonised"
+                provenance.extend(rebuilt_provenance)
+                notes.extend(rebuilt_notes)
+    if method == "as_published":
+        # SSB fills years before a region existed with zeros; they are not data.
+        while points and points[0].value == 0:
+            points.pop(0)
+        if level in SUMMED_CODELISTS and points:
+            notes.append(
+                f"SSB has no series summed to today's borders for this table, so the series is "
+                f"{code}'s own and starts at {points[0].period}."
+                + (
+                    ""
+                    if args.measure_kind
+                    else " Give measure_kind to rebuild earlier years from the regions that "
+                    "became this one."
+                )
+            )
+    first = rows[0] if rows else {}
+    return Result(
+        data=SeriesOutput(
+            table_id=args.table_id,
+            title=table["title"],
+            region_code=code,
+            region_name=first.get(f"{region_dim}_label"),
+            measure=first.get(f"{measure_dim['code']}_label") if measure_dim else None,
+            method=method,
+            points=points,
+        ),
+        provenance=provenance,
+        notes=notes,
+    )
+
+
 OPERATIONS = (
     Operation(
         name="place_overview",
@@ -650,5 +998,25 @@ OPERATIONS = (
         http_method="POST",
         http_path="/v1/municipalities/compare",
         examples=({"municipalities": ["Bergen", "Trondheim", "Stavanger"]},),
+    ),
+    Operation(
+        name="statistics_series",
+        title="A statistic over time for one region",
+        description=(
+            "One SSB statistic for Norway, a county or a municipality over every year, in one "
+            "call. Uses SSB's series summed to today's borders where the table has one, so the "
+            "series does not stop at the 2020 or 2024 reforms. Accepts codes, old or current, "
+            "and names. Find tables with statistics_search_tables."
+        ),
+        input_model=SeriesInput,
+        output_model=SeriesOutput,
+        handler=statistics_series,
+        source_ids=("ssb_statbank", "ssb_klass"),
+        http_method="POST",
+        http_path="/v1/statistics/series",
+        examples=(
+            {"table_id": "07459", "region": "Tromsø", "from_year": 2010},
+            {"table_id": "07459", "region": "46", "filters": {"Kjonn": ["2"]}},
+        ),
     ),
 )

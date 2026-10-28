@@ -173,3 +173,10 @@ async def test_municipality_profile(live):
 async def test_compare_municipalities(live):
     result = await OPS["compare_municipalities"].invoke(live, {"municipalities": ["0301", "4601"]})
     assert [r["code"] for r in result["data"]["rows"]] == ["0301", "4601"]
+
+
+async def test_statistics_series(live):
+    result = await OPS["statistics_series"].invoke(
+        live, {"table_id": "07459", "region": "Tromsø", "from_year": 2015}
+    )
+    assert result["data"]["method"] == "summed_to_todays_borders"
