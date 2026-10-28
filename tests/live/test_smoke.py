@@ -96,3 +96,12 @@ async def test_nve_station_and_latest_discharge(live):
         live, {"station": "62.5.0", "parameter": "discharge"}
     )
     assert latest["data"]["row_count"] == 1
+
+
+async def test_entur_stop_and_departures(live):
+    found = await OPS["transit_find_stops"].invoke(live, {"query": "Oslo S", "limit": 1})
+    assert found["data"]["stops"][0]["id"] == "NSR:StopPlace:59872"
+    departures = await OPS["transit_departures"].invoke(
+        live, {"stop": "NSR:StopPlace:59872", "limit": 3}
+    )
+    assert departures["data"]["departures"]

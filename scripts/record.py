@@ -125,6 +125,26 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ),
         ("water_observations", {"station": "62.5.0", "parameter": "snow_depth"}),
     ],
+    "entur_geocoder": [
+        ("transit_find_stops", {"query": "Oslo S", "limit": 3}),
+        ("transit_find_stops", {"lat": 60.3913, "lon": 5.3221, "radius_km": 0.5}),
+        ("transit_find_stops", {"municipality": "4601", "stop_types": ["railStation"]}),
+        ("transit_find_stops", {"query": "Bergen stasjon", "lat": 60.39, "lon": 5.33, "limit": 3}),
+        ("transit_find_stops", {"query": "qqxxzzvv"}),
+    ],
+    "entur_journeyplanner": [
+        ("transit_departures", {"stop": "NSR:StopPlace:59872", "limit": 5}),
+        (
+            "transit_departures",
+            {"stop": "NSR:StopPlace:59872", "modes": ["rail"], "within_minutes": 60},
+        ),
+        ("transit_departures", {"stop": "NSR:Quay:571", "limit": 3}),
+        (
+            "transit_departures",
+            {"stop": "NSR:StopPlace:58366", "start": "2026-10-29T08:00:00", "limit": 3},
+        ),
+        ("transit_departures", {"stop": "NSR:StopPlace:999999999"}),
+    ],
 }
 
 

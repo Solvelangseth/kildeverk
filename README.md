@@ -22,7 +22,8 @@ publishers whose data it reads.
 | [MET Norway Locationforecast](#met_locationforecast) | ✅ available | `weather_forecast` |
 | [MET Norway Frost](#met_frost): needs a free client id | ✅ available | `weather_find_stations`, `weather_station_elements`, `weather_observations` |
 | [NVE HydAPI](#nve_hydapi): needs a free key | ✅ available | `water_find_stations`, `water_observations` |
-| Entur (stops, departures) | planned | |
+| [Entur Geocoder](#entur_geocoder): stop places | ✅ available | `transit_find_stops` |
+| [Entur Journey Planner](#entur_journeyplanner): departures | ✅ available | `transit_departures` |
 | Kartverket (addresses, place names, elevation) | planned | |
 
 Two tools describe the service itself: `sources_list` and `service_status`.
@@ -363,6 +364,65 @@ on data points per request. Kildeverk spends at most 60 calls a minute.
 - Flood and landslide warnings (Varsom) come from a different NVE service and are not included.
 - Station metadata names parameters in Norwegian. The `alias` field gives the English name that
   `water_observations` accepts.
+
+<a id="entur_geocoder"></a>
+### Entur Geocoder: stop places
+
+**What it covers:** every public transport stop place in Norway, taken from the national stop
+register (NSR) that Entur maintains.
+- `transit_find_stops` finds stops by name, near a point, or by municipality code. It can be limited
+  to some kinds of stop, such as `railStation`, `ferryStop` or `airport`. Each stop has its NSR id,
+  the modes it serves, its municipality and county, its position and its fare zones.
+
+Only NSR stop places are returned. The geocoder also knows addresses, points of interest and
+OpenStreetMap places, but Kildeverk asks for the `stopPlace` layer alone, so every result is a stop
+that `transit_departures` can use.
+
+**Licence:** [NLOD](https://data.norge.no/nlod/en/2.0), stated in
+[Entur's developer documentation](https://developer.entur.org/pages-intro-authentication).
+
+**Rate limits:** 1000 requests a minute per client name, reported in `rate-limit-*` headers.
+Kildeverk spends at most 60 calls a minute.
+
+**Caching:** 24 hours. The stop register changes rarely.
+
+**Behaviour worth knowing:**
+- This uses Geocoder v3. Entur deprecated v1 and v2 in June 2026.
+- With a `query`, `lat` and `lon` only rank nearby stops higher; `radius_km` applies when there is
+  no query.
+
+<a id="entur_journeyplanner"></a>
+### Entur Journey Planner: departures
+
+**What it covers:** departures from any stop place or single quay in Norway, for every operator:
+trains, buses, trams, metro, ferries and flights.
+- `transit_departures` returns the next departures, with scheduled and expected times, the delay,
+  whether the time is real-time, the platform, line, destination, operator and cancellations. Any
+  disruption notices are listed once and referenced from the departures they affect. It can be
+  limited to some modes, and can look from a later start time.
+
+**Identification:** Entur requires every client to send an `ET-Client-Name` header in the form
+`<company>-<application>`. Kildeverk sends `kildeverk-local` or `kildeverk-public`. Set
+`KILDEVERK_ENTUR_CLIENT_NAME` to use your own. No key is needed.
+
+**Licence:** [NLOD](https://data.norge.no/nlod/en/2.0), as for the geocoder.
+
+**Rate limits:** 2000 requests per two minutes per client name. Kildeverk spends at most 60 calls a
+minute.
+
+**Caching:** 30 seconds. Departures for "now" are the same request from call to call, so a burst of
+identical questions costs one upstream call; the result says when it came from the cache.
+
+**Behaviour worth knowing:**
+- Times are Norwegian local time with their UTC offset. A `start` without an offset is read as
+  Norwegian time, summer time included.
+- Departures are ordered by expected time, so a delayed train can come after a later scheduled one.
+- Real-time coverage depends on the operator; `realtime: false` means the time is the timetable.
+- The query is GraphQL, and provenance records the full request body.
+
+**Known gaps:**
+- Journey planning from A to B is not exposed yet.
+- Groups of stop places (all of "Oslo", say) are not searched; use a stop place or a quay.
 
 ## Development
 

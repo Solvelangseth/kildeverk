@@ -23,10 +23,32 @@ def error_response(error: ToolError) -> JSONResponse:
     return JSONResponse(error.envelope(), status_code=error.http_status, headers=headers)
 
 
+def _list_fields(op: Operation) -> set[str]:
+    """Input fields that take a list, so a query string may repeat them or separate with commas."""
+
+    def is_array(schema: dict[str, Any]) -> bool:
+        return schema.get("type") == "array" or any(is_array(s) for s in schema.get("anyOf", []))
+
+    return {name for name, schema in op.input_schema()["properties"].items() if is_array(schema)}
+
+
+def _query_arguments(request: Request, list_fields: set[str]) -> dict[str, Any]:
+    arguments: dict[str, Any] = {}
+    for name in request.query_params:
+        if name in list_fields:
+            values = request.query_params.getlist(name)
+            arguments[name] = [part for v in values for part in v.split(",") if part]
+        else:
+            arguments[name] = request.query_params[name]
+    return arguments
+
+
 def _endpoint(op: Operation):
+    list_fields = _list_fields(op)
+
     async def endpoint(request: Request) -> JSONResponse:
         if op.http_method == "GET":
-            arguments: dict[str, Any] = dict(request.query_params)
+            arguments = _query_arguments(request, list_fields)
         else:
             try:
                 arguments = json.loads(await request.body() or b"{}")

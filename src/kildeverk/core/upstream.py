@@ -345,7 +345,7 @@ def _detail(response: httpx.Response) -> str:
     if isinstance(body, dict) and isinstance(body.get("error"), dict):
         body = body["error"]
     if isinstance(body, dict):
-        for field_name in ("reason", "title", "message", "detail", "error"):
+        for field_name in ("reason", "detail", "message", "title", "error"):
             value = body.get(field_name)
             if isinstance(value, str) and value.strip():
                 return value.strip()[:200]

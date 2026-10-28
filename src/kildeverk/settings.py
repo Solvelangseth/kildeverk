@@ -33,6 +33,14 @@ class Settings(BaseSettings):
     """Key for NVE's HydAPI (free at hydapi.nve.no). Without it the water tools answer
     NOT_CONFIGURED."""
 
+    entur_client_name: str = ""
+    """Sent to Entur as ET-Client-Name, which it requires in the form
+    '<company>-<application>'. Defaults to 'kildeverk-<deployment>'."""
+
+    @property
+    def et_client_name(self) -> str:
+        return self.entur_client_name or f"kildeverk-{self.deployment}"
+
     @property
     def user_agent(self) -> str:
         contact = f"; {self.contact}" if self.contact else ""

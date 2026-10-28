@@ -56,6 +56,9 @@ def build_context(
         credentials["met_frost"] = httpx.BasicAuth(settings.frost_client_id, "")
     if settings.nve_api_key:
         credentials["nve_hydapi"] = HeaderAuth("X-API-Key", settings.nve_api_key)
+    # Entur needs no key, but every request must say which client it comes from.
+    for source_id in ("entur_geocoder", "entur_journeyplanner"):
+        credentials[source_id] = HeaderAuth("ET-Client-Name", settings.et_client_name)
     upstreams = {
         spec.id: Upstream(
             spec,

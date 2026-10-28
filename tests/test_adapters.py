@@ -68,6 +68,28 @@ def test_rest_get_with_query_parameters(http):
     assert len(response.json()["data"]["tables"]) == 3
 
 
+@pytest.mark.parametrize(
+    "params",
+    [
+        [("municipality", "4601"), ("stop_types", "railStation")],
+        [("municipality", "4601"), ("stop_types", "railStation,")],
+    ],
+)
+def test_rest_list_parameters_repeat_or_use_commas(http, params):
+    response = http.get("/v1/transit/stops", params=params)
+    assert response.status_code == 200
+    assert all("railStation" in s["stop_types"] for s in response.json()["data"]["stops"])
+
+
+def test_rest_repeated_list_parameter_keeps_every_value(http):
+    response = http.get(
+        "/v1/transit/departures",
+        params=[("stop", "NSR:StopPlace:59872"), ("modes", "rail"), ("within_minutes", "60")],
+    )
+    assert response.status_code == 200
+    assert {d["mode"] for d in response.json()["data"]["departures"]} == {"rail"}
+
+
 def test_rest_path_parameter(http):
     response = http.get("/v1/statistics/tables/07459", params={"value_search": "bergen"})
     assert response.status_code == 200
