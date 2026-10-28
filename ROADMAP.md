@@ -50,7 +50,7 @@ or a credential and cannot be done from the code alone.
 
 - [x] Run every tool's own examples live in the daily smoke job, so a change upstream shows up
       against the exact calls the docs and website advertise.
-- [ ] "Copy as curl" and "copy as MCP call" buttons next to each "Try it" on the website.
+- [x] "Copy as curl" and "copy as MCP call" buttons next to each "Try it" on the website.
 
 ## More from the same publishers
 

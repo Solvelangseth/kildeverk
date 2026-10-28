@@ -82,8 +82,12 @@ def _tool_block(tool: dict[str, Any]) -> str:
         </details>
         <div class="try">
           <textarea spellcheck="false" aria-label="Arguments for {_e(tool["name"])}"
-            data-method="{_e(method)}" data-path="{_e(path)}">{_e(json.dumps(example, ensure_ascii=False, indent=2))}</textarea>
-          <button type="button" class="run">Try it</button>
+            data-tool="{_e(tool["name"])}" data-method="{_e(method)}" data-path="{_e(path)}">{_e(json.dumps(example, ensure_ascii=False, indent=2))}</textarea>
+          <div class="actions">
+            <button type="button" class="run">Try it</button>
+            <button type="button" class="ghost copy-curl">Copy as curl</button>
+            <button type="button" class="ghost copy-mcp">Copy as MCP call</button>
+          </div>
           <pre class="out" hidden></pre>
         </div>
       </article>"""
@@ -216,7 +220,7 @@ td {{ border-top: 1px solid var(--line); padding: 6px 8px 6px 0; vertical-align:
 .try {{ margin-top: 12px; }}
 .try textarea {{ width: 100%; min-height: 4.5em; resize: vertical; background: var(--code-bg); color: var(--ink);
   border: 1px solid var(--line); border-radius: 8px; padding: 10px; }}
-.try button {{ margin-top: 6px; }}
+.try .actions {{ display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }}
 .out {{ max-height: 420px; overflow: auto; }}
 .out.error {{ outline: 2px solid var(--err); }}
 footer {{ border-top: 1px solid var(--line); margin-top: 30px; padding: 22px 0 40px; color: var(--muted); font-size: .9rem; }}
@@ -316,14 +320,14 @@ footer {{ border-top: 1px solid var(--line); margin-top: 30px; padding: 22px 0 4
     }});
   }});
 
-  function request(method, path, args) {{
+  // The URL and body a tool call becomes over HTTP: path parameters filled in, then a JSON
+  // body for POST or a query string for GET (lists as repeated parameters).
+  function target(method, path, args) {{
     var rest = Object.assign({{}}, args);
     path = path.replace(/\\{{(\\w+)\\}}/g, function (_, name) {{
       var value = rest[name]; delete rest[name]; return encodeURIComponent(value);
     }});
-    if (method === "POST") {{
-      return fetch(path, {{ method: "POST", headers: {{ "Content-Type": "application/json" }}, body: JSON.stringify(rest) }});
-    }}
+    if (method === "POST") return {{ url: path, body: JSON.stringify(rest) }};
     var query = new URLSearchParams();
     Object.keys(rest).forEach(function (key) {{
       var value = rest[key];
@@ -332,11 +336,51 @@ footer {{ border-top: 1px solid var(--line); margin-top: 30px; padding: 22px 0 4
       else query.append(key, value);
     }});
     var qs = query.toString();
-    return fetch(path + (qs ? "?" + qs : ""));
+    return {{ url: path + (qs ? "?" + qs : ""), body: null }};
+  }}
+
+  function request(method, path, args) {{
+    var t = target(method, path, args);
+    if (t.body !== null) {{
+      return fetch(t.url, {{ method: "POST", headers: {{ "Content-Type": "application/json" }}, body: t.body }});
+    }}
+    return fetch(t.url);
+  }}
+
+  function shellQuote(text) {{ return "'" + text.replace(/'/g, "'\\''") + "'"; }}
+
+  function asCurl(method, path, args) {{
+    var t = target(method, path, args);
+    var base = origin.indexOf("http") === 0 ? origin : "http://127.0.0.1:8000";
+    if (t.body !== null) {{
+      return "curl -X POST " + shellQuote(base + t.url) + " -H 'Content-Type: application/json' -d " + shellQuote(t.body);
+    }}
+    return "curl " + shellQuote(base + t.url);
+  }}
+
+  function asMcp(tool, args) {{
+    return JSON.stringify({{ jsonrpc: "2.0", id: 1, method: "tools/call", params: {{ name: tool, arguments: args }} }}, null, 2);
+  }}
+
+  function flash(button, text) {{
+    var label = button.textContent; button.textContent = text;
+    setTimeout(function () {{ button.textContent = label; }}, 1500);
   }}
 
   document.querySelectorAll(".try").forEach(function (box) {{
     var area = box.querySelector("textarea"), out = box.querySelector(".out"), button = box.querySelector(".run");
+    function args() {{
+      try {{ return JSON.parse(area.value || "{{}}"); }}
+      catch (e) {{ out.hidden = false; out.className = "out error"; out.textContent = "Arguments are not valid JSON: " + e.message; return null; }}
+    }}
+    box.querySelector(".copy-curl").addEventListener("click", function (e) {{
+      var a = args(); if (a === null) return;
+      navigator.clipboard.writeText(asCurl(area.dataset.method, area.dataset.path, a)).then(function () {{ flash(e.target, "Copied"); }});
+    }});
+    box.querySelector(".copy-mcp").addEventListener("click", function (e) {{
+      var a = args(); if (a === null) return;
+      navigator.clipboard.writeText(asMcp(area.dataset.tool, a)).then(function () {{ flash(e.target, "Copied"); }});
+    }});
     button.addEventListener("click", function () {{
       var args;
       try {{ args = JSON.parse(area.value || "{{}}"); }}

@@ -81,3 +81,5 @@ def test_site_lists_every_source_and_tool(tmp_path: Path):
     assert all(f'id="tool-{op.name}"' in html for op in operations())
     assert "<script>" in html and "{" not in html.split("<style>")[0].split("<title>")[0]
     assert (tmp_path / "catalogue.json").exists()
+    assert html.count('class="ghost copy-curl"') == len(operations())
+    assert 'data-tool="place_overview"' in html
