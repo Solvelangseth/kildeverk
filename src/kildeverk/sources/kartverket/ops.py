@@ -35,6 +35,7 @@ from kildeverk.sources.kartverket.spec import (
     PLACES_URL,
     SPEC,
 )
+from kildeverk.sources.ssb_klass.names import with_region_names
 
 # Coordinates in and out are plain WGS84-compatible latitude and longitude (ETRS89).
 CRS = 4258
@@ -348,7 +349,7 @@ OPERATIONS = (
         ),
         input_model=AddressSearchInput,
         output_model=AddressSearchOutput,
-        handler=addresses_search,
+        handler=with_region_names({"municipality": "municipality"})(addresses_search),
         source_ids=(SPEC.id,),
         http_method="GET",
         http_path="/v1/addresses",
@@ -368,7 +369,9 @@ OPERATIONS = (
         ),
         input_model=PlaceSearchInput,
         output_model=PlaceSearchOutput,
-        handler=places_search,
+        handler=with_region_names({"municipality": "municipality", "county": "county"})(
+            places_search
+        ),
         source_ids=(SPEC.id,),
         http_method="GET",
         http_path="/v1/places",

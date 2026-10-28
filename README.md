@@ -50,6 +50,13 @@ summed to today's borders, so the change reaches back past the 2020 and 2024 ref
 Two tools describe the service itself: `sources_list` and `service_status`, which also counts
 calls, errors and cache hits per tool.
 
+Tools that filter by municipality or county also accept names: `companies_search`,
+`schools_search`, `traffic_find_points`, `addresses_search`, `places_search`,
+`hazards_flood_landslide` and `weather_warnings`. Names are resolved to today's code through SSB
+Klass, including former municipalities that merged whole into one of today's; Klass is cited in
+the result, and a note says what a name was read as. A name shared by two municipalities, or
+a former one that was divided, is an error that lists the codes.
+
 Over MCP, the server also offers **resources**: `kildeverk://guide` (which tool answers which
 question), `kildeverk://sources`, and one `kildeverk://sources/<id>` per source. It offers four
 **prompts**: `profile_place`, `profile_municipality`, `find_statistic` and `compare_places`.

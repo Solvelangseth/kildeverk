@@ -11,6 +11,7 @@ from kildeverk.context import Context
 from kildeverk.core.envelope import Result
 from kildeverk.core.operation import Operation
 from kildeverk.sources.met.spec import METALERTS, METALERTS_URL
+from kildeverk.sources.ssb_klass.names import COUNTY_PATTERN, with_region_names
 
 LEVEL_NAMES = {1: "green", 2: "yellow", 3: "orange", 4: "red"}
 
@@ -26,8 +27,9 @@ class WarningsInput(BaseModel):
     lon: float | None = Field(default=None, ge=-180, le=180)
     county: str | None = Field(
         default=None,
-        pattern=r"^\d{2}$",
-        description="County number as it was when the warning was issued.",
+        pattern=COUNTY_PATTERN,
+        description="County number as it was when the warning was issued, or a county name "
+        "(resolved to today's number).",
     )
     domain: Literal["land", "marine"] | None = Field(default=None, description="Land or sea.")
     month: Month | None = Field(
@@ -193,7 +195,7 @@ OPERATIONS = (
         ),
         input_model=WarningsInput,
         output_model=WarningsOutput,
-        handler=warnings,
+        handler=with_region_names({"county": "county"})(warnings),
         source_ids=(METALERTS.id,),
         http_method="GET",
         http_path="/v1/weather/warnings",

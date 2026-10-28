@@ -120,8 +120,9 @@ async def test_search_needs_a_filter_and_respects_the_window(ctx):
 
 def test_search_input_accepts_rest_style_lists_and_rejects_bad_values():
     assert SearchInput(municipality="0301,4601").municipality == ["0301", "4601"]
+    assert SearchInput(municipality="Oslo").municipality == ["Oslo"]  # resolved by the tool
     with pytest.raises(ValueError):
-        SearchInput(municipality="Oslo")
+        SearchInput(municipality="301")
     with pytest.raises(ValueError, match="0, 1, or 5"):
         SearchInput(min_employees=3)
 

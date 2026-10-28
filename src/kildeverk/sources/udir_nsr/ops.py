@@ -12,6 +12,13 @@ from kildeverk.core.envelope import Result
 from kildeverk.core.errors import ErrorCode, NextCall, ToolError
 from kildeverk.core.operation import Operation
 from kildeverk.core.upstream import UpstreamClientError
+from kildeverk.sources.ssb_klass.names import (
+    COUNTY_HELP,
+    COUNTY_PATTERN,
+    MUNICIPALITY_HELP,
+    MUNICIPALITY_PATTERN,
+    with_region_names,
+)
 from kildeverk.sources.udir_nsr.spec import BASE_URL, SPEC
 
 OrgNumber = Field(
@@ -44,8 +51,10 @@ class SchoolsSearchInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     name: str | None = Field(default=None, min_length=2, max_length=80)
-    municipality: str | None = Field(default=None, pattern=r"^\d{4}$")
-    county: str | None = Field(default=None, pattern=r"^\d{2}$")
+    municipality: str | None = Field(
+        default=None, pattern=MUNICIPALITY_PATTERN, description=MUNICIPALITY_HELP
+    )
+    county: str | None = Field(default=None, pattern=COUNTY_PATTERN, description=COUNTY_HELP)
     level: Literal["primary", "secondary"] | None = Field(
         default=None,
         description="'primary' for grunnskole (years 1-10), 'secondary' for videregående.",
@@ -277,7 +286,9 @@ OPERATIONS = (
         ),
         input_model=SchoolsSearchInput,
         output_model=SchoolsSearchOutput,
-        handler=schools_search,
+        handler=with_region_names({"municipality": "municipality", "county": "county"})(
+            schools_search
+        ),
         source_ids=(SPEC.id,),
         http_method="GET",
         http_path="/v1/schools",

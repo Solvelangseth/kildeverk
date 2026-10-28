@@ -31,7 +31,7 @@ or a credential and cannot be done from the code alone.
       with only Kildeverk's tools, to measure which tools are found, misused or missing.
 - [x] Count tool calls, errors and cache hits per tool, and show them in `service_status`.
 
-- [ ] Accept municipality and county names wherever a code is accepted (`companies_search`,
+- [x] Accept municipality and county names wherever a code is accepted (`companies_search`,
       `schools_search`, `hazards_flood_landslide`, …), resolved through Klass, so an agent can
       skip a lookup call. Results say what a name was resolved to.
 - [ ] A `compact` option on the tools with large results, returning only the fields most answers

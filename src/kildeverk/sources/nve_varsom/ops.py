@@ -25,6 +25,7 @@ from kildeverk.sources.nve_varsom.models import (
     Warning,
 )
 from kildeverk.sources.nve_varsom.spec import AVALANCHE_URL, FLOOD_URL, LANDSLIDE_URL, SPEC
+from kildeverk.sources.ssb_klass.names import with_region_names
 
 OSLO = ZoneInfo("Europe/Oslo")
 ENGLISH = 2
@@ -262,7 +263,9 @@ OPERATIONS = (
         ),
         input_model=FloodLandslideInput,
         output_model=FloodLandslideOutput,
-        handler=flood_landslide,
+        handler=with_region_names({"municipality": "municipality", "county": "county"})(
+            flood_landslide
+        ),
         source_ids=(SPEC.id,),
         http_method="GET",
         http_path="/v1/hazards/flood-landslide",

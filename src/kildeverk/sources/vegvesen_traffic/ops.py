@@ -15,6 +15,13 @@ from kildeverk.core.envelope import Provenance, Result
 from kildeverk.core.errors import ErrorCode, NextCall, ToolError
 from kildeverk.core.operation import Operation
 from kildeverk.core.upstream import Fetched, Upstream, UpstreamClientError
+from kildeverk.sources.ssb_klass.names import (
+    COUNTY_HELP,
+    COUNTY_PATTERN,
+    MUNICIPALITY_HELP,
+    MUNICIPALITY_PATTERN,
+    with_region_names,
+)
 from kildeverk.sources.vegvesen_traffic.spec import GRAPHQL_URL, SPEC
 
 OSLO = ZoneInfo("Europe/Oslo")
@@ -32,8 +39,10 @@ class FindPointsInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     name: str | None = Field(default=None, min_length=2, max_length=60)
-    municipality: str | None = Field(default=None, pattern=r"^\d{4}$")
-    county: str | None = Field(default=None, pattern=r"^\d{2}$")
+    municipality: str | None = Field(
+        default=None, pattern=MUNICIPALITY_PATTERN, description=MUNICIPALITY_HELP
+    )
+    county: str | None = Field(default=None, pattern=COUNTY_PATTERN, description=COUNTY_HELP)
     road: str | None = Field(
         default=None,
         pattern=r"^(?i:[ERFK]V?)\s?\d{1,5}$",
@@ -432,7 +441,9 @@ OPERATIONS = (
         ),
         input_model=FindPointsInput,
         output_model=FindPointsOutput,
-        handler=find_points,
+        handler=with_region_names({"municipality": "municipality", "county": "county"})(
+            find_points
+        ),
         # A search near a point first asks Kartverket which county the point is in.
         source_ids=(SPEC.id, "kartverket"),
         http_method="GET",

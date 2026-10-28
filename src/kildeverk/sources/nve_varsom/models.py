@@ -5,6 +5,13 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from kildeverk.sources.ssb_klass.names import (
+    COUNTY_HELP,
+    COUNTY_PATTERN,
+    MUNICIPALITY_HELP,
+    MUNICIPALITY_PATTERN,
+)
+
 MAX_DAYS = 31
 
 LEVEL_NAMES = {0: "none", 1: "green", 2: "yellow", 3: "orange", 4: "red"}
@@ -44,9 +51,9 @@ class FloodLandslideInput(_Period):
 
     kinds: list[Literal["flood", "landslide"]] = Field(default=["flood", "landslide"], min_length=1)
     municipality: str | None = Field(
-        default=None, pattern=r"^\d{4}$", description="Municipality code, e.g. '3305'."
+        default=None, pattern=MUNICIPALITY_PATTERN, description=MUNICIPALITY_HELP
     )
-    county: str | None = Field(default=None, pattern=r"^\d{2}$", description="County number.")
+    county: str | None = Field(default=None, pattern=COUNTY_PATTERN, description=COUNTY_HELP)
     min_level: int = Field(
         default=2,
         ge=1,

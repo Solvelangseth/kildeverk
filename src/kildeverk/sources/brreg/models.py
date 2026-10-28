@@ -63,8 +63,8 @@ class SearchInput(BaseModel):
     )
     municipality: CodeList = Field(
         default=None,
-        description="Municipality codes (4 digits), matched on business or postal address. "
-        "Use current codes; regions_resolve finds them.",
+        description="Municipality codes (4 digits) or names, matched on business or postal "
+        "address. Names are resolved to today's codes.",
         max_length=50,
     )
     industry: CodeList = Field(
@@ -104,8 +104,10 @@ class SearchInput(BaseModel):
     @field_validator("municipality")
     @classmethod
     def _four_digits(cls, value: list[str] | None) -> list[str] | None:
-        if value and not all(code.isdigit() and len(code) == 4 for code in value):
-            raise ValueError("municipality codes have 4 digits, e.g. '0301'")
+        if value and not all(
+            (code.isdigit() and len(code) == 4) or not code[:1].isdigit() for code in value
+        ):
+            raise ValueError("municipality codes have 4 digits, e.g. '0301'; names work too")
         return value
 
 

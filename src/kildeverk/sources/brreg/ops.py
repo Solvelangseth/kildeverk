@@ -32,6 +32,7 @@ from kildeverk.sources.brreg.spec import (
     REGISTER_PAGE,
     SPEC,
 )
+from kildeverk.sources.ssb_klass.names import with_region_names
 
 SORTS = {
     "most_employees": "antallAnsatte,DESC",
@@ -320,7 +321,7 @@ OPERATIONS = (
         ),
         input_model=SearchInput,
         output_model=SearchOutput,
-        handler=search,
+        handler=with_region_names({"municipality": "municipality"})(search),
         source_ids=(SPEC.id,),
         http_method="GET",
         http_path="/v1/companies",

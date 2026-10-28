@@ -5,6 +5,13 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from kildeverk.sources.ssb_klass.names import (
+    COUNTY_HELP,
+    COUNTY_PATTERN,
+    MUNICIPALITY_HELP,
+    MUNICIPALITY_PATTERN,
+)
+
 # --- addresses_search --------------------------------------------------------------
 
 
@@ -20,7 +27,7 @@ class AddressSearchInput(BaseModel):
     )
     postcode: str | None = Field(default=None, pattern=r"^\d{4}$")
     municipality: str | None = Field(
-        default=None, pattern=r"^\d{4}$", description="Municipality code, e.g. '5001' (Trondheim)."
+        default=None, pattern=MUNICIPALITY_PATTERN, description=MUNICIPALITY_HELP
     )
     fuzzy: bool = Field(default=False, description="Also match spellings close to the query.")
     lat: float | None = Field(default=None, ge=57, le=82)
@@ -100,8 +107,10 @@ class PlaceSearchInput(BaseModel):
         description="Kind of place, in Norwegian as the register names it, e.g. 'Fjell', "
         "'Innsjø', 'By', 'Gard', 'Tettsted', 'Øy'. Unknown kinds list close matches.",
     )
-    municipality: str | None = Field(default=None, pattern=r"^\d{4}$")
-    county: str | None = Field(default=None, pattern=r"^\d{2}$", description="County number.")
+    municipality: str | None = Field(
+        default=None, pattern=MUNICIPALITY_PATTERN, description=MUNICIPALITY_HELP
+    )
+    county: str | None = Field(default=None, pattern=COUNTY_PATTERN, description=COUNTY_HELP)
     lat: float | None = Field(default=None, ge=57, le=82)
     lon: float | None = Field(default=None, ge=-11, le=35)
     radius_m: int = Field(default=500, ge=1, le=5000, description="With lat and lon.")
