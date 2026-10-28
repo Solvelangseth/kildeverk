@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from kildeverk.core.source import SourceSpec
 from kildeverk.sources.brreg.spec import SPEC as BRREG
+from kildeverk.sources.datanorge.spec import SPEC as DATANORGE
 from kildeverk.sources.entur.spec import GEOCODER as ENTUR_GEOCODER
 from kildeverk.sources.entur.spec import JOURNEY_PLANNER as ENTUR_JOURNEY_PLANNER
 from kildeverk.sources.kartverket.spec import SPEC as KARTVERKET
@@ -27,6 +28,7 @@ SOURCES: tuple[SourceSpec, ...] = (
     KARTVERKET,
     NORGES_BANK,
     NVE_VARSOM,
+    DATANORGE,
 )
 
 
@@ -34,6 +36,7 @@ def operations():
     # Imported late: handlers need Context, and Context needs SOURCES.
     from kildeverk.sources import meta
     from kildeverk.sources.brreg.ops import OPERATIONS as BRREG_OPS
+    from kildeverk.sources.datanorge.ops import OPERATIONS as DATANORGE_OPS
     from kildeverk.sources.entur.ops import OPERATIONS as ENTUR_OPS
     from kildeverk.sources.kartverket.ops import OPERATIONS as KARTVERKET_OPS
     from kildeverk.sources.met.ops import OPERATIONS as MET_OPS
@@ -53,5 +56,6 @@ def operations():
         *KARTVERKET_OPS,
         *NORGES_BANK_OPS,
         *NVE_VARSOM_OPS,
+        *DATANORGE_OPS,
         *meta.OPERATIONS,
     )

@@ -130,3 +130,8 @@ async def test_varsom_warnings_and_avalanche_summary(live):
     assert warnings["provenance"]
     summary = await OPS["hazards_avalanche"].invoke(live, {})
     assert len(summary["data"]["forecasts"]) >= 40
+
+
+async def test_datanorge_search(live):
+    result = await OPS["catalog_search"].invoke(live, {"query": "befolkning", "limit": 3})
+    assert result["data"]["entries"]

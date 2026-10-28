@@ -27,11 +27,9 @@ publishers whose data it reads.
 | [Kartverket](#kartverket): addresses, place names, elevation | ✅ available | `addresses_search`, `places_search`, `terrain_elevation` |
 | [Norges Bank](#norges_bank): exchange rates and the policy rate | ✅ available | `currency_exchange_rates`, `rates_policy_rate` |
 | [NVE Varsom](#nve_varsom): flood, landslide and avalanche warnings | ✅ available | `hazards_flood_landslide`, `hazards_avalanche` |
+| [data.norge.no](#datanorge): the national data catalogue | ✅ available | `catalog_search` |
 
 Two tools describe the service itself: `sources_list` and `service_status`.
-
-**Not yet included:**
-- data.norge.no's dataset search, which is documented as internal and liable to change.
 
 No source is scraped, and no undocumented endpoint behind a website is used. Kildeverk is
 non-commercial. Every result names the licence its source states, or says that none is stated.
@@ -543,6 +541,40 @@ level you ask for.
 - Warnings are forecasts. NVE gives no guarantee of timeliness, so check varsom.no before acting.
 - Municipality and county codes must be current (since 2024). [SSB Klass](#ssb_klass) can map older
   codes.
+
+<a id="datanorge"></a>
+### data.norge.no: the national data catalogue
+
+**What it covers:** the catalogue where Norwegian public bodies describe their datasets and APIs,
+run by the Norwegian Digitalisation Agency (Digdir).
+- `catalog_search` searches it by text, and filters by EU theme, publisher, file format, open-data
+  status or recent change. Each entry has its title, a short description, publisher, themes, formats,
+  keywords, and links to its data.norge.no page and the publisher's own description.
+
+It finds where data lives and who publishes it. It does not return the data itself, and it is the
+fallback for topics the other tools don't cover.
+
+**Licence:** none stated for the catalogue metadata. The search API's
+[documentation](https://search.api.fellesdatakatalog.digdir.no/swagger-ui.html) gives none, so results
+say "No licence stated". Each dataset's own licence is on its data.norge.no page.
+
+**Rate limits:** none published. Kildeverk keeps to 10 calls a minute, because this is a search
+service run for people using data.norge.no.
+
+**Caching:** 1 hour.
+
+**Behaviour worth knowing:**
+- Titles and descriptions are what each publisher wrote, often in Norwegian. Norwegian words
+  (`befolkning`, `vær`) usually find more than English ones.
+- To search one publisher, take `publisher.path` from any result, for example
+  `/STAT/972417807/971526920` for Statistics Norway. A shorter path covers everything below it:
+  `/KOMMUNE` is every municipality.
+- Without a query, results come newest first.
+- Results are paged. `page` asks for the next one, and the result says how many pages there are.
+
+**Known gaps:**
+- Concepts, information models and public services in the catalogue are not searched.
+- How complete and accurate an entry is depends on its publisher.
 
 ## Development
 

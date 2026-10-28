@@ -210,6 +210,16 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ("hazards_avalanche", {"region": 3011, "start": "2026-10-01"}),
         ("hazards_avalanche", {"lat": 59.91, "lon": 10.75, "start": "2026-03-10"}),
     ],
+    "datanorge": [
+        ("catalog_search", {"query": "befolkning", "open_data_only": True}),
+        (
+            "catalog_search",
+            {"query": "befolkning", "publisher": "/STAT/972417807/971526920", "limit": 3},
+        ),
+        ("catalog_search", {"query": "vær", "kind": "data_services"}),
+        ("catalog_search", {"themes": ["TRAN"], "formats": ["CSV"], "limit": 5}),
+        ("catalog_search", {"query": "qqxxzzvvyy"}),
+    ],
 }
 
 
