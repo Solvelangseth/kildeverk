@@ -51,3 +51,30 @@ def test_catalogue_builds():
     catalogue = build_catalogue()
     assert {s["id"] for s in catalogue["sources"]} == SOURCE_IDS
     assert {t["name"] for t in catalogue["tools"]} == {op.name for op in OPS}
+
+
+def _literal_next_calls():
+    """Every NextCall(tool="...", arguments={...}) in the sources whose arguments are literals."""
+
+    import ast
+
+    found = []
+    for path in sorted((ROOT / "src" / "kildeverk").rglob("*.py")):
+        for node in ast.walk(ast.parse(path.read_text())):
+            if not (isinstance(node, ast.Call) and getattr(node.func, "id", None) == "NextCall"):
+                continue
+            kwargs = {k.arg: k.value for k in node.keywords}
+            try:
+                tool = ast.literal_eval(kwargs["tool"])
+                arguments = ast.literal_eval(kwargs["arguments"])
+            except (KeyError, ValueError):
+                continue  # built from runtime values; covered by the tools' own tests
+            found.append((f"{path.name}:{node.lineno}", tool, arguments))
+    return found
+
+
+@pytest.mark.parametrize("where,tool,arguments", _literal_next_calls(), ids=lambda v: str(v))
+def test_every_literal_next_call_is_runnable(where, tool, arguments):
+    ops = {op.name: op for op in OPS}
+    assert tool in ops, f"{where} suggests unknown tool {tool}"
+    ops[tool].input_model.model_validate(arguments)

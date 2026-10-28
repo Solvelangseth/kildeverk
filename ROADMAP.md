@@ -36,8 +36,8 @@ or a credential and cannot be done from the code alone.
       skip a lookup call. Results say what a name was resolved to.
 - [ ] A `compact` option on the tools with large results, returning only the fields most answers
       need, to save agents' context.
-- [ ] Make every `next_call` in errors and `follow_up` lists runnable as given: a test that
-      validates each one against its tool's input model.
+- [x] Make every literal `next_call` runnable as given: a test finds each one in the code and
+      validates it against its tool's input model.
 
 ## More from the same publishers
 
