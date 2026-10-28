@@ -34,6 +34,8 @@ or a credential and cannot be done from the code alone.
       baseline. Tested offline against a scripted model.
 - [ ] Run the eval (costs model tokens) and publish the results on the website and in the README:
       accuracy with tools against without, by category, and which tools were missed or misused.
+- [ ] Tune tool descriptions against the eval: rewrite the descriptions of tools the model missed
+      or misused, re-run, keep what improves the held-out questions.
 - [x] Count tool calls, errors and cache hits per tool, and show them in `service_status`.
 
 - [x] Accept municipality and county names wherever a code is accepted (`companies_search`,
