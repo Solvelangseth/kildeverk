@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class Licence(BaseModel):
@@ -40,11 +40,44 @@ class Provenance(BaseModel):
     citation: str = Field(description="Ready-to-paste citation line.")
 
 
+class Summary(BaseModel):
+    """The provenance at a glance: who the data is from, and how fresh it is."""
+
+    publishers: list[str]
+    licences: list[str]
+    upstream_responses: int
+    from_cache: int
+    stale: bool = Field(description="True if any part was an expired copy served during an outage.")
+    oldest_retrieved_at: datetime | None = Field(
+        description="When the oldest upstream response used was fetched."
+    )
+
+    @classmethod
+    def of(cls, provenance: list[Provenance]) -> Summary:
+        return cls(
+            publishers=sorted({p.publisher for p in provenance}),
+            licences=sorted({p.licence.name for p in provenance}),
+            upstream_responses=len(provenance),
+            from_cache=sum(p.cache.hit for p in provenance),
+            stale=any(p.cache.stale for p in provenance),
+            oldest_retrieved_at=min((p.retrieved_at for p in provenance), default=None),
+        )
+
+
 class Result[T](BaseModel):
     data: T
     provenance: list[Provenance]
     notes: list[str] = Field(default_factory=list)
     truncated: bool = False
+    summary: Summary | None = Field(
+        default=None, description="The provenance at a glance; filled in from it."
+    )
+
+    @model_validator(mode="after")
+    def _summarise(self) -> Result[T]:
+        if self.summary is None and self.provenance:
+            self.summary = Summary.of(self.provenance)
+        return self
 
 
 def citation(

@@ -70,3 +70,15 @@ async def test_a_tool_given_a_name_behaves_as_given_the_code(ctx):
         "retrieved_at": by_name["provenance"][-1]["retrieved_at"],
         "cache": by_name["provenance"][-1]["cache"],
     }
+
+
+async def test_summary_counts_the_name_lookup_too(ctx):
+    result = await OPS["schools_search"].invoke(
+        ctx, {"municipality": "Bergen", "level": "secondary"}
+    )
+    summary = result["summary"]
+    assert summary["upstream_responses"] == len(result["provenance"]) == 3
+    assert summary["publishers"] == sorted(
+        {"Statistics Norway (SSB)", "Norwegian Directorate for Education and Training (Udir)"}
+    )
+    assert summary["stale"] is False and summary["oldest_retrieved_at"]

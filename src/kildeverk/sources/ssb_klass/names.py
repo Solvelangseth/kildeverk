@@ -12,7 +12,7 @@ from dataclasses import dataclass, field
 from typing import Literal
 
 from kildeverk.context import Context
-from kildeverk.core.envelope import Provenance
+from kildeverk.core.envelope import Provenance, Summary
 from kildeverk.core.errors import ErrorCode, NextCall, ToolError
 from kildeverk.sources.ssb_klass.history import Unit
 from kildeverk.sources.ssb_klass.ops import _history, _today
@@ -136,6 +136,7 @@ def with_region_names(fields: dict[str, Level]):
             if notes or provenance:
                 result.provenance = [*provenance, *result.provenance]
                 result.notes = [*result.notes, *notes]
+                result.summary = Summary.of(result.provenance)
             return result
 
         resolving.__name__ = handler.__name__

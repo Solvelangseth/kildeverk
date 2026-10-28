@@ -142,9 +142,21 @@ uv run kildeverk call statistics_get_data '{"table_id": "07459", "select": {"Reg
     "citation": "Statistics Norway (SSB): Statbank table 07459: Population, by region and year. Retrieved 2026-10-28 07:02 UTC from https://data.ssb.no/... Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/)."
   }],
   "notes": [],
-  "truncated": false
+  "truncated": false,
+  "summary": {
+    "publishers": ["Statistics Norway (SSB)"],
+    "licences": ["Creative Commons Attribution 4.0 International"],
+    "upstream_responses": 1,
+    "from_cache": 0,
+    "stale": false,
+    "oldest_retrieved_at": "2026-10-28T07:02:11Z"
+  }
 }
 ```
+
+`summary` is the provenance at a glance. For the tools that combine sources, which may draw on a
+dozen upstream responses, it says in one place who the data is from, how much came from the cache,
+and how old the oldest part is.
 
 An error looks like this:
 
