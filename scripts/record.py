@@ -149,6 +149,8 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ("regions_at_point", {"lat": 60.39, "lon": 5.32}),
         ("regions_at_point", {"lat": 59.0, "lon": 5.0}),
         ("regions_at_point", {"lat": 66.0, "lon": 1.0}),
+        ("regions_at_point", {"lat": 69.65, "lon": 18.96, "date": "2019-06-01"}),
+        ("regions_at_point", {"lat": 60.36, "lon": 5.0, "date": "2019-06-01"}),
         ("addresses_search", {"query": "Karl Johans gate 22 Oslo"}),
         ("addresses_search", {"lat": 59.9139, "lon": 10.7522, "radius_m": 50}),
         ("addresses_search", {"postcode": "0184", "limit": 3}),

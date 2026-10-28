@@ -199,6 +199,26 @@ class RegionsAtPointInput(BaseModel):
 
     lat: float = Field(ge=57, le=72)
     lon: float = Field(ge=-1, le=33)
+    date: dt.date | None = Field(
+        default=None,
+        description="Also say which municipality and county the point was in on this date "
+        "(1960 or later), following today's back through SSB Klass.",
+    )
+
+
+class Candidate(BaseModel):
+    code: str
+    name: str
+
+
+class AtDate(BaseModel):
+    date: dt.date
+    certain: bool = Field(
+        description="True when exactly one municipality then overlapped today's; otherwise the "
+        "point was in one of the candidates, and Klass cannot say which."
+    )
+    municipalities: list[Candidate]
+    counties: list[Candidate]
 
 
 class RegionsAtPointOutput(BaseModel):
@@ -208,3 +228,4 @@ class RegionsAtPointOutput(BaseModel):
     municipality: str
     county_code: str
     county: str
+    at_date: AtDate | None = Field(description="Only when `date` was given.")

@@ -520,7 +520,11 @@ identical questions costs one upstream call; the result says when it came from t
 - `regions_at_point` tells you which municipality and county a coordinate lies in. Its codes work in
   every tool that filters by municipality or county, so it joins a location to statistics,
   companies, addresses and warnings. Municipalities include their sea territory; a point beyond it,
-  abroad, or on Svalbard or Jan Mayen (which have no municipalities) answers `NOT_FOUND`.
+  abroad, or on Svalbard or Jan Mayen (which have no municipalities) answers `NOT_FOUND`. Give a
+  `date` to also learn which municipality and county the point was in then: today's municipality is
+  followed back through [SSB Klass](#ssb_klass). When several municipalities later merged into
+  today's one, all of them are listed and `certain` is false, because Klass records codes rather
+  than borders.
 
 **Licence:** [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), per Kartverket's
 [terms of use](https://www.kartverket.no/api-og-data/vilkar-for-bruk), which ask for the credit

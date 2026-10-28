@@ -17,7 +17,9 @@ from kildeverk.sources.kartverket.models import (
     AddressSearchInput,
     AddressSearchOutput,
     Area,
+    AtDate,
     Cadastre,
+    Candidate,
     Elevation,
     ElevationInput,
     ElevationOutput,
@@ -326,15 +328,67 @@ async def regions_at_point(ctx: Context, args: RegionsAtPointInput) -> Result[Re
             upstream_status=404,
         ) from None
     body = fetched.json
+    provenance = [up.provenance(fetched, title="Kartverket municipality at point")]
+    notes = [*fetched.notes, "Municipalities include their sea territory out to the baseline."]
+    at_date = None
+    if args.date is not None:
+        at_date, klass_provenance = await _regions_then(
+            ctx, args.date, body["kommunenummer"], body["fylkesnummer"]
+        )
+        provenance.extend(klass_provenance)
+        if not at_date.certain:
+            notes.append(
+                f"On {args.date} the area of today's {body['kommunenavn']} belonged to several "
+                "regions; Klass records codes, not borders, so it cannot say which held the point."
+            )
     return Result(
         data=RegionsAtPointOutput(
             municipality_code=body["kommunenummer"],
             municipality=body["kommunenavn"],
             county_code=body["fylkesnummer"],
             county=body["fylkesnavn"],
+            at_date=at_date,
         ),
-        provenance=[up.provenance(fetched, title="Kartverket municipality at point")],
-        notes=[*fetched.notes, "Municipalities include their sea territory out to the baseline."],
+        provenance=provenance,
+        notes=notes,
+    )
+
+
+async def _regions_then(
+    ctx: Context, when: dt.date, municipality: str, county: str
+) -> tuple[AtDate, list]:
+    """The regions valid on `when` whose territory became part of today's regions."""
+
+    from kildeverk.sources.ssb_klass.ops import _history, _today
+
+    if when < dt.date(1960, 1, 1) or when > _today():
+        raise ToolError(
+            ErrorCode.INVALID_ARGUMENT,
+            "The date must be between 1960-01-01 (where SSB Klass's history starts) and today.",
+            source_id="ssb_klass",
+        )
+    found: dict[str, list[Candidate]] = {}
+    provenance: list = []
+    for level, today_code in (("municipality", municipality), ("county", county)):
+        history, level_provenance, _ = await _history(ctx, level)
+        provenance.extend(level_provenance)
+        found[level] = [
+            Candidate(code=u.code, name=u.name)
+            for u in history.units_at(when)
+            if today_code in {t.code for t in history.map_to(u, _today()).targets}
+        ]
+    # A municipality code starts with its county's number at the time, which narrows the
+    # counties to those that held one of the candidate municipalities.
+    prefixes = {m.code[:2] for m in found["municipality"]}
+    counties = [c for c in found["county"] if c.code in prefixes] or found["county"]
+    return (
+        AtDate(
+            date=when,
+            certain=len(found["municipality"]) == 1,
+            municipalities=found["municipality"],
+            counties=counties,
+        ),
+        provenance,
     )
 
 
@@ -402,15 +456,19 @@ OPERATIONS = (
         title="Municipality and county at a point",
         description=(
             "Which municipality and county a coordinate lies in, by Kartverket's current "
-            "boundaries. The codes plug straight into the statistics, company, address, warning "
-            "and region tools, so this joins a location to everything filed by municipality."
+            "boundaries, and optionally which it was in on an earlier date (via SSB Klass). "
+            "The codes plug straight into the statistics, company, address, warning and region "
+            "tools, so this joins a location to everything filed by municipality."
         ),
         input_model=RegionsAtPointInput,
         output_model=RegionsAtPointOutput,
         handler=regions_at_point,
-        source_ids=(SPEC.id,),
+        source_ids=(SPEC.id, "ssb_klass"),
         http_method="GET",
         http_path="/v1/regions/at-point",
-        examples=({"lat": 60.39, "lon": 5.32}, {"lat": 69.65, "lon": 18.96}),
+        examples=(
+            {"lat": 60.39, "lon": 5.32},
+            {"lat": 69.65, "lon": 18.96, "date": "2019-06-01"},
+        ),
     ),
 )

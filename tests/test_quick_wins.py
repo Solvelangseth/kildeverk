@@ -75,6 +75,7 @@ async def test_point_to_municipality_and_county(ctx):
         "municipality": "Bergen",
         "county_code": "46",
         "county": "Vestland",
+        "at_date": None,
     }
 
 
@@ -189,3 +190,27 @@ def test_reservoir_input_rules():
         ReservoirsInput(areas=["NO6"])
     with pytest.raises(ValidationError):
         ReservoirsInput(to_year=2020)
+
+
+async def test_point_on_a_past_date_follows_klass_back(ctx):
+    result = await call(ctx, "regions_at_point", lat=69.65, lon=18.96, date="2019-06-01")
+    then = result["data"]["at_date"]
+    assert result["data"]["municipality_code"] == "5501"
+    assert then["certain"] is True
+    assert then["municipalities"] == [{"code": "1902", "name": "Tromsø"}]
+    assert [c["code"] for c in then["counties"]] == ["19"]
+    assert "ssb_klass" in {p["source_id"] for p in result["provenance"]}
+
+
+async def test_a_merged_municipality_gives_candidates_not_a_guess(ctx):
+    result = await call(ctx, "regions_at_point", lat=60.36, lon=5.0, date="2019-06-01")
+    then = result["data"]["at_date"]
+    assert then["certain"] is False
+    assert {m["name"] for m in then["municipalities"]} == {"Sund", "Fjell", "Øygarden"}
+    assert [c["code"] for c in then["counties"]] == ["12"]
+    assert any("cannot say which" in n for n in result["notes"])
+
+
+async def test_past_date_must_be_within_klass_history(ctx):
+    error = await fails(ctx, "regions_at_point", lat=60.39, lon=5.32, date="1950-01-01")
+    assert error["code"] == "INVALID_ARGUMENT"
