@@ -897,7 +897,16 @@ uv run kildeverk site --out site/dist          # build the website
 `eval/` holds an evaluation set: 32 questions an agent should answer with these tools, each with
 the reference call that answers it, live-built truth (`uv run python -m eval.build_truth`) and a
 scorer. Questions about fixed periods keep their answers; those marked `moves` follow the latest
-figures and need truth rebuilt before a run.
+figures and need truth rebuilt before a run. `eval/run.py` asks a model each question with only
+Kildeverk's tools (and, as a baseline, with none), scores the submitted answers and reports
+accuracy, tool calls and tokens:
+
+```sh
+uv run --group eval python -m eval.run --arms tools,notools --out eval/runs/run.jsonl
+```
+
+Every run spends model tokens; it needs Anthropic credentials (`ANTHROPIC_API_KEY` or an
+`ant auth login` profile).
 
 Each source lives in `src/kildeverk/sources/<id>/`:
 - `spec.py`: licence, limits, cache lifetimes, coverage and gaps.

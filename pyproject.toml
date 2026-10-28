@@ -20,6 +20,9 @@ kildeverk = "kildeverk.cli:main"
 
 [dependency-groups]
 dev = ["pytest>=8", "pytest-asyncio>=0.24", "respx>=0.21", "ruff>=0.6"]
+eval = [
+    "anthropic>=2.3.0",
+]
 
 [build-system]
 requires = ["hatchling"]

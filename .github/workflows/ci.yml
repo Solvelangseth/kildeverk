@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
-      - run: uv sync --python 3.12
+      - run: uv sync --python 3.12 --all-groups
       - run: uv run ruff check src tests scripts eval
       - run: uv run ruff format --check src tests scripts eval
       - run: uv run pytest
