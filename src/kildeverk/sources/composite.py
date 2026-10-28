@@ -301,6 +301,31 @@ def _pick(matches: list[dict[str, Any]], asked: str) -> tuple[str, str] | ToolEr
     )
 
 
+async def _population_part(ctx: Context, code: str) -> dict[str, Any] | ToolError:
+    """Population for the last 11 years under today's borders.
+
+    SSB's `agg_KommSummer` codelist sums older municipalities into today's ('K-4601'), so the
+    series does not start at the latest reform. A municipality missing from it falls back to
+    the plain code.
+    """
+
+    select = {"ContentsCode": ["Personer1"], "Tid": {"latest": 11}}
+    summed = await _part(
+        ctx,
+        "statistics_get_data",
+        {
+            "table_id": "07459",
+            "codelists": {"Region": "agg_KommSummer"},
+            "select": {"Region": [f"K-{code}"], **select},
+        },
+    )
+    if isinstance(summed, dict) and summed["data"]["rows"]:
+        return summed
+    return await _part(
+        ctx, "statistics_get_data", {"table_id": "07459", "select": {"Region": [code], **select}}
+    )
+
+
 def _population(rows: list[dict[str, Any]]) -> Population | None:
     # Years before a municipality existed come back as 0 from SSB; they are not data.
     rows = [r for r in rows if isinstance(r.get("value"), int) and r["value"] > 0]
@@ -348,14 +373,7 @@ async def municipality_profile(
         hazards,
         weather,
     ) = await asyncio.gather(
-        _part(
-            ctx,
-            "statistics_get_data",
-            {
-                "table_id": "07459",
-                "select": {"Region": [code], "ContentsCode": ["Personer1"], "Tid": {"latest": 11}},
-            },
-        ),
+        _population_part(ctx, code),
         _part(
             ctx, "companies_search", {"municipality": [code], "sort": "most_employees", "limit": 5}
         ),
@@ -388,7 +406,7 @@ async def municipality_profile(
     if people and people.change_since and int(people.year) - int(people.change_since) < 10:
         notes.append(
             f"Population change is from {people.change_since}, the first year SSB has figures for "
-            f"{code} under today's borders."
+            f"{code}."
         )
     employers = (
         [

@@ -252,4 +252,7 @@ async def test_profile_combines_sources(ctx, monkeypatch):
     assert data["schools"] == {"total": 235, "primary": 93, "secondary": 32, "private": 112}
     assert data["traffic_points"] == 172
     assert ("weather_warnings", {"county": "46"}) in calls
-    assert ("statistics_get_data" in {t for t, _ in calls}) and len(result["provenance"]) >= 7
+    population_calls = [a for t, a in calls if t == "statistics_get_data"]
+    assert population_calls[0]["codelists"] == {"Region": "agg_KommSummer"}
+    assert population_calls[0]["select"]["Region"] == ["K-4601"]
+    assert len(result["provenance"]) >= 7

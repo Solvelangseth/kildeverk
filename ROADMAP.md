@@ -19,9 +19,8 @@ or a credential and cannot be done from the code alone.
       named places.
 - [x] `municipality_profile`: population and change (SSB), companies and largest employers
       (Brreg), schools (NSR), traffic counting points and current warnings, for any code or name.
-- [ ] Population history across reforms in `municipality_profile`: today SSB's series under a new
-      code starts at the reform, so Tromsø's change only goes back to 2024. Harmonise the older
-      codes with `regions_harmonise` to give a ten-year change everywhere.
+- [x] Population history across reforms in `municipality_profile`, from SSB's series summed to
+      today's borders (`agg_KommSummer`), so every municipality gets a ten-year change.
 - [ ] `compare_municipalities`: the same figures side by side for two to five municipalities.
 
 ## Making it better for agents
