@@ -163,3 +163,8 @@ async def test_place_overview(live):
     result = await OPS["place_overview"].invoke(live, {"lat": 59.9139, "lon": 10.7522})
     assert result["data"]["municipality"]["code"] == "0301"
     assert result["data"]["weather"] and result["data"]["nearest_stops"]
+
+
+async def test_municipality_profile(live):
+    result = await OPS["municipality_profile"].invoke(live, {"municipality": "1201"})
+    assert result["data"]["code"] == "4601" and result["data"]["population"]["latest"] > 250_000

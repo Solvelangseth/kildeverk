@@ -155,3 +155,101 @@ async def test_a_point_at_sea_suggests_sea_level(ctx, parts, monkeypatch):
     )
     result = await OPS["place_overview"].invoke(ctx, {"lat": 60.0, "lon": 5.0})
     assert "sea_level" in {f["tool"] for f in result["data"]["follow_up"]}
+
+
+# --- municipality_profile ----------------------------------------------------------
+
+
+def _match(code, name, status, today=(), exact=True):
+    return {
+        "code": code,
+        "name": name,
+        "status": status,
+        "today": [{"code": c, "name": n} for c, n in today],
+        "today_exact": exact,
+    }
+
+
+def test_pick_follows_reforms_and_refuses_guesses():
+    assert composite._pick([_match("4601", "Bergen", "current")], "4601") == ("4601", "Bergen")
+    old = [_match("1201", "Bergen", "ended", [("4601", "Bergen")])]
+    assert composite._pick(old, "1201") == ("4601", "Bergen")
+    # A current municipality wins over an ended one of the same name.
+    os_ = [
+        _match("3430", "Os", "current"),
+        _match("1243", "Os", "ended", [("4624", "Bjørnafjorden")]),
+    ]
+    assert composite._pick(os_, "os") == ("3430", "Os")
+    split = [_match("5001", "X", "ended", [("1", "A"), ("2", "B")], exact=False)]
+    assert composite._pick(split, "5001").body.code == "NOT_FOUND"
+    two = [_match("1", "Nes", "current"), _match("2", "Nes", "current")]
+    error = composite._pick(two, "nes")
+    assert error.body.code == "AMBIGUOUS" and error.body.next_call.arguments == {
+        "municipality": "1"
+    }
+
+
+def test_population_ignores_placeholder_zeros():
+    rows = [
+        {"Tid": "2018", "value": 0},
+        {"Tid": "2020", "value": 1000},
+        {"Tid": "2025", "value": 1090},
+        {"Tid": "2026", "value": 1100},
+    ]
+    people = composite._population(rows)
+    assert people.latest == 1100 and people.change_since == "2020"
+    assert people.change_since_pct == 10.0 and people.change_1y_pct == 0.92
+
+
+async def test_profile_combines_sources(ctx, monkeypatch):
+    def school(total):
+        return {"data": {"total_matches": total, "schools": []}, "provenance": [_prov("udir_nsr")]}
+
+    answers = {
+        "regions_resolve": {
+            "data": {"matches": [_match("1201", "Bergen", "ended", [("4601", "Bergen")])]},
+            "provenance": [_prov("ssb_klass")],
+        },
+        "statistics_get_data": {
+            "data": {"rows": [{"Tid": "2025", "value": 293709}, {"Tid": "2026", "value": 294860}]},
+            "provenance": [_prov("ssb_statbank")],
+        },
+        "companies_search": {
+            "data": {
+                "total_matches": 58393,
+                "companies": [
+                    {
+                        "org_number": "964338531",
+                        "name": "BERGEN KOMMUNE",
+                        "employees": 32820,
+                        "industry": None,
+                    }
+                ],
+            },
+            "provenance": [_prov("brreg")],
+        },
+        "traffic_find_points": {
+            "data": {"total_matches": 172},
+            "provenance": [_prov("vegvesen_traffic")],
+        },
+        "hazards_flood_landslide": {"data": {"warnings": []}, "provenance": [_prov("nve_varsom")]},
+        "weather_warnings": {"data": {"warnings": []}, "provenance": [_prov("met_metalerts")]},
+    }
+    calls = []
+
+    async def fake(ctx, tool, arguments):
+        calls.append((tool, arguments))
+        if tool == "schools_search":
+            key = arguments.get("level") or arguments.get("ownership") or "all"
+            return school({"all": 235, "primary": 93, "secondary": 32, "private": 112}[key])
+        return answers[tool]
+
+    monkeypatch.setattr(composite, "_part", fake)
+    result = await OPS["municipality_profile"].invoke(ctx, {"municipality": "1201"})
+    data = result["data"]
+    assert (data["code"], data["name"], data["resolved_from"]) == ("4601", "Bergen", "1201")
+    assert data["population"]["latest"] == 294860 and data["companies_registered"] == 58393
+    assert data["schools"] == {"total": 235, "primary": 93, "secondary": 32, "private": 112}
+    assert data["traffic_points"] == 172
+    assert ("weather_warnings", {"county": "46"}) in calls
+    assert ("statistics_get_data" in {t for t, _ in calls}) and len(result["provenance"]) >= 7

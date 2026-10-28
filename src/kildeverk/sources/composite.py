@@ -14,7 +14,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from kildeverk.context import Context
 from kildeverk.core.envelope import Provenance, Result
-from kildeverk.core.errors import NextCall, ToolError
+from kildeverk.core.errors import ErrorCode, NextCall, ToolError
 from kildeverk.core.operation import Operation
 
 
@@ -219,6 +219,253 @@ async def place_overview(ctx: Context, args: PlaceOverviewInput) -> Result[Place
     )
 
 
+# --- municipality_profile ----------------------------------------------------------
+
+
+class MunicipalityProfileInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    municipality: str = Field(
+        min_length=2,
+        max_length=60,
+        description="A municipality code, old or current ('1201', '4601'), or a name ('Bergen').",
+    )
+
+
+class Population(BaseModel):
+    latest: int
+    year: str
+    change_1y_pct: float | None
+    change_since: str | None = Field(description="The earliest year the change below is from.")
+    change_since_pct: float | None
+
+
+class Employer(BaseModel):
+    org_number: str
+    name: str
+    employees: int | None
+    industry: str | None
+
+
+class Schools(BaseModel):
+    total: int
+    primary: int
+    secondary: int
+    private: int
+
+
+class MunicipalityProfileOutput(BaseModel):
+    code: str
+    name: str
+    county_code: str
+    resolved_from: str | None = Field(
+        description="The code or name asked for, when it was not today's code."
+    )
+    population: Population | None
+    companies_registered: int | None = Field(description="Active units in the business register.")
+    largest_employers: list[Employer]
+    schools: Schools | None
+    traffic_points: int | None = Field(description="Operational traffic counting points.")
+    warnings: list[Warning]
+    follow_up: list[NextCall]
+
+
+def _pick(matches: list[dict[str, Any]], asked: str) -> tuple[str, str] | ToolError:
+    """Today's (code, name) for what was asked, following reforms through Klass."""
+
+    exact = [m for m in matches if asked in (m["code"], m["name"].lower())] or matches
+    current = {(m["code"], m["name"]) for m in exact if m["status"] == "current"}
+    later = {
+        (r["code"], r["name"])
+        for m in exact
+        if m["status"] == "ended" and m["today_exact"]
+        for r in m["today"]
+    }
+    options = current or later
+    if len(options) == 1:
+        return options.pop()
+    if not options:
+        return ToolError(
+            ErrorCode.NOT_FOUND,
+            f"'{asked}' is no municipality today, or was split between several.",
+            next_call=NextCall(tool="regions_resolve", arguments={"query": asked}),
+        )
+    return ToolError(
+        ErrorCode.AMBIGUOUS,
+        f"'{asked}' fits several municipalities: "
+        + ", ".join(f"{c} {n}" for c, n in sorted(options))
+        + ". Give the code.",
+        next_call=NextCall(
+            tool="municipality_profile", arguments={"municipality": min(options)[0]}
+        ),
+    )
+
+
+def _population(rows: list[dict[str, Any]]) -> Population | None:
+    # Years before a municipality existed come back as 0 from SSB; they are not data.
+    rows = [r for r in rows if isinstance(r.get("value"), int) and r["value"] > 0]
+    if not rows:
+        return None
+    rows.sort(key=lambda r: r["Tid"])
+    latest, first = rows[-1], rows[0]
+
+    def pct(old: int, new: int) -> float:
+        return round((new - old) / old * 100, 2)
+
+    return Population(
+        latest=latest["value"],
+        year=latest["Tid"],
+        change_1y_pct=pct(rows[-2]["value"], latest["value"]) if len(rows) > 1 else None,
+        change_since=first["Tid"] if len(rows) > 1 else None,
+        change_since_pct=pct(first["value"], latest["value"]) if len(rows) > 1 else None,
+    )
+
+
+async def municipality_profile(
+    ctx: Context, args: MunicipalityProfileInput
+) -> Result[MunicipalityProfileOutput]:
+    asked = args.municipality.strip().lower()
+    resolved = await _part(
+        ctx, "regions_resolve", {"query": asked, "level": "municipality", "limit": 20}
+    )
+    if isinstance(resolved, ToolError):
+        raise resolved
+    picked = _pick(resolved["data"]["matches"], asked)
+    if isinstance(picked, ToolError):
+        raise picked
+    code, name = picked
+
+    # The school searches differ only in filters applied here, so they share one upstream call.
+    school_query = {"municipality": code, "limit": 1}
+    (
+        population,
+        companies,
+        schools,
+        primary,
+        secondary,
+        private,
+        traffic,
+        hazards,
+        weather,
+    ) = await asyncio.gather(
+        _part(
+            ctx,
+            "statistics_get_data",
+            {
+                "table_id": "07459",
+                "select": {"Region": [code], "ContentsCode": ["Personer1"], "Tid": {"latest": 11}},
+            },
+        ),
+        _part(
+            ctx, "companies_search", {"municipality": [code], "sort": "most_employees", "limit": 5}
+        ),
+        _part(ctx, "schools_search", school_query),
+        _part(ctx, "schools_search", {**school_query, "level": "primary"}),
+        _part(ctx, "schools_search", {**school_query, "level": "secondary"}),
+        _part(ctx, "schools_search", {**school_query, "ownership": "private"}),
+        _part(ctx, "traffic_find_points", {"municipality": code, "limit": 50}),
+        _part(ctx, "hazards_flood_landslide", {"municipality": code}),
+        _part(ctx, "weather_warnings", {"county": code[:2]}),
+    )
+    parts = {
+        "region": resolved,
+        "population": population,
+        "companies": companies,
+        "schools": schools,
+        "traffic points": traffic,
+        "flood and landslide warnings": hazards,
+        "weather warnings": weather,
+    }
+    provenance: list[Provenance] = []
+    notes: list[str] = []
+    for label, part in parts.items():
+        if isinstance(part, ToolError):
+            notes.append(f"No {label}: {part.body.message}")
+        else:
+            provenance.extend(Provenance.model_validate(p) for p in part["provenance"])
+
+    people = _population(population["data"]["rows"]) if isinstance(population, dict) else None
+    if people and people.change_since and int(people.year) - int(people.change_since) < 10:
+        notes.append(
+            f"Population change is from {people.change_since}, the first year SSB has figures for "
+            f"{code} under today's borders."
+        )
+    employers = (
+        [
+            Employer(
+                org_number=c["org_number"],
+                name=c["name"],
+                employees=c.get("employees"),
+                industry=(c.get("industry") or {}).get("description")
+                if isinstance(c.get("industry"), dict)
+                else c.get("industry"),
+            )
+            for c in companies["data"]["companies"]
+        ]
+        if isinstance(companies, dict)
+        else []
+    )
+    school_counts = None
+    counts = [schools, primary, secondary, private]
+    if all(isinstance(c, dict) for c in counts):
+        total, n_primary, n_secondary, n_private = (c["data"]["total_matches"] for c in counts)  # type: ignore[index]
+        school_counts = Schools(
+            total=total, primary=n_primary, secondary=n_secondary, private=n_private
+        )
+        notes.append(
+            "School counts include every active unit the register calls a school, such as "
+            "adult education and culture schools."
+        )
+    warnings: list[Warning] = []
+    if isinstance(weather, dict):
+        warnings += [
+            Warning(
+                kind="weather",
+                level=w["level_name"],
+                title=w["event"],
+                valid_to=_time(w["valid_to"]),
+            )
+            for w in weather["data"]["warnings"]
+        ]
+    if isinstance(hazards, dict):
+        warnings += [
+            Warning(
+                kind=w["kind"],
+                level=w["level_name"],
+                title=w["title"],
+                valid_to=_time(w["valid_to"]),
+            )
+            for w in hazards["data"]["warnings"]
+        ]
+    if warnings and any(w.kind == "weather" for w in warnings):
+        notes.append("Weather warnings are for the whole county; check each warning's area.")
+
+    return Result(
+        data=MunicipalityProfileOutput(
+            code=code,
+            name=name,
+            county_code=code[:2],
+            resolved_from=args.municipality if args.municipality != code else None,
+            population=people,
+            companies_registered=companies["data"].get("total_matches")
+            if isinstance(companies, dict)
+            else None,
+            largest_employers=employers,
+            schools=school_counts,
+            traffic_points=traffic["data"]["total_matches"] if isinstance(traffic, dict) else None,
+            warnings=warnings,
+            follow_up=[
+                NextCall(tool="statistics_search_tables", arguments={"query": f"{name} kommune"}),
+                NextCall(tool="schools_search", arguments={"municipality": code}),
+                NextCall(tool="traffic_find_points", arguments={"municipality": code}),
+                NextCall(tool="addresses_search", arguments={"municipality": code, "limit": 5}),
+            ],
+        ),
+        provenance=provenance,
+        notes=notes,
+    )
+
+
 OPERATIONS = (
     Operation(
         name="place_overview",
@@ -242,5 +489,31 @@ OPERATIONS = (
         http_method="GET",
         http_path="/v1/places/overview",
         examples=({"lat": 60.3913, "lon": 5.3221},),
+    ),
+    Operation(
+        name="municipality_profile",
+        title="Profile of a municipality",
+        description=(
+            "One Norwegian municipality from several sources at once: population and how it "
+            "changed (SSB), registered companies and the largest employers (Brønnøysund), "
+            "schools by level and ownership (Udir), traffic counting points (Statens vegvesen), "
+            "and weather, flood and landslide warnings in force. Accepts today's code, a code "
+            "from before the 2020 or 2024 reforms, or a name."
+        ),
+        input_model=MunicipalityProfileInput,
+        output_model=MunicipalityProfileOutput,
+        handler=municipality_profile,
+        source_ids=(
+            "ssb_klass",
+            "ssb_statbank",
+            "brreg",
+            "udir_nsr",
+            "vegvesen_traffic",
+            "nve_varsom",
+            "met_metalerts",
+        ),
+        http_method="GET",
+        http_path="/v1/municipalities/{municipality}/profile",
+        examples=({"municipality": "4601"}, {"municipality": "1201"}, {"municipality": "Tromsø"}),
     ),
 )
