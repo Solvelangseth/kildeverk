@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import asyncio
 import datetime as dt
-from typing import Any, Literal
+from typing import Any, Literal, NamedTuple
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -579,7 +579,19 @@ async def compare_municipalities(ctx: Context, args: CompareInput) -> Result[Com
 # --- statistics_series -------------------------------------------------------------
 
 # SSB's codelists that sum older regions into today's, and the prefix their codes carry.
-SUMMED_CODELISTS = {"municipality": ("agg_KommSummer", "K-"), "county": ("agg_KommFylker", "F-")}
+SUMMED_CODELISTS = {
+    "municipality": {"agg_KommSummer": "K-", "agg_KommSummerHist": "K_"},
+    "county": {"agg_KommFylker": "F-", "agg_KommFylkerHist": "F_"},
+}
+
+
+def _summed_codelist(level: str, available: set[str]) -> tuple[str, str] | None:
+    """The table's codelist summed to today's borders for `level`, and its code prefix."""
+
+    for name, prefix in SUMMED_CODELISTS.get(level, {}).items():
+        if name in available:
+            return name, prefix
+    return None
 
 
 class SeriesInput(BaseModel):
@@ -659,6 +671,83 @@ async def _region_for_series(ctx: Context, value: str) -> tuple[str, str, str | 
         ErrorCode.NOT_FOUND,
         f"No municipality or county is called '{value}'.",
         next_call=NextCall(tool="regions_resolve", arguments={"query": value}),
+    )
+
+
+class _Prepared(NamedTuple):
+    table: dict[str, Any]
+    dims: dict[str, dict[str, Any]]
+    region_dim: str
+    time_dim: str
+    measure_dim: dict[str, Any] | None
+    select: dict[str, Any]
+    provenance: list[Provenance]
+
+
+async def _prepare_table(
+    ctx: Context,
+    table_id: str,
+    measure: str | None,
+    filters: dict[str, list[str]],
+    *,
+    retry: tuple[str, dict[str, Any]],
+) -> _Prepared:
+    """Describe a table and build the selection every region tool needs, or say what is missing."""
+
+    described = await _part(
+        ctx, "statistics_describe_table", {"table_id": table_id, "values_limit": 50}
+    )
+    if isinstance(described, ToolError):
+        raise described
+    table = described["data"]
+    dims = {d["role"]: d for d in table["dimensions"] if d["role"] in ("region", "time", "measure")}
+    if "region" not in dims or "time" not in dims:
+        raise ToolError(
+            ErrorCode.INVALID_ARGUMENT,
+            f"Table {table_id} has no region or no time dimension, so it cannot be read by region.",
+            next_call=NextCall(
+                tool="statistics_search_tables", arguments={"query": table["title"][:40]}
+            ),
+        )
+    region_dim, time_dim = dims["region"]["code"], dims["time"]["code"]
+    select: dict[str, Any] = dict(filters)
+    measure_dim = dims.get("measure")
+    if measure_dim:
+        measures = [v["code"] for v in measure_dim["values"]]
+        if measure:
+            select[measure_dim["code"]] = [measure]
+        elif len(measures) == 1:
+            select[measure_dim["code"]] = measures
+        else:
+            options = ", ".join(f"{v['code']} ({v['label']})" for v in measure_dim["values"][:12])
+            tool, arguments = retry
+            raise ToolError(
+                ErrorCode.AMBIGUOUS,
+                f"Table {table_id} has several measures; choose one with `measure`: {options}.",
+                next_call=NextCall(tool=tool, arguments={**arguments, "measure": measures[0]}),
+            )
+    for d in table["dimensions"]:
+        if (
+            d["code"] not in select
+            and d["code"] not in (region_dim, time_dim)
+            and not d["can_omit"]
+        ):
+            raise ToolError(
+                ErrorCode.INVALID_ARGUMENT,
+                f"Table {table_id} needs a value for {d['code']} ({d['label']}); pass it in "
+                f"`filters`, e.g. {{'{d['code']}': ['{d['values'][0]['code']}']}}.",
+                next_call=NextCall(
+                    tool="statistics_describe_table", arguments={"table_id": table_id}
+                ),
+            )
+    return _Prepared(
+        table=table,
+        dims=dims,
+        region_dim=region_dim,
+        time_dim=time_dim,
+        measure_dim=measure_dim,
+        select=select,
+        provenance=[Provenance.model_validate(p) for p in described["provenance"]],
     )
 
 
@@ -762,71 +851,25 @@ async def _harmonised_series(
 
 async def statistics_series(ctx: Context, args: SeriesInput) -> Result[SeriesOutput]:
     code, level, region_note = await _region_for_series(ctx, args.region)
-    described = await _part(
-        ctx, "statistics_describe_table", {"table_id": args.table_id, "values_limit": 50}
+    prepared = await _prepare_table(
+        ctx,
+        args.table_id,
+        args.measure,
+        args.filters,
+        retry=("statistics_series", {"table_id": args.table_id, "region": args.region}),
     )
-    if isinstance(described, ToolError):
-        raise described
-    table = described["data"]
-    dims = {d["role"]: d for d in table["dimensions"] if d["role"] in ("region", "time", "measure")}
-    if "region" not in dims or "time" not in dims:
-        raise ToolError(
-            ErrorCode.INVALID_ARGUMENT,
-            f"Table {args.table_id} has no region or no time dimension, so it has no series by region.",
-            next_call=NextCall(
-                tool="statistics_search_tables", arguments={"query": table["title"][:40]}
-            ),
-        )
-    region_dim, time_dim = dims["region"]["code"], dims["time"]["code"]
-
-    select: dict[str, Any] = {k: v for k, v in args.filters.items()}
-    measure_dim = dims.get("measure")
-    if measure_dim:
-        measures = [v["code"] for v in measure_dim["values"]]
-        if args.measure:
-            select[measure_dim["code"]] = [args.measure]
-        elif len(measures) == 1:
-            select[measure_dim["code"]] = measures
-        else:
-            options = ", ".join(f"{v['code']} ({v['label']})" for v in measure_dim["values"][:12])
-            raise ToolError(
-                ErrorCode.AMBIGUOUS,
-                f"Table {args.table_id} has several measures; choose one with `measure`: {options}.",
-                next_call=NextCall(
-                    tool="statistics_series",
-                    arguments={
-                        "table_id": args.table_id,
-                        "region": args.region,
-                        "measure": measures[0],
-                    },
-                ),
-            )
-    for d in table["dimensions"]:
-        if (
-            d["code"] not in select
-            and d["code"] not in (region_dim, time_dim)
-            and not d["can_omit"]
-        ):
-            raise ToolError(
-                ErrorCode.INVALID_ARGUMENT,
-                f"Table {args.table_id} needs a value for {d['code']} ({d['label']}); pass it in "
-                f"`filters`, e.g. {{'{d['code']}': ['{d['values'][0]['code']}']}}.",
-                next_call=NextCall(
-                    tool="statistics_describe_table", arguments={"table_id": args.table_id}
-                ),
-            )
+    table, dims, region_dim, time_dim, measure_dim, select, described_provenance = prepared
     if args.from_year:
         select[time_dim] = {"from": str(args.from_year)}
     else:
         select[time_dim] = "*"
 
     notes = [region_note] if region_note else []
-    provenance = [Provenance.model_validate(p) for p in described["provenance"]]
+    provenance = list(described_provenance)
     method = "as_published"
     fetched: dict[str, Any] | ToolError | None = None
-    summed = SUMMED_CODELISTS.get(level)
-    available = {c["id"] for c in dims["region"].get("codelists") or []}
-    if summed and summed[0] in available:
+    summed = _summed_codelist(level, {c["id"] for c in dims["region"].get("codelists") or []})
+    if summed:
         fetched = await _part(
             ctx,
             "statistics_get_data",
@@ -924,6 +967,212 @@ async def statistics_series(ctx: Context, args: SeriesInput) -> Result[SeriesOut
     )
 
 
+# --- statistics_rank ---------------------------------------------------------------
+
+
+class RankInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    table_id: str = Field(pattern=r"^\d{5}$", description="SSB table, e.g. '07459'.")
+    level: Literal["municipality", "county"] = "municipality"
+    measure: str | None = Field(default=None, description="ContentsCode, when there are several.")
+    filters: dict[str, list[str]] = Field(
+        default_factory=dict, description="Codes for the table's other dimensions."
+    )
+    period: str | None = Field(
+        default=None, max_length=10, description="e.g. '2025'. Defaults to the latest."
+    )
+    compare_to: str | None = Field(
+        default=None,
+        max_length=10,
+        description="An earlier period. Adds the change to each row and ranks by it.",
+    )
+    order: Literal["highest", "lowest"] = "highest"
+    min_value: float | None = Field(
+        default=None,
+        description="Leave out regions whose value is below this, e.g. 1000 when ranking change, "
+        "so that tiny municipalities with large swings don't top the list.",
+    )
+    limit: int = Field(default=10, ge=1, le=400)
+
+
+class RankedRow(BaseModel):
+    rank: int
+    code: str
+    name: str | None
+    value: float | int | None
+    earlier: float | int | None = Field(description="The value in `compare_to`, if given.")
+    change: float | int | None
+    change_pct: float | None
+
+
+class RankOutput(BaseModel):
+    table_id: str
+    title: str
+    measure: str | None
+    level: str
+    period: str
+    compare_to: str | None
+    ranked_by: str = Field(description="'value' or 'change_pct'.")
+    method: str = Field(
+        description="'summed_to_todays_borders', or 'current_codes' (today's codes as published)."
+    )
+    country: RankedRow | None = Field(description="Norway as a whole, for reference.")
+    total_regions: int
+    rows: list[RankedRow]
+
+
+async def statistics_rank(ctx: Context, args: RankInput) -> Result[RankOutput]:
+    from kildeverk.sources.ssb_klass.ops import _history, _today
+
+    table, dims, region_dim, time_dim, measure_dim, select, provenance = await _prepare_table(
+        ctx,
+        args.table_id,
+        args.measure,
+        args.filters,
+        retry=("statistics_rank", {"table_id": args.table_id, "level": args.level}),
+    )
+    provenance = list(provenance)
+    last = str(table["last_period"])
+    if args.period:
+        candidates = [args.period]
+    elif last.isdigit():
+        # The newest year is sometimes listed before its figures exist ('..'), so the last
+        # three are fetched and the newest with data is used.
+        candidates = [str(int(last) - n) for n in range(3)]
+    else:
+        candidates = [last]
+    select[time_dim] = sorted(set(candidates + ([args.compare_to] if args.compare_to else [])))
+    notes: list[str] = []
+
+    summed = _summed_codelist(args.level, {c["id"] for c in dims["region"].get("codelists") or []})
+    codelist, prefix = summed or ("", "")
+    method = "current_codes"
+    fetched: dict[str, Any] | ToolError | None = None
+    if summed:
+        fetched = await _part(
+            ctx,
+            "statistics_get_data",
+            {
+                "table_id": args.table_id,
+                "codelists": {region_dim: codelist},
+                "select": {**select, region_dim: "*"},
+                "max_rows": 10000,
+            },
+        )
+        if isinstance(fetched, dict) and fetched["data"]["rows"]:
+            method = "summed_to_todays_borders"
+        else:
+            fetched = None
+    if fetched is None:
+        history, klass_provenance, _ = await _history(ctx, args.level)
+        current = [u.code for u in history.units_at(_today())]
+        fetched = await _part(
+            ctx,
+            "statistics_get_data",
+            {
+                "table_id": args.table_id,
+                "select": {**select, region_dim: current},
+                "max_rows": 10000,
+            },
+        )
+        provenance.extend(klass_provenance)
+        if args.compare_to:
+            notes.append(
+                "SSB has no series for today's borders in this table: regions created by a "
+                "reform after the earlier period have no value for it."
+            )
+    if isinstance(fetched, ToolError):
+        raise fetched
+    provenance.extend(Provenance.model_validate(p) for p in fetched["provenance"])
+    notes.extend(fetched["notes"])
+
+    values: dict[str, dict[str, Any]] = {}
+    names: dict[str, str | None] = {}
+    for row in fetched["data"]["rows"]:
+        code = str(row[region_dim]).removeprefix(prefix)
+        names[code] = row.get(f"{region_dim}_label")
+        if isinstance(row.get("value"), int | float):
+            values.setdefault(code, {})[str(row[time_dim])] = row["value"]
+
+    # A period counts as having data only with real values: SSB's placeholder zeros don't.
+    with_data = [p for p in candidates if any(v.get(p) for v in values.values())]
+    period = with_data[0] if with_data else candidates[0]
+    if not args.period and period != last:
+        notes.append(f"{last} has no figures yet, so {period} is ranked.")
+
+    def build(code: str) -> RankedRow:
+        now = values.get(code, {}).get(period)
+        before = values.get(code, {}).get(args.compare_to) if args.compare_to else None
+        change = now - before if now is not None and before is not None else None
+        return RankedRow(
+            rank=0,
+            code=code,
+            name=names.get(code),
+            value=now,
+            earlier=before,
+            change=round(change, 4) if isinstance(change, float) else change,
+            change_pct=round(change / before * 100, 2) if change is not None and before else None,
+        )
+
+    rows = [build(code) for code in values if code not in ("0", "Rest")]
+    # SSB's placeholder zeros (a region that did not exist yet) are not values to rank.
+    rows = [r for r in rows if r.value not in (None, 0) or (r.value == 0 and r.earlier)]
+    if args.min_value is not None:
+        small = [r for r in rows if r.value is None or r.value < args.min_value]
+        rows = [r for r in rows if r not in small]
+        if small:
+            notes.append(f"{len(small)} regions below {args.min_value:g} are left out.")
+    key = "change_pct" if args.compare_to else "value"
+    ranked = [r for r in rows if getattr(r, key) is not None]
+    ranked.sort(key=lambda r: getattr(r, key), reverse=args.order == "highest")
+    for n, r in enumerate(ranked, 1):
+        r.rank = n
+    if key == "change_pct" and args.min_value is None and ranked:
+        notes.append(
+            "Small regions can top a ranking by change with tiny numbers; set min_value to leave "
+            "them out."
+        )
+    if len(ranked) < len(rows):
+        notes.append(
+            f"{len(rows) - len(ranked)} regions have no {key.replace('_', ' ')} and are left out."
+        )
+
+    country = None
+    national = await _part(
+        ctx,
+        "statistics_get_data",
+        {"table_id": args.table_id, "select": {**select, region_dim: ["0"]}},
+    )
+    if isinstance(national, dict) and national["data"]["rows"]:
+        for row in national["data"]["rows"]:
+            if isinstance(row.get("value"), int | float):
+                values.setdefault("0", {})[str(row[time_dim])] = row["value"]
+        names["0"] = national["data"]["rows"][0].get(f"{region_dim}_label")
+        country = build("0")
+        provenance.extend(Provenance.model_validate(p) for p in national["provenance"])
+
+    first = fetched["data"]["rows"][0] if fetched["data"]["rows"] else {}
+    return Result(
+        data=RankOutput(
+            table_id=args.table_id,
+            title=table["title"],
+            measure=first.get(f"{measure_dim['code']}_label") if measure_dim else None,
+            level=args.level,
+            period=period,
+            compare_to=args.compare_to,
+            ranked_by=key,
+            method=method,
+            country=country,
+            total_regions=len(ranked),
+            rows=ranked[: args.limit],
+        ),
+        provenance=provenance,
+        notes=notes,
+        truncated=len(ranked) > args.limit,
+    )
+
+
 OPERATIONS = (
     Operation(
         name="place_overview",
@@ -1017,6 +1266,27 @@ OPERATIONS = (
         examples=(
             {"table_id": "07459", "region": "Tromsø", "from_year": 2010},
             {"table_id": "07459", "region": "46", "filters": {"Kjonn": ["2"]}},
+        ),
+    ),
+    Operation(
+        name="statistics_rank",
+        title="Rank municipalities or counties on a statistic",
+        description=(
+            "Every municipality or county ranked on one SSB statistic for one period, highest or "
+            "lowest first, with Norway's figure for reference. Give compare_to for an earlier "
+            "period to rank by change instead ('which municipalities grew fastest since 2015?'). "
+            "Uses SSB's figures for today's borders where the table has them."
+        ),
+        input_model=RankInput,
+        output_model=RankOutput,
+        handler=statistics_rank,
+        source_ids=("ssb_statbank", "ssb_klass"),
+        http_method="POST",
+        http_path="/v1/statistics/rank",
+        examples=(
+            {"table_id": "07459", "limit": 5},
+            {"table_id": "07459", "compare_to": "2015", "limit": 5},
+            {"table_id": "07459", "level": "county", "order": "lowest"},
         ),
     ),
 )

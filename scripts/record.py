@@ -301,8 +301,25 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ("schools_get", {"org_number": "874738352"}),
         ("schools_get", {"org_number": "999999999"}),
     ],
-    # Not a source: statistics_series, which reads SSB Statbank and Klass together.
-    "statistics_series": [
+    # Not a source: statistics_series and statistics_rank, which read Statbank and Klass together.
+    "statistics_combined": [
+        ("statistics_rank", {"table_id": "07459", "limit": 5}),
+        ("statistics_rank", {"table_id": "07459", "compare_to": "2015", "limit": 5}),
+        ("statistics_rank", {"table_id": "07459", "level": "county", "order": "lowest"}),
+        (
+            "statistics_rank",
+            {
+                "table_id": "06913",
+                "measure": "Levende",
+                "compare_to": "2015",
+                "min_value": 1000,
+                "limit": 5,
+            },
+        ),
+        (
+            "statistics_series",
+            {"table_id": "06913", "region": "Tromsø", "measure": "Levende", "from_year": 2015},
+        ),
         ("statistics_series", {"table_id": "07459", "region": "Tromsø", "from_year": 2010}),
         ("statistics_series", {"table_id": "07459", "region": "1201", "from_year": 2015}),
         (
@@ -317,9 +334,9 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         (
             "statistics_series",
             {
-                "table_id": "06913",
+                "table_id": "11342",
                 "region": "Tromsø",
-                "measure": "Levende",
+                "measure": "Folkemengde",
                 "from_year": 2015,
                 "measure_kind": "additive",
             },

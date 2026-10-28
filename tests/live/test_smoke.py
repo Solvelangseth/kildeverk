@@ -180,3 +180,8 @@ async def test_statistics_series(live):
         live, {"table_id": "07459", "region": "Tromsø", "from_year": 2015}
     )
     assert result["data"]["method"] == "summed_to_todays_borders"
+
+
+async def test_statistics_rank(live):
+    result = await OPS["statistics_rank"].invoke(live, {"table_id": "07459", "limit": 3})
+    assert result["data"]["rows"][0]["code"] == "0301"

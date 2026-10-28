@@ -46,15 +46,15 @@ async def test_non_additive_measure_follows_renumberings_only(ctx):
 async def test_additive_measure_is_rebuilt_from_the_regions_that_merged(ctx):
     result = await series(
         ctx,
-        table_id="06913",
+        table_id="11342",
         region="Tromsø",
-        measure="Levende",
+        measure="Folkemengde",
         from_year=2015,
         measure_kind="additive",
     )
     data = result["data"]
     assert data["method"] == "harmonised" and data["points"][0]["period"] == "2015"
-    assert all(p["value"] > 500 for p in data["points"] if p["value"] is not None)
+    assert all(70_000 < p["value"] < 90_000 for p in data["points"])
     assert {p["source_id"] for p in result["provenance"]} == {"ssb_statbank", "ssb_klass"}
 
 
@@ -71,3 +71,52 @@ async def test_a_required_dimension_is_named(ctx):
         await series(ctx, table_id="12558", region="5501", measure="AntHush")
     assert caught.value.body.code == "INVALID_ARGUMENT"
     assert "filters" in caught.value.body.message
+
+
+async def test_series_uses_the_hist_codelist_and_its_prefix(ctx, replay):
+    result = await series(ctx, table_id="06913", region="Tromsø", measure="Levende", from_year=2015)
+    assert result["data"]["method"] == "summed_to_todays_borders"
+    assert result["data"]["points"][0]["period"] == "2015"
+
+
+# --- statistics_rank ---------------------------------------------------------------
+
+
+async def rank(ctx, **arguments):
+    return await OPS["statistics_rank"].invoke(ctx, arguments)
+
+
+async def test_rank_municipalities_by_value_with_norway_for_reference(ctx):
+    result = await rank(ctx, table_id="07459", limit=5)
+    data = result["data"]
+    assert data["method"] == "summed_to_todays_borders" and data["total_regions"] > 350
+    assert data["rows"][0]["code"] == "0301" and data["rows"][1]["code"] == "4601"
+    assert [r["rank"] for r in data["rows"]] == [1, 2, 3, 4, 5]
+    assert data["country"]["code"] == "0" and data["country"]["value"] > 5_000_000
+    assert all(not r["code"].startswith(("K-", "K_")) for r in data["rows"])
+
+
+async def test_rank_by_change_since_an_earlier_year(ctx):
+    result = await rank(ctx, table_id="07459", compare_to="2015", limit=5)
+    rows = result["data"]["rows"]
+    assert result["data"]["ranked_by"] == "change_pct"
+    assert [r["change_pct"] for r in rows] == sorted((r["change_pct"] for r in rows), reverse=True)
+    assert rows[0]["change"] == rows[0]["value"] - rows[0]["earlier"]
+    assert any("min_value" in n for n in result["notes"])
+
+
+async def test_rank_counties_lowest_first(ctx):
+    result = await rank(ctx, table_id="07459", level="county", order="lowest")
+    rows = result["data"]["rows"]
+    assert result["data"]["total_regions"] == 15
+    assert [r["value"] for r in rows] == sorted(r["value"] for r in rows)
+
+
+async def test_rank_skips_a_year_without_figures_and_small_regions(ctx):
+    result = await rank(
+        ctx, table_id="06913", measure="Levende", compare_to="2015", min_value=1000, limit=5
+    )
+    data = result["data"]
+    assert data["period"] != "2026"
+    assert any("has no figures yet" in n for n in result["notes"])
+    assert all(r["value"] >= 1000 for r in data["rows"])

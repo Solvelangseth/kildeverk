@@ -54,6 +54,12 @@ does not, `measure_kind` lets Kildeverk rebuild the earlier years itself with
 today's one, and rates and shares (`non_additive`) follow one-to-one renumberings only. The result
 says which method it used and from which codes.
 
+`statistics_rank` ranks every municipality or county on one SSB statistic, with Norway's figure for
+reference. Give `compare_to` to rank by change since an earlier year ("which municipalities grew
+fastest since 2015?"), and `min_value` to leave out tiny municipalities whose percentages swing.
+When the newest year is listed before its figures exist, it ranks the newest year that has them,
+and says so.
+
 Two tools describe the service itself: `sources_list` and `service_status`, which also counts
 calls, errors and cache hits per tool.
 
