@@ -25,13 +25,12 @@ publishers whose data it reads.
 | [Entur Geocoder](#entur_geocoder): stop places | ✅ available | `transit_find_stops` |
 | [Entur Journey Planner](#entur_journeyplanner): departures | ✅ available | `transit_departures` |
 | [Kartverket](#kartverket): addresses, place names, elevation | ✅ available | `addresses_search`, `places_search`, `terrain_elevation` |
+| [Norges Bank](#norges_bank): exchange rates and the policy rate | ✅ available | `currency_exchange_rates`, `rates_policy_rate` |
+| [NVE Varsom](#nve_varsom): flood, landslide and avalanche warnings | ✅ available | `hazards_flood_landslide`, `hazards_avalanche` |
 
 Two tools describe the service itself: `sources_list` and `service_status`.
 
 **Not yet included:**
-- Norges Bank (exchange rates and the policy rate). Its open-data pages state no licence, so its
-  results will say "licence not stated" rather than name one.
-- NVE's flood and landslide warnings (Varsom). These also state no licence.
 - data.norge.no's dataset search, which is documented as internal and liable to change.
 
 No source is scraped, and no undocumented endpoint behind a website is used. Kildeverk is
@@ -361,7 +360,8 @@ on data points per request. Kildeverk spends at most 60 calls a minute.
 
 **Known gaps:**
 - Rating curves and percentiles are not exposed yet.
-- Flood and landslide warnings (Varsom) come from a different NVE service and are not included.
+- Flood, landslide and avalanche warnings come from a different NVE service: see
+  [NVE Varsom](#nve_varsom).
 - Station metadata names parameters in Norwegian. The `alias` field gives the English name that
   `water_observations` accepts.
 
@@ -464,6 +464,85 @@ systematic use credit SSR, so place results carry a note saying so.
 **Known gaps:**
 - Property data beyond the address, such as owners and areas, is not included.
 - Points outside Norway and its waters have no elevation.
+
+<a id="norges_bank"></a>
+### Norges Bank: exchange rates and the policy rate
+
+**What it covers:** the central bank's own published rates.
+- `currency_exchange_rates` gives how many kroner a currency costs, for about 40 currencies and the
+  krone's trade-weighted indices (`I44`, `TWI`). Rates are daily on business days, or monthly or
+  annual averages. Leave out `start` for the latest rate.
+- `rates_policy_rate` gives the key policy rate now, the date it took effect, and every change since
+  a given date, with the size of each change.
+
+**Licence:** none stated. Norges Bank publishes this as open data, but its
+[open-data page](https://www.norges-bank.no/en/topics/Statistics/open-data/) gives no licence or terms.
+Results therefore say "No licence stated by the publisher" instead of naming one.
+
+**Rate limits:** none published. Kildeverk spends at most 25 calls a minute.
+
+**Caching:**
+- Latest rates and the policy rate: 1 hour.
+- Periods ending more than two days ago: 24 hours.
+
+**Behaviour worth knowing:**
+- Some currencies are quoted per 100 units (JPY, SEK, DKK and others). Each row gives Norges Bank's
+  quote (`nok` for `per` units) and the rate for one unit (`nok_per_unit`).
+- Currencies Norges Bank has stopped publishing, such as HRK after the euro changeover, still answer.
+  A note says when they were last quoted.
+- An unknown code next to known ones is reported in a note. If every code is unknown, the error
+  lists the codes Norges Bank publishes.
+- The policy rate's change dates are the first business day at the new rate, not the meeting date.
+
+**Known gaps:**
+- Other interest rates, such as NOWA and government bond yields, are not exposed yet.
+
+<a id="nve_varsom"></a>
+### NVE Varsom: flood, landslide and avalanche warnings
+
+**What it covers:** the warnings NVE publishes on [varsom.no](https://www.varsom.no/).
+- `hazards_flood_landslide` gives flood and landslide warnings for all of Norway, a county or a
+  municipality. Each warning has its level (green, yellow, orange, red), when it applies, its title,
+  what to expect, the causes, consequences and advice, and the counties and municipalities it covers.
+  By default it covers today and the next two days, yellow and above. Any past period of up to 31 days
+  works too, so the August 2023 storm Hans is still there, at red.
+- `hazards_avalanche` gives avalanche forecasts by forecasting region or by point. Each forecast has
+  the danger level (1 low to 5 very high), a summary, and its avalanche problems: type, cause,
+  probability, trigger, size, and the aspects and heights affected. It also has advice and the
+  forecaster's assessment. With no region or point, it lists every region's level and id, highest
+  danger first.
+
+**Licence:** [NLOD](https://data.norge.no/nlod/en/2.0), stated in NVE's documentation for the
+[flood](https://api.nve.no/doc/flomvarsling/), [landslide](https://api.nve.no/doc/jordskredvarsling/)
+and [avalanche](https://api.nve.no/doc/snoeskredvarsel/) APIs. NVE asks for the credit "Varsler fra
+Flomvarslingen / Jordskredvarslingen / Snøskredvarslingen i Norge og www.varsom.no", and asks users not
+to leave warnings out based on their own judgement. Kildeverk never filters a warning except by the
+level you ask for.
+
+**Rate limits:** none published. Kildeverk spends at most 25 calls a minute.
+
+**Caching:**
+- Current warnings: 10 minutes.
+- Past periods: 24 hours.
+- The list of avalanche regions: 7 days.
+
+**Behaviour worth knowing:**
+- Nationwide, NVE lists only warnings above green. Ask for a municipality to see green days too
+  (`min_level: 1`).
+- A county query returns one row per municipality upstream. Kildeverk merges rows that share a
+  warning id into one warning listing all its municipalities.
+- Times are Norwegian local time with their offset. Flood and landslide days run from 07:00 to 07:00.
+- Avalanche forecasts are published from about December to June. Outside the season every region
+  says "no rating" (level 0), and a note says why.
+- The avalanche danger assessment is often in Norwegian even when English is asked for. The summary,
+  problems and advice are in English.
+- Avalanche heights are read from NVE's height codes: above, below, between two heights, or outside
+  them.
+
+**Known gaps:**
+- Warnings are forecasts. NVE gives no guarantee of timeliness, so check varsom.no before acting.
+- Municipality and county codes must be current (since 2024). [SSB Klass](#ssb_klass) can map older
+  codes.
 
 ## Development
 

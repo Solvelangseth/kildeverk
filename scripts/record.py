@@ -169,6 +169,47 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
             },
         ),
     ],
+    "norges_bank": [
+        ("currency_exchange_rates", {}),
+        ("currency_exchange_rates", {"currencies": ["JPY", "USD"]}),
+        (
+            "currency_exchange_rates",
+            {"currencies": ["EUR"], "start": "2026-10-01", "end": "2026-10-09"},
+        ),
+        (
+            "currency_exchange_rates",
+            {
+                "currencies": ["EUR"],
+                "frequency": "monthly",
+                "start": "2025-01-01",
+                "end": "2025-12-31",
+            },
+        ),
+        ("currency_exchange_rates", {"currencies": ["USD", "XXX"]}),
+        ("currency_exchange_rates", {"currencies": ["XXX"]}),
+        ("currency_exchange_rates", {"currencies": ["HRK"]}),
+        ("rates_policy_rate", {"since": "2021-01-01"}),
+        ("rates_policy_rate", {"since": "2026-06-01"}),
+    ],
+    # Storm Hans in August 2023 for flood and landslide; a winter day for avalanches.
+    "nve_varsom": [
+        ("hazards_flood_landslide", {"start": "2023-08-08", "end": "2023-08-09"}),
+        (
+            "hazards_flood_landslide",
+            {"municipality": "3305", "start": "2023-08-08", "end": "2023-08-09", "min_level": 1},
+        ),
+        (
+            "hazards_flood_landslide",
+            {"county": "34", "kinds": ["landslide"], "start": "2023-08-08", "end": "2023-08-08"},
+        ),
+        ("hazards_flood_landslide", {"municipality": "4621", "start": "2026-10-01"}),
+        ("hazards_avalanche", {"start": "2026-03-10"}),
+        ("hazards_avalanche", {"region": 3011, "start": "2026-03-10"}),
+        ("hazards_avalanche", {"lat": 69.65, "lon": 18.96, "start": "2026-03-10"}),
+        ("hazards_avalanche", {"region": 3999, "start": "2026-03-10"}),
+        ("hazards_avalanche", {"region": 3011, "start": "2026-10-01"}),
+        ("hazards_avalanche", {"lat": 59.91, "lon": 10.75, "start": "2026-03-10"}),
+    ],
 }
 
 

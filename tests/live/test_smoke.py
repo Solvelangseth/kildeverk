@@ -116,3 +116,17 @@ async def test_kartverket_address_place_and_elevation(live):
         live, {"points": [{"lat": 61.63644, "lon": 8.31248}]}
     )
     assert 2400 < height["data"]["points"][0]["elevation_m"] < 2500
+
+
+async def test_norges_bank_rates(live):
+    rates = await OPS["currency_exchange_rates"].invoke(live, {"currencies": ["EUR"]})
+    assert 5 < rates["data"]["rows"][0]["nok"] < 20
+    policy = await OPS["rates_policy_rate"].invoke(live, {"since": "2020-01-01"})
+    assert policy["data"]["changes"]
+
+
+async def test_varsom_warnings_and_avalanche_summary(live):
+    warnings = await OPS["hazards_flood_landslide"].invoke(live, {"municipality": "0301"})
+    assert warnings["provenance"]
+    summary = await OPS["hazards_avalanche"].invoke(live, {})
+    assert len(summary["data"]["forecasts"]) >= 40

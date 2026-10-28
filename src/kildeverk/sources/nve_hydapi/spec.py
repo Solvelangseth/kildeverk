@@ -39,6 +39,6 @@ SPEC = SourceSpec(
         "Needs a free HydAPI key; without one these tools answer NOT_CONFIGURED",
         "The newest values are uncontrolled and can be revised; each row says how far it has been checked",
         "Rating curves and percentiles are not exposed yet",
-        "Flood and landslide warnings are a different NVE service and are not included",
+        "Flood, landslide and avalanche warnings are a separate source (nve_varsom)",
     ],
 )
