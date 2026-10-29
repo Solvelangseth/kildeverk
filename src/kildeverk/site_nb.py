@@ -515,10 +515,14 @@ SOURCES: dict[str, SourceText] = {
                 "stemte når det var navneopprop"
             ),
             "Stortingsrepresentantene: parti, valgkrets og komiteer, nå eller for en periode",
+            (
+                "Spørsmål til statsrådene: skriftlige spørsmål i sin helhet, spørretimen og "
+                "interpellasjoner, med spørrer, statsråd, datoer og lenke til svaret"
+            ),
         ],
         [
             "Mange voteringer er uten navneopprop, uten tall eller navn; svarene sier fra",
-            "Spørsmål til statsrådene, høringer og debatter er ikke tatt med ennå",
+            "Høringer og debatter er ikke tatt med ennå, heller ikke svartekstene fra statsrådene",
             "Kontaktinformasjon og fødselsdatoer for representantene er utelatt",
         ],
     ),
@@ -807,6 +811,10 @@ TOOLS: dict[str, ToolText] = {
         "En sak og voteringene",
         "Én sak med vedtaket og hver votering, også hvordan partiene stemte.",
     ),
+    "parliament_questions": ToolText(
+        "Spørsmål til statsrådene",
+        "Skriftlige spørsmål, spørretimen og interpellasjoner, med lenke til svaret.",
+    ),
     "parliament_members": ToolText(
         "Stortingsrepresentantene",
         "Representantene i dag eller i en periode, med parti, valgkrets og komiteer.",
@@ -934,8 +942,8 @@ THEMES: list[tuple[str, str, list[str]]] = [
     ),
     (
         "Stortinget",
-        "Saker, voteringer og representanter.",
-        ["parliament_cases", "parliament_case", "parliament_members"],
+        "Saker, voteringer, spørsmål og representanter.",
+        ["parliament_cases", "parliament_case", "parliament_questions", "parliament_members"],
     ),
     (
         "Språk",

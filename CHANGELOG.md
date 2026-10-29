@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `parliament_questions`: questions members of Stortinget put to ministers (written questions,
+  question time, interpellations), searchable by words, minister, party and answer status.
 - `sea_level_extremes`: storm-surge return levels, record sea levels and tidal levels at a place on
   the coast, from Kartverket, in NN2000 so they compare with heights on land.
 - A new source, the World Bank's World Development Indicators: `world_indicators` compares Norway

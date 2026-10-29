@@ -337,6 +337,25 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ("sea_level_extremes", {"station": "HFT"}),
         ("sea_level_extremes", {"lat": 61.5, "lon": 9.0}),
     ],
+    # Recorded apart from stortinget, so its recordings stay as they are.
+    "stortinget_questions": [
+        ("parliament_questions", {"session": "2025-2026", "query": "strøm", "limit": 5}),
+        ("parliament_questions", {"kind": "interpellation", "session": "2025-2026", "limit": 3}),
+        (
+            "parliament_questions",
+            {
+                "session": "2025-2026",
+                "minister": "helse",
+                "party": "H",
+                "answered": True,
+                "limit": 5,
+            },
+        ),
+        (
+            "parliament_questions",
+            {"kind": "question_time", "session": "2025-2026", "query": "barnehage"},
+        ),
+    ],
     "worldbank_wdi": [
         ("world_indicators", {"indicator": "gdp_per_capita"}),
         (
@@ -514,6 +533,7 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
 SCRUB = {
     "brreg": {"telefon", "mobil", "epostadresse"},
     "stortinget": {"epost", "foedselsdato", "doedsdato", "respons_dato_tid", "versjon"},
+    "stortinget_questions": {"epost", "foedselsdato", "doedsdato", "respons_dato_tid", "versjon"},
     "met_metalerts": {"geometry", "resources"},
     # Pictures carry photographers' names; observer ids are not needed.
     "nve_regobs": {"Attachments", "AttachmentSummaries", "ObserverID", "ObserverGUID"},
@@ -547,8 +567,30 @@ def _regobs_usernames(url: str, body):
     return body
 
 
+def _question_sample(url: str, body):
+    # A session's written questions are 8 MB; keep the ones the tests look for and a sample.
+    import re
+
+    if not isinstance(body, dict) or "sporsmal_liste" not in body:
+        return body
+    wanted = re.compile(r"(?<!\w)(strøm|barnehage)", re.IGNORECASE)
+    body["sporsmal_liste"] = [
+        q
+        for i, q in enumerate(body["sporsmal_liste"])
+        if i < 60
+        or wanted.search(q.get("tittel") or "")
+        or (
+            "helse" in (q.get("sporsmal_til_minister_tittel") or "")
+            and ((q.get("sporsmal_fra") or {}).get("parti") or {}).get("id") == "H"
+            and i % 4 == 0
+        )
+    ]
+    return body
+
+
 # Whole-response trims, for responses too large to keep in full.
 TRIM = {
+    "stortinget_questions": _question_sample,
     "nve_regobs": _regobs_usernames,
     "nve_reservoirs": _reservoir_years,
     "elhub": _elhub_midnights,

@@ -18,7 +18,13 @@ SPEC = SourceSpec(
     budget=Budget(
         rate_per_s=50 / 60, capacity=10, upstream_limit="100 requests per minute; 429 above"
     ),
-    cache_ttls_s={"sessions": 86_400, "cases": 3_600, "case": 3_600, "people": 86_400},
+    cache_ttls_s={
+        "sessions": 86_400,
+        "cases": 3_600,
+        "case": 3_600,
+        "people": 86_400,
+        "questions": 3_600,
+    },
     covers=[
         (
             "Every case before Stortinget by session: bills, budgets and other matters, with "
@@ -29,11 +35,15 @@ SPEC = SourceSpec(
             "voted when votes were recorded by name"
         ),
         "The members of Stortinget: party, constituency and committees, now or for a period",
+        (
+            "Questions to ministers: written questions in full, question time and "
+            "interpellations, with asker, minister, dates and a link to the answer"
+        ),
     ],
     known_gaps=[
         "Titles and texts are in Norwegian",
         "Many votes are by acclamation, with no counts or names; results say so",
-        "Questions to ministers, hearings and debates are not exposed yet",
+        "Hearings and debates are not exposed yet, nor the texts of ministers' answers",
         "Contact details and birth dates of members are left out",
     ],
 )

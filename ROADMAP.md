@@ -91,7 +91,7 @@ or a credential and cannot be done from the code alone.
 
 - [ ] Entur journey planning from A to B.
 - [x] Kartverket return levels for storm surge (`sea_level_extremes`).
-- [ ] Stortinget questions to ministers.
+- [x] Stortinget questions to ministers (`parliament_questions`).
 - [x] MET ocean forecast (waves and sea temperature).
 - [ ] Statens vegvesen's national road database (NVDB): speed limits, tunnels, bridges.
 

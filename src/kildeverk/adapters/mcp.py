@@ -47,7 +47,8 @@ GUIDE = """# Choosing a Kildeverk tool
   `traffic_volumes` for road traffic.
 - **Maps:** `addresses_search`, `places_search`, `terrain_elevation`, `regions_at_point`.
 - **Money:** `currency_exchange_rates`, `rates_policy_rate`.
-- **Parliament:** `parliament_cases`, then `parliament_case` for votes; `parliament_members`.
+- **Parliament:** `parliament_cases`, then `parliament_case` for votes; `parliament_questions`
+  for questions to ministers; `parliament_members`.
 - **Schools:** `schools_search`, then `schools_get`.
 - **Norwegian words:** `dictionary_lookup` for spelling, inflection and meaning.
 - **Anything else:** `catalog_search` finds which public body publishes it.

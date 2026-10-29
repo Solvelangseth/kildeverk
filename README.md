@@ -41,7 +41,7 @@ publishers whose data it reads.
 | [data.norge.no](#datanorge): the national data catalogue | ✅ available | `catalog_search` |
 | [NVE reservoir statistics](#nve_reservoirs): hydropower reservoir fill | ✅ available | `energy_reservoirs` |
 | [Elhub](#elhub): electricity consumption and production | ✅ available | `electricity_municipality`, `electricity_price_areas` |
-| [Stortinget](#stortinget): cases, votes and members | ✅ available | `parliament_cases`, `parliament_case`, `parliament_members` |
+| [Stortinget](#stortinget): cases, votes, members and questions | ✅ available | `parliament_cases`, `parliament_case`, `parliament_members`, `parliament_questions` |
 | [Statens vegvesen traffic data](#vegvesen_traffic) | ✅ available | `traffic_find_points`, `traffic_volumes` |
 | [National School Register](#udir_nsr) | ✅ available | `schools_search`, `schools_get` |
 | [Ordbøkene](#ordbokene): Bokmålsordboka and Nynorskordboka | ✅ available | `dictionary_lookup` |
@@ -969,6 +969,12 @@ Kildeverk spends at most 4 a second.
   it. Each vote has its result and counts and, when recorded by name, how each party voted.
 - `parliament_members` lists the members sitting today, or those of an electoral period, with
   party, constituency and committees, and a count per party.
+- `parliament_questions` lists the questions members put to ministers in a session: written
+  questions (in full), questions from question time, or interpellations, filtered by words (each
+  matching from the start of a word), the minister, the asker's party and whether it is answered.
+  Each has the asker and constituency, the minister, the dates and a link to the question and its
+  answer on stortinget.no. The API's single-question endpoint fails for current questions, so
+  answer texts are left to that link.
 
 **Licence:** [NLOD](https://data.norge.no/nlod/en/2.0), per Stortinget's
 [terms of use](https://data.stortinget.no/om-datatjenesten/bruksvilkar/). The terms require
@@ -992,7 +998,7 @@ Stortinget to be named as the source, and say data must not be presented in a mi
 
 **Known gaps:**
 - Committees are given only for members sitting today, not for past periods.
-- Questions to ministers, hearings and debates are not exposed yet.
+- Hearings and debates are not exposed yet; nor are the texts of ministers' answers.
 
 <a id="vegvesen_traffic"></a>
 ### Statens vegvesen: traffic counts

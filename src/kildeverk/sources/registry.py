@@ -89,6 +89,7 @@ def operations():
     from kildeverk.sources.ssb_klass.ops import OPERATIONS as SSB_KLASS_OPS
     from kildeverk.sources.ssb_statbank.ops import OPERATIONS as SSB_STATBANK_OPS
     from kildeverk.sources.stortinget.ops import OPERATIONS as STORTINGET_OPS
+    from kildeverk.sources.stortinget.questions import OPERATIONS as STORTINGET_QUESTION_OPS
     from kildeverk.sources.udir_nsr.ops import OPERATIONS as UDIR_NSR_OPS
     from kildeverk.sources.usgs.ops import OPERATIONS as USGS_OPS
     from kildeverk.sources.vegvesen_traffic.ops import OPERATIONS as VEGVESEN_TRAFFIC_OPS
@@ -115,6 +116,7 @@ def operations():
         *NVE_RESERVOIRS_OPS,
         *ELHUB_OPS,
         *STORTINGET_OPS,
+        *STORTINGET_QUESTION_OPS,
         *VEGVESEN_TRAFFIC_OPS,
         *UDIR_NSR_OPS,
         *USGS_OPS,
