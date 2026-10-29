@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- A new source, the national road database (NVDB): `road_at_point` gives the road at a point with
+  its category, speed limit, daily traffic, height limit and bridge or tunnel.
 - A new source, Eurostat: `eurostat_search` finds datasets and `eurostat_data` reads any slice of
   one, by default for the Nordic countries and the EU, with regions down to NUTS level.
 - The upstream gateway reads plain-text answers and repeated query parameters.

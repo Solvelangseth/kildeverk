@@ -61,6 +61,8 @@ def build_context(
     # Entur needs no key, but every request must say which client it comes from.
     for source_id in ("entur_geocoder", "entur_journeyplanner"):
         credentials[source_id] = HeaderAuth("ET-Client-Name", settings.et_client_name)
+    # NVDB likewise refuses requests without an X-Client header naming the client.
+    credentials["vegvesen_nvdb"] = HeaderAuth("X-Client", settings.et_client_name)
     upstreams = {
         spec.id: Upstream(
             spec,

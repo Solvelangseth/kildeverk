@@ -30,6 +30,7 @@ from kildeverk.sources.ssb_statbank.spec import SPEC as SSB_STATBANK
 from kildeverk.sources.stortinget.spec import SPEC as STORTINGET
 from kildeverk.sources.udir_nsr.spec import SPEC as UDIR_NSR
 from kildeverk.sources.usgs.spec import SPEC as USGS_EARTHQUAKES
+from kildeverk.sources.vegvesen_nvdb.spec import SPEC as VEGVESEN_NVDB
 from kildeverk.sources.vegvesen_traffic.spec import SPEC as VEGVESEN_TRAFFIC
 from kildeverk.sources.worldbank.spec import SPEC as WORLDBANK
 
@@ -57,6 +58,7 @@ SOURCES: tuple[SourceSpec, ...] = (
     ELHUB,
     STORTINGET,
     VEGVESEN_TRAFFIC,
+    VEGVESEN_NVDB,
     UDIR_NSR,
     USGS_EARTHQUAKES,
     ORDBOKENE,
@@ -96,6 +98,7 @@ def operations():
     from kildeverk.sources.stortinget.questions import OPERATIONS as STORTINGET_QUESTION_OPS
     from kildeverk.sources.udir_nsr.ops import OPERATIONS as UDIR_NSR_OPS
     from kildeverk.sources.usgs.ops import OPERATIONS as USGS_OPS
+    from kildeverk.sources.vegvesen_nvdb.ops import OPERATIONS as VEGVESEN_NVDB_OPS
     from kildeverk.sources.vegvesen_traffic.ops import OPERATIONS as VEGVESEN_TRAFFIC_OPS
     from kildeverk.sources.worldbank.ops import OPERATIONS as WORLDBANK_OPS
 
@@ -123,6 +126,7 @@ def operations():
         *STORTINGET_OPS,
         *STORTINGET_QUESTION_OPS,
         *VEGVESEN_TRAFFIC_OPS,
+        *VEGVESEN_NVDB_OPS,
         *UDIR_NSR_OPS,
         *USGS_OPS,
         *ORDBOKENE_OPS,

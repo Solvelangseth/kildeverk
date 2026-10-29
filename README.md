@@ -1,7 +1,7 @@
 # Kildeverk
 
 Live Norwegian public data for AI agents and people. Kildeverk is an MCP server
-and a read-only JSON API over 29 official data services from 17 publishers, 14 of them Norwegian:
+and a read-only JSON API over 30 official data services from 17 publishers, 14 of them Norwegian:
 statistics, companies, weather, water, warnings, transport, maps, the sea, money,
 energy, parliament, roads and schools. Every result says exactly where it came from.
 
@@ -43,6 +43,7 @@ publishers whose data it reads.
 | [Elhub](#elhub): electricity consumption and production | ✅ available | `electricity_municipality`, `electricity_price_areas` |
 | [Stortinget](#stortinget): cases, votes, members and questions | ✅ available | `parliament_cases`, `parliament_case`, `parliament_members`, `parliament_questions` |
 | [Statens vegvesen traffic data](#vegvesen_traffic) | ✅ available | `traffic_find_points`, `traffic_volumes` |
+| [NVDB](#vegvesen_nvdb): the national road database | ✅ available | `road_at_point` |
 | [National School Register](#udir_nsr) | ✅ available | `schools_search`, `schools_get` |
 | [Ordbøkene](#ordbokene): Bokmålsordboka and Nynorskordboka | ✅ available | `dictionary_lookup` |
 | [USGS Earthquake Catalog](#usgs_earthquakes) | ✅ available | `hazards_earthquakes` |
@@ -1037,7 +1038,31 @@ about 10,000 of them on roads and cycle paths.
 
 **Known gaps:**
 - Hourly is the finest resolution; single vehicles and speeds are not public.
-- Traffic indices and the national road database (NVDB) are not exposed yet.
+- Traffic indices are not exposed yet. Speed limits and the road at a point come from
+  [NVDB](#vegvesen_nvdb).
+
+<a id="vegvesen_nvdb"></a>
+### NVDB: the national road database
+
+**What it covers:** `road_at_point` gives the road nearest a point that carries vehicles, from
+Statens vegvesen's national road database: its reference (`EV39 S78D1 m454`) and category
+(European, national, county, municipal, private or forest road), the speed limit, the annual
+average daily traffic (ÅDT) with the share of long vehicles and its year, any signed height limit,
+and the bridge or tunnel it is on.
+
+**Licence:** [NLOD 2.0](https://data.norge.no/nlod/en/2.0), as data.norge.no lists the
+[Nasjonal vegdatabank API](https://data.norge.no/datasets/e52c9fbc-1cf2-3910-97c1-425cd5c2304e).
+
+**Rate limits:** a rate limiter that is not published, and every request must carry an `X-Client`
+header naming the client; Kildeverk sends its client name. It spends at most 120 calls a minute;
+one lookup is six calls, cached for a day.
+
+**Behaviour worth knowing:** footpaths and cycle paths are skipped (NVDB marks them with road-user
+group G), so a point beside a road finds the road. A point above a tunnel finds the road on the
+surface; give a point on the tunnel's road at its entrance.
+
+**Known gaps:** other road objects (lanes, weight limits, road works, rest areas) are not exposed
+yet.
 
 <a id="udir_nsr"></a>
 ### National School Register (NSR)

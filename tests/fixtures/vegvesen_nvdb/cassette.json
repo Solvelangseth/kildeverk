@@ -1,0 +1,142 @@
+[
+ {
+  "method": "GET",
+  "url": "https://nvdbapiles.atlas.vegvesen.no/posisjon?lat=60.379&lon=5.3388&srid=4326&maks_avstand=50&maks_antall=10",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "response": "[{\"vegsystemreferanse\":{\"vegsystem\":{\"vegkategori\":\"K\",\"fase\":\"V\",\"nummer\":4653},\"strekning\":{\"strekning\":1,\"delstrekning\":1,\"arm\":false,\"adskilte_løp\":\"Nei\",\"trafikantgruppe\":\"K\",\"retning\":\"MED\",\"meter\":111.762},\"kortform\":\"KV4653 S1D1 m112\"},\"veglenkesekvens\":{\"veglenkesekvensid\":755722,\"relativPosisjon\":0.11898782,\"kortform\":\"0.11898782@755722\"},\"geometri\":{\"wkt\":\"POINT Z (60.37918329 5.33889996 11.407)\",\"srid\":4326},\"kommune\":4601,\"avstand\":21.211},{\"vegsystemreferanse\":{\"vegsystem\":{\"vegkategori\":\"K\",\"fase\":\"V\",\"nummer\":99995},\"strekning\":{\"strekning\":10,\"delstrekning\":20,\"arm\":false,\"adskilte_løp\":\"Nei\",\"trafikantgruppe\":\"G\",\"retning\":\"MED\",\"meter\":3.092},\"kortform\":\"KV99995 S10D20 m3\"},\"veglenkesekvens\":{\"veglenkesekvensid\":803003,\"relativPosisjon\":0.52639368,\"kortform\":\"0.52639368@803003\"},\"geometri\":{\"wkt\":\"POINT Z (60.37884644 5.33838384 21.52685163)\",\"srid\":4326},\"kommune\":4601,\"avstand\":28.74},{\"vegsystemreferanse\":{\"vegsystem\":{\"vegkategori\":\"K\",\"fase\":\"V\",\"nummer\":99995},\"strekning\":{\"strekning\":10,\"delstrekning\":10,\"arm\":false,\"adskilte_løp\":\"Nei\",\"trafikantgruppe\":\"G\",\"retning\":\"MED\",\"meter\":27.631},\"kortform\":\"KV99995 S10D10 m28\"},\"veglenkesekvens\":{\"veglenkesekvensid\":803003,\"relativPosisjon\":0.4741973,\"kortform\":\"0.4741973@803003\"},\"geometri\":{\"wkt\":\"POINT Z (60.37886863 5.33835047 20.66)\",\"srid\":4326},\"kommune\":4601,\"avstand\":28.906},{\"vegsystemreferanse\":{\"vegsystem\":{\"vegkategori\":\"K\",\"fase\":\"V\",\"nummer\":99995},\"strekning\":{\"strekning\":10,\"delstrekning\":1,\"arm\":false,\"adskilte_løp\":\"Nei\",\"trafikantgruppe\":\"G\",\"retning\":\"MED\",\"meter\":9.512},\"kortform\":\"KV99995 S10D1 m10\"},\"veglenkesekvens\":{\"veglenkesekvensid\":803003,\"relativPosisjon\":0.11451488,\"kortform\":\"0.11451488@803003\"},\"geometri\":{\"wkt\":\"POINT Z (60.37910584 5.33824434 12.95249256)\",\"srid\":4326},\"kommune\":4601,\"avstand\":32.967},{\"vegsystemreferanse\":{\"vegsystem\":{\"vegkategori\":\"P\",\"fase\":\"V\",\"nummer\":94487},\"strekning\":{\"strekning\":1,\"delstrekning\":1,\"arm\":false,\"adskilte_løp\":\"Nei\",\"trafikantgruppe\":\"K\",\"retning\":\"MED\",\"meter\":30.462},\"kortform\":\"PV94487 S1D1 m30\"},\"veglenkesekvens\":{\"veglenkesekvensid\":3380430,\"relativPosisjon\":0.99993454,\"kortform\":\"0.99993454@3380430\"},\"geometri\":{\"wkt\":\"POINT Z (60.3788494 5.33826569 21.72)\",\"srid\":4326},\"kommune\":4601,\"avstand\":34.043},{\"vegsystemreferanse\":{\"vegsystem\":{\"vegkategori\":\"K\",\"fase\":\"V\",\"nummer\":4630},\"strekning\":{\"strekning\":1,\"delstrekning\":1,\"arm\":false,\"adskilte_løp\":\"Nei\",\"trafikantgruppe\":\"K\",\"retning\":\"MED\",\"meter\":10.075},\"kortform\":\"KV4630 S1D1 m10\"},\"veglenkesekvens\":{\"veglenkesekvensid\":755690,\"relativPosisjon\":0.0319083,\"kortform\":\"0.0319083@755690\"},\"geometri\":{\"wkt\":\"POINT Z (60.37915773 5.33821064 11.91642421)\",\"srid\":4326},\"kommune\":4601,\"avstand\":37.093},{\"vegsystemreferanse\":{\"vegsystem\":{\"vegkategori\":\"K\",\"fase\":\"V\",\"nummer\":4630},\"strekning\":{\"strekning\":1,\"delstrekning\":1,\"arm\":false,\"adskilte_løp\":\"Nei\",\"trafikantgruppe\":\"K\",\"retning\":\"MED\",\"meter\":7.975},\"kortform\":\"KV4630 S1D1 m8\"},\"veglenkesekvens\":{\"veglenkesekvensid\":755690,\"relativPosisjon\":0.02525632,\"kortform\":\"0.02525632@755690\"},\"geometri\":{\"wkt\":\"POINT Z (60.3791742 5.33822861 11.707)\",\"srid\":4326},\"kommune\":4601,\"avstand\":37.152},{\"vegsystemreferanse\":{\"vegsystem\":{\"vegkategori\":\"K\",\"fase\":\"V\",\"nummer\":99995},\"strekning\":{\"strekning\":10,\"delstrekning\":20,\"arm\":false,\"adskilte_løp\":\"Nei\",\"trafikantgruppe\":\"G\",\"retning\":\"MED\",\"meter\":30.546},\"kortform\":\"KV99995 S10D20 m31\"},\"veglenkesekvens\":{\"veglenkesekvensid\":803003,\"relativPosisjon\":0.85570568,\"kortform\":\"0.85570568@803003\"},\"geometri\":{\"wkt\":\"POINT Z (60.3786674 5.33868907 28.1)\",\"srid\":4326},\"kommune\":4601,\"avstand\":37.679},{\"vegsystemreferanse\":{\"vegsystem\":{\"vegkategori\":\"P\",\"fase\":\"V\",\"nummer\":13520},\"strekning\":{\"strekning\":8,\"delstrekning\":1,\"arm\":false,\"adskilte_løp\":\"Nei\",\"trafikantgruppe\":\"K\",\"retning\":\"MED\",\"meter\":13.063},\"kortform\":\"PV13520 S8D1 m13\"},\"veglenkesekvens\":{\"veglenkesekvensid\":2675400,\"relativPosisjon\":0.25642765,\"kortform\":\"0.25642765@2675400\"},\"geometri\":{\"wkt\":\"POINT Z (60.37924386 5.33928301 2.567)\",\"srid\":4326},\"kommune\":4601,\"avstand\":38.151},{\"vegsystemreferanse\":{\"vegsystem\":{\"vegkategori\":\"K\",\"fase\":\"V\",\"nummer\":4653},\"strekning\":{\"strekning\":1,\"delstrekning\":1,\"arm\":false,\"adskilte_løp\":\"Nei\",\"trafikantgruppe\":\"K\",\"retning\":\"MED\",\"meter\":75.327},\"kortform\":\"KV4653 S1D1 m75\"},\"veglenkesekvens\":{\"veglenkesekvensid\":755722,\"relativPosisjon\":0.08019688,\"kortform\":\"0.08019688@755722\"},\"geometri\":{\"wkt\":\"POINT Z (60.37924414 5.33825722 11.407)\",\"srid\":4326},\"kommune\":4601,\"avstand\":40.596}]"
+ },
+ {
+  "method": "GET",
+  "url": "https://nvdbapiles.atlas.vegvesen.no/vegobjekter/105?veglenkesekvens=0.11898782%40755722&inkluder=egenskaper&antall=3",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "expires": "0",
+   "content-type": "application/json"
+  },
+  "response": "{\"objekter\":[{\"id\":82192662,\"href\":\"https://nvdbapiles.atlas.vegvesen.no/vegobjekter/105/82192662\",\"egenskaper\":[{\"id\":5127,\"navn\":\"Gyldig fra dato\",\"verdi\":\"1980-01-01\",\"egenskapstype\":\"Dato\"},{\"id\":2021,\"navn\":\"Fartsgrense\",\"verdi\":30,\"enum_id\":2726,\"enhet\":{\"id\":7,\"navn\":\"Kilometer/time\",\"kortnavn\":\"km/h\"},\"egenskapstype\":\"Heltallenum\"}]}],\"metadata\":{\"returnert\":1,\"sidestørrelse\":3,\"neste\":{\"start\":\"82192662:2\",\"href\":\"https://nvdbapiles.atlas.vegvesen.no/vegobjekter/105?veglenkesekvens=0.11898782@755722&inkluder=egenskaper&start=82192662:2&antall=3\"}}}"
+ },
+ {
+  "method": "GET",
+  "url": "https://nvdbapiles.atlas.vegvesen.no/vegobjekter/591?veglenkesekvens=0.11898782%40755722&inkluder=egenskaper&antall=3",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "expires": "0",
+   "content-type": "application/json"
+  },
+  "response": "{\"objekter\":[],\"metadata\":{\"returnert\":0,\"sidestørrelse\":3,\"neste\":{\"start\":\"0:0\",\"href\":\"https://nvdbapiles.atlas.vegvesen.no/vegobjekter/591?veglenkesekvens=0.11898782@755722&inkluder=egenskaper&start=0:0&antall=3\"}}}"
+ },
+ {
+  "method": "GET",
+  "url": "https://nvdbapiles.atlas.vegvesen.no/vegobjekter/540?veglenkesekvens=0.11898782%40755722&inkluder=egenskaper&antall=3",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "expires": "0",
+   "content-type": "application/json"
+  },
+  "response": "{\"objekter\":[],\"metadata\":{\"returnert\":0,\"sidestørrelse\":3,\"neste\":{\"start\":\"0:0\",\"href\":\"https://nvdbapiles.atlas.vegvesen.no/vegobjekter/540?veglenkesekvens=0.11898782@755722&inkluder=egenskaper&start=0:0&antall=3\"}}}"
+ },
+ {
+  "method": "GET",
+  "url": "https://nvdbapiles.atlas.vegvesen.no/vegobjekter/60?veglenkesekvens=0.11898782%40755722&inkluder=egenskaper&antall=3",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "expires": "0",
+   "content-type": "application/json"
+  },
+  "response": "{\"objekter\":[],\"metadata\":{\"returnert\":0,\"sidestørrelse\":3,\"neste\":{\"start\":\"0:0\",\"href\":\"https://nvdbapiles.atlas.vegvesen.no/vegobjekter/60?veglenkesekvens=0.11898782@755722&inkluder=egenskaper&start=0:0&antall=3\"}}}"
+ },
+ {
+  "method": "GET",
+  "url": "https://nvdbapiles.atlas.vegvesen.no/vegobjekter/67?veglenkesekvens=0.11898782%40755722&inkluder=egenskaper&antall=3",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "expires": "0",
+   "content-type": "application/json"
+  },
+  "response": "{\"objekter\":[],\"metadata\":{\"returnert\":0,\"sidestørrelse\":3,\"neste\":{\"start\":\"0:0\",\"href\":\"https://nvdbapiles.atlas.vegvesen.no/vegobjekter/67?veglenkesekvens=0.11898782@755722&inkluder=egenskaper&start=0:0&antall=3\"}}}"
+ },
+ {
+  "method": "GET",
+  "url": "https://nvdbapiles.atlas.vegvesen.no/posisjon?lat=60.3925&lon=5.3185&srid=4326&maks_avstand=80&maks_antall=10",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "response": "[{\"vegsystemreferanse\":{\"vegsystem\":{\"vegkategori\":\"F\",\"fase\":\"V\",\"nummer\":5347},\"strekning\":{\"strekning\":1,\"delstrekning\":1,\"arm\":false,\"adskilte_løp\":\"Nei\",\"trafikantgruppe\":\"K\",\"retning\":\"MED\",\"meter\":402.608},\"kortform\":\"FV5347 S1D1 m403\"},\"veglenkesekvens\":{\"veglenkesekvensid\":805002,\"relativPosisjon\":0.6658341,\"kortform\":\"0.6658341@805002\"},\"geometri\":{\"wkt\":\"POINT Z (60.39250021 5.31849991 8.80011413)\",\"srid\":4326},\"kommune\":4601,\"avstand\":0.041},{\"vegsystemreferanse\":{\"vegsystem\":{\"vegkategori\":\"F\",\"fase\":\"V\",\"nummer\":5347},\"strekning\":{\"strekning\":1,\"delstrekning\":1,\"arm\":false,\"adskilte_løp\":\"Nei\",\"trafikantgruppe\":\"K\",\"retning\":\"MED\",\"meter\":402.897},\"kortform\":\"FV5347 S1D1 m403\"},\"veglenkesekvens\":{\"veglenkesekvensid\":805002,\"relativPosisjon\":0.66601846,\"kortform\":\"0.66601846@805002\"},\"geometri\":{\"wkt\":\"POINT Z (60.3925023 5.31850296 8.806)\",\"srid\":4326},\"kommune\":4601,\"avstand\":0.291},{\"vegsystemreferanse\":{\"vegsystem\":{\"vegkategori\":\"F\",\"fase\":\"V\",\"nummer\":5334},\"strekning\":{\"strekning\":1,\"delstrekning\":1,\"arm\":false,\"adskilte_løp\":\"Nei\",\"trafikantgruppe\":\"K\",\"retning\":\"MED\",\"meter\":336.237},\"kortform\":\"FV5334 S1D1 m336\"},\"veglenkesekvens\":{\"veglenkesekvensid\":805414,\"relativPosisjon\":0.98616528,\"kortform\":\"0.98616528@805414\"},\"geometri\":{\"wkt\":\"POINT Z (60.39247146 5.31856338 8.906)\",\"srid\":4326},\"kommune\":4601,\"avstand\":4.718},{\"vegsystemreferanse\":{\"vegsystem\":{\"vegkategori\":\"F\",\"fase\":\"V\",\"nummer\":5347},\"strekning\":{\"strekning\":1,\"delstrekning\":1,\"arm\":false,\"adskilte_løp\":\"Nei\",\"trafikantgruppe\":\"K\",\"retning\":\"MED\",\"meter\":407.439},\"kortform\":\"FV5347 S1D1 m407\"},\"veglenkesekvens\":{\"veglenkesekvensid\":805002,\"relativPosisjon\":0.66891134,\"kortform\":\"0.66891134@805002\"},\"geometri\":{\"wkt\":\"POINT Z (60.39253569 5.31854965 8.96)\",\"srid\":4326},\"kommune\":4601,\"avstand\":4.827},{\"vegsystemreferanse\":{\"vegsystem\":{\"vegkategori\":\"F\",\"fase\":\"V\",\"nummer\":5347},\"kortform\":\"FV5347\"},\"veglenkesekvens\":{\"veglenkesekvensid\":3521330,\"relativPosisjon\":0.52369777,\"kortform\":\"0.52369777@3521330\"},\"geometri\":{\"wkt\":\"POINT Z (60.39253628 5.31839152 8.43369877)\",\"srid\":4326},\"kommune\":4601,\"avstand\":7.265},{\"vegsystemreferanse\":{\"vegsystem\":{\"vegkategori\":\"F\",\"fase\":\"V\",\"nummer\":5347},\"kortform\":\"FV5347\"},\"veglenkesekvens\":{\"veglenkesekvensid\":3521318,\"relativPosisjon\":0.46781582,\"kortform\":\"0.46781582@3521318\"},\"geometri\":{\"wkt\":\"POINT Z (60.39250672 5.31865175 9.406)\",\"srid\":4326},\"kommune\":4601,\"avstand\":8.398},{\"vegsystemreferanse\":{\"vegsystem\":{\"vegkategori\":\"F\",\"fase\":\"V\",\"nummer\":5347},\"kortform\":\"FV5347\"},\"veglenkesekvens\":{\"veglenkesekvensid\":3521330,\"relativPosisjon\":0.5503008,\"kortform\":\"0.5503008@3521330\"},\"geometri\":{\"wkt\":\"POINT Z (60.39257203 5.31844012 8.62)\",\"srid\":4326},\"kommune\":4601,\"avstand\":8.716},{\"vegsystemreferanse\":{\"vegsystem\":{\"vegkategori\":\"F\",\"fase\":\"V\",\"nummer\":5347},\"strekning\":{\"strekning\":1,\"delstrekning\":1,\"arm\":false,\"adskilte_løp\":\"Nei\",\"trafikantgruppe\":\"K\",\"retning\":\"MED\",\"meter\":392.221},\"kortform\":\"FV5347 S1D1 m392\"},\"veglenkesekvens\":{\"veglenkesekvensid\":805002,\"relativPosisjon\":0.65920868,\"kortform\":\"0.65920868@805002\"},\"geometri\":{\"wkt\":\"POINT Z (60.39242442 5.31839085 8.606)\",\"srid\":4326},\"kommune\":4601,\"avstand\":10.399},{\"vegsystemreferanse\":{\"vegsystem\":{\"vegkategori\":\"F\",\"fase\":\"V\",\"nummer\":5334},\"strekning\":{\"strekning\":1,\"delstrekning\":1,\"arm\":false,\"adskilte_løp\":\"Nei\",\"trafikantgruppe\":\"K\",\"retning\":\"MED\",\"meter\":329.11},\"kortform\":\"FV5334 S1D1 m329\"},\"veglenkesekvens\":{\"veglenkesekvensid\":805414,\"relativPosisjon\":0.95168626,\"kortform\":\"0.95168626@805414\"},\"geometri\":{\"wkt\":\"POINT Z (60.39242609 5.31865397 9.106)\",\"srid\":4326},\"kommune\":4601,\"avstand\":11.843},{\"vegsystemreferanse\":{\"vegsystem\":{\"vegkategori\":\"F\",\"fase\":\"V\",\"nummer\":5334},\"kortform\":\"FV5334\"},\"veglenkesekvens\":{\"veglenkesekvensid\":3521299,\"relativPosisjon\":0.5434964,\"kortform\":\"0.5434964@3521299\"},\"geometri\":{\"wkt\":\"POINT Z (60.39246426 5.31871177 9.306)\",\"srid\":4326},\"kommune\":4601,\"avstand\":12.348}]"
+ },
+ {
+  "method": "GET",
+  "url": "https://nvdbapiles.atlas.vegvesen.no/vegobjekter/105?veglenkesekvens=0.6658341%40805002&inkluder=egenskaper&antall=3",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "expires": "0",
+   "content-type": "application/json"
+  },
+  "response": "{\"objekter\":[{\"id\":82230597,\"href\":\"https://nvdbapiles.atlas.vegvesen.no/vegobjekter/105/82230597\",\"egenskaper\":[{\"id\":5127,\"navn\":\"Gyldig fra dato\",\"verdi\":\"2004-09-01\",\"egenskapstype\":\"Dato\"},{\"id\":2021,\"navn\":\"Fartsgrense\",\"verdi\":30,\"enum_id\":2726,\"enhet\":{\"id\":7,\"navn\":\"Kilometer/time\",\"kortnavn\":\"km/h\"},\"egenskapstype\":\"Heltallenum\"},{\"id\":1891,\"navn\":\"Vedtaksnummer\",\"verdi\":\"V-12 R-04\",\"egenskapstype\":\"Tekst\"},{\"id\":9155,\"navn\":\"Arkivnummer\",\"verdi\":\"2003/84289-006\",\"egenskapstype\":\"Tekst\"}]}],\"metadata\":{\"returnert\":1,\"sidestørrelse\":3,\"neste\":{\"start\":\"82230597:3\",\"href\":\"https://nvdbapiles.atlas.vegvesen.no/vegobjekter/105?veglenkesekvens=0.6658341@805002&inkluder=egenskaper&start=82230597:3&antall=3\"}}}"
+ },
+ {
+  "method": "GET",
+  "url": "https://nvdbapiles.atlas.vegvesen.no/vegobjekter/540?veglenkesekvens=0.6658341%40805002&inkluder=egenskaper&antall=3",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "expires": "0",
+   "content-type": "application/json"
+  },
+  "response": "{\"objekter\":[{\"id\":1026960272,\"href\":\"https://nvdbapiles.atlas.vegvesen.no/vegobjekter/540/1026960272\",\"egenskaper\":[{\"id\":4621,\"navn\":\"År, gjelder for\",\"verdi\":2025,\"egenskapstype\":\"Heltall\"},{\"id\":4624,\"navn\":\"ÅDT, andel lange kjøretøy\",\"verdi\":4,\"enhet\":{\"id\":22,\"navn\":\"Prosent\",\"kortnavn\":\"%\"},\"egenskapstype\":\"Heltall\"},{\"id\":4623,\"navn\":\"ÅDT, total\",\"verdi\":11000,\"egenskapstype\":\"Heltall\"},{\"id\":4625,\"navn\":\"Grunnlag for ÅDT\",\"verdi\":\"Statistisk estimat\",\"enum_id\":22753,\"egenskapstype\":\"Tekstenum\"},{\"id\":12083,\"navn\":\"Gjelder trafikk i begge retninger\",\"verdi\":\"Ja\",\"enum_id\":21001,\"egenskapstype\":\"Tekstenum\"},{\"id\":13250,\"navn\":\"Overført fra Trafikkdatasystemet\",\"verdi\":\"Ja\",\"enum_id\":23161,\"egenskapstype\":\"Tekstenum\"}]}],\"metadata\":{\"returnert\":1,\"sidestørrelse\":3,\"neste\":{\"start\":\"1026960272:1\",\"href\":\"https://nvdbapiles.atlas.vegvesen.no/vegobjekter/540?veglenkesekvens=0.6658341@805002&inkluder=egenskaper&start=1026960272:1&antall=3\"}}}"
+ },
+ {
+  "method": "GET",
+  "url": "https://nvdbapiles.atlas.vegvesen.no/vegobjekter/591?veglenkesekvens=0.6658341%40805002&inkluder=egenskaper&antall=3",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "expires": "0",
+   "content-type": "application/json"
+  },
+  "response": "{\"objekter\":[],\"metadata\":{\"returnert\":0,\"sidestørrelse\":3,\"neste\":{\"start\":\"0:0\",\"href\":\"https://nvdbapiles.atlas.vegvesen.no/vegobjekter/591?veglenkesekvens=0.6658341@805002&inkluder=egenskaper&start=0:0&antall=3\"}}}"
+ },
+ {
+  "method": "GET",
+  "url": "https://nvdbapiles.atlas.vegvesen.no/vegobjekter/60?veglenkesekvens=0.6658341%40805002&inkluder=egenskaper&antall=3",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "expires": "0",
+   "content-type": "application/json"
+  },
+  "response": "{\"objekter\":[],\"metadata\":{\"returnert\":0,\"sidestørrelse\":3,\"neste\":{\"start\":\"0:0\",\"href\":\"https://nvdbapiles.atlas.vegvesen.no/vegobjekter/60?veglenkesekvens=0.6658341@805002&inkluder=egenskaper&start=0:0&antall=3\"}}}"
+ },
+ {
+  "method": "GET",
+  "url": "https://nvdbapiles.atlas.vegvesen.no/vegobjekter/67?veglenkesekvens=0.6658341%40805002&inkluder=egenskaper&antall=3",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "expires": "0",
+   "content-type": "application/json"
+  },
+  "response": "{\"objekter\":[],\"metadata\":{\"returnert\":0,\"sidestørrelse\":3,\"neste\":{\"start\":\"0:0\",\"href\":\"https://nvdbapiles.atlas.vegvesen.no/vegobjekter/67?veglenkesekvens=0.6658341@805002&inkluder=egenskaper&start=0:0&antall=3\"}}}"
+ },
+ {
+  "method": "GET",
+  "url": "https://nvdbapiles.atlas.vegvesen.no/posisjon?lat=61.6&lon=8.3&srid=4326&maks_avstand=20&maks_antall=10",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "response": "[]"
+ }
+]

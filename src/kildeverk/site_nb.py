@@ -565,7 +565,26 @@ SOURCES: dict[str, SourceText] = {
         [
             "Time er den fineste oppløsningen; enkeltkjøretøy og fart er ikke offentlig",
             "Tallene er bare så fullstendige som dekningen, som hver rad oppgir",
-            "Trafikkindekser og Nasjonal vegdatabank (NVDB) er ikke tatt med ennå",
+            "Trafikkindekser er ikke tatt med ennå; road_at_point leser Nasjonal vegdatabank",
+        ],
+    ),
+    "vegvesen_nvdb": SourceText(
+        "Nasjonal vegdatabank (NVDB)",
+        "Statens vegvesen",
+        [
+            (
+                "Veien ved et hvilket som helst punkt i Norge: vegreferanse og vegkategori, "
+                "fartsgrense, årsdøgntrafikk, skiltet høydebegrensning, og om punktet er på en bru "
+                "eller i en tunnel, med navn"
+            ),
+        ],
+        [
+            "Bare nærmeste vei for kjøretøy; gang- og sykkelveier hoppes over",
+            (
+                "Et punkt over en tunnel finner veien på overflaten; gi et punkt på tunnelveien ved "
+                "innkjøringen"
+            ),
+            "Andre vegobjekter (felt, vektgrenser, vegarbeid, rasteplasser) er ikke tatt med ennå",
         ],
     ),
     "udir_nsr": SourceText(
@@ -801,6 +820,10 @@ TOOLS: dict[str, ToolText] = {
         "Fly på en flyplass",
         "Avganger og ankomster med tider, forsinkelser, gate og bagasjebånd, fra Avinor.",
     ),
+    "road_at_point": ToolText(
+        "Veien ved et punkt",
+        "Vegreferanse, fartsgrense, trafikkmengde, høydegrense og bru eller tunnel fra NVDB.",
+    ),
     "traffic_find_points": ToolText(
         "Finn trafikktellepunkter",
         "Statens vegvesens tellepunkter etter navn, kommune, vei eller avstand.",
@@ -958,6 +981,7 @@ THEMES: list[tuple[str, str, list[str]]] = [
             "transit_departures",
             "transit_journeys",
             "flights_airport",
+            "road_at_point",
             "traffic_find_points",
             "traffic_volumes",
         ],

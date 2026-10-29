@@ -30,6 +30,6 @@ SPEC = SourceSpec(
     known_gaps=[
         "Hourly is the finest resolution; single vehicles and speeds are not public",
         "Counts are only as complete as their coverage, which each row gives",
-        "Traffic indices and the national road database (NVDB) are not exposed yet",
+        "Traffic indices are not exposed yet; road_at_point reads the national road database",
     ],
 )

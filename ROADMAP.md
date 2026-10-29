@@ -93,7 +93,7 @@ or a credential and cannot be done from the code alone.
 - [x] Kartverket return levels for storm surge (`sea_level_extremes`).
 - [x] Stortinget questions to ministers (`parliament_questions`).
 - [x] MET ocean forecast (waves and sea temperature).
-- [ ] Statens vegvesen's national road database (NVDB): speed limits, tunnels, bridges.
+- [x] Statens vegvesen's national road database (NVDB): `road_at_point`.
 
 ## New sources: shortlist (checked 2026-10-29)
 
@@ -138,7 +138,7 @@ must be read in full before building.
       key. The API announces shutdown dates in a `Sunset` header, which the module should show in
       `service_status` (https://api.regobs.no/v5/). **S–M**, medium risk (the old version shuts
       down six months after a new one ships).
-- [ ] **Vegvesen NVDB road objects** (`vegvesen_nvdb`): speed limits, tunnels, bridges and height
+- [x] **Vegvesen NVDB road objects** (`vegvesen_nvdb`, built 2026-10-29; licence NLOD 2.0 per data.norge.no): speed limits, tunnels, bridges and height
       limits near a point or along a road. Most reads need "ingen autentisering". The API logs an
       `X-Client` header and has a rate limiter (https://nvdbapiles.atlas.vegvesen.no/,
       https://nvdb-docs.atlas.vegvesen.no/). Neither page states a licence: confirm it is NLOD

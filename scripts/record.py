@@ -402,6 +402,11 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ("eurostat_data", {"dataset": "une_rt_a", "geo": ["NO", "US"], "last_periods": 1}),
         ("eurostat_data", {"dataset": "nonexist_xx"}),
     ],
+    "vegvesen_nvdb": [
+        ("road_at_point", {"lat": 60.3790, "lon": 5.3388}),
+        ("road_at_point", {"lat": 60.3925, "lon": 5.3185, "max_distance_m": 80}),
+        ("road_at_point", {"lat": 61.6, "lon": 8.3, "max_distance_m": 20}),
+    ],
     "worldbank_wdi": [
         ("world_indicators", {"indicator": "gdp_per_capita"}),
         (
