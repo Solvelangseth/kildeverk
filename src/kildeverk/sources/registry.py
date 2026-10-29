@@ -10,6 +10,7 @@ from kildeverk.sources.datanorge.spec import SPEC as DATANORGE
 from kildeverk.sources.elhub.spec import SPEC as ELHUB
 from kildeverk.sources.entur.spec import GEOCODER as ENTUR_GEOCODER
 from kildeverk.sources.entur.spec import JOURNEY_PLANNER as ENTUR_JOURNEY_PLANNER
+from kildeverk.sources.eurostat.spec import SPEC as EUROSTAT
 from kildeverk.sources.kartverket.spec import SPEC as KARTVERKET
 from kildeverk.sources.kartverket_sea.spec import SPEC as KARTVERKET_SEA
 from kildeverk.sources.met.spec import AIRQUALITY as MET_AIRQUALITY
@@ -61,6 +62,7 @@ SOURCES: tuple[SourceSpec, ...] = (
     ORDBOKENE,
     AVINOR,
     WORLDBANK,
+    EUROSTAT,
 )
 
 
@@ -74,6 +76,7 @@ def operations():
     from kildeverk.sources.elhub.ops import OPERATIONS as ELHUB_OPS
     from kildeverk.sources.entur.journeys import OPERATIONS as ENTUR_JOURNEY_OPS
     from kildeverk.sources.entur.ops import OPERATIONS as ENTUR_OPS
+    from kildeverk.sources.eurostat.ops import OPERATIONS as EUROSTAT_OPS
     from kildeverk.sources.kartverket.ops import OPERATIONS as KARTVERKET_OPS
     from kildeverk.sources.kartverket_sea.levels import OPERATIONS as SEA_LEVEL_EXTREME_OPS
     from kildeverk.sources.kartverket_sea.ops import OPERATIONS as KARTVERKET_SEA_OPS
@@ -125,6 +128,7 @@ def operations():
         *ORDBOKENE_OPS,
         *AVINOR_OPS,
         *WORLDBANK_OPS,
+        *EUROSTAT_OPS,
         *composite.OPERATIONS,
         *cite.OPERATIONS,
         *meta.OPERATIONS,

@@ -380,6 +380,28 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ),
         ("transit_journeys", {"origin": "Xyzzyville", "destination": "Oslo S"}),
     ],
+    "eurostat": [
+        ("eurostat_search", {"query": "electricity prices household", "limit": 5}),
+        ("eurostat_search", {"query": "zzzqx"}),
+        (
+            "eurostat_data",
+            {
+                "dataset": "une_rt_a",
+                "filters": {"age": ["Y15-74"], "unit": ["PC_ACT"], "sex": ["T"]},
+            },
+        ),
+        (
+            "eurostat_data",
+            {
+                "dataset": "demo_r_pjangrp3",
+                "geo": ["NO08", "NO09"],
+                "filters": {"sex": ["T"], "age": ["TOTAL"]},
+                "last_periods": 1,
+            },
+        ),
+        ("eurostat_data", {"dataset": "une_rt_a", "geo": ["NO", "US"], "last_periods": 1}),
+        ("eurostat_data", {"dataset": "nonexist_xx"}),
+    ],
     "worldbank_wdi": [
         ("world_indicators", {"indicator": "gdp_per_capita"}),
         (
@@ -612,6 +634,16 @@ def _question_sample(url: str, body):
     return body
 
 
+def _eurostat_toc(url: str, text: str) -> str:
+    # The table of contents is 2 MB of text; keep its header and the lines the tests search.
+    lines = text.splitlines(keepends=True)
+    return lines[0] + "".join(line for line in lines[1:] if "lectricity" in line)
+
+
+# Trims for plain-text bodies.
+TEXT_TRIM = {"eurostat": _eurostat_toc}
+
+
 # Whole-response trims, for responses too large to keep in full.
 TRIM = {
     "stortinget_questions": _question_sample,
@@ -649,6 +681,15 @@ async def record(source_id: str) -> None:
             outcome = exc.body.code
         print(f"{tool} {json.dumps(arguments)} -> {outcome}")
     await ctx.aclose()
+
+    if text_trim := TEXT_TRIM.get(source_id):
+        for exchange in transport.exchanges:
+            try:
+                json.loads(exchange["response"])
+            except ValueError:
+                exchange["response"] = text_trim(
+                    exchange["url"].split("?")[0], exchange["response"]
+                )
 
     keys = SCRUB.get(source_id)
     trim = TRIM.get(source_id)

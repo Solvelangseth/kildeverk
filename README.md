@@ -1,7 +1,7 @@
 # Kildeverk
 
 Live Norwegian public data for AI agents and people. Kildeverk is an MCP server
-and a read-only JSON API over 28 official data services from 16 publishers, 14 of them Norwegian:
+and a read-only JSON API over 29 official data services from 17 publishers, 14 of them Norwegian:
 statistics, companies, weather, water, warnings, transport, maps, the sea, money,
 energy, parliament, roads and schools. Every result says exactly where it came from.
 
@@ -47,6 +47,7 @@ publishers whose data it reads.
 | [Ordbøkene](#ordbokene): Bokmålsordboka and Nynorskordboka | ✅ available | `dictionary_lookup` |
 | [USGS Earthquake Catalog](#usgs_earthquakes) | ✅ available | `hazards_earthquakes` |
 | [World Bank World Development Indicators](#worldbank_wdi) | ✅ available | `world_indicators` |
+| [Eurostat](#eurostat): European statistics, Norway included | ✅ available | `eurostat_search`, `eurostat_data` |
 
 Three tools combine sources. `place_overview` takes a coordinate and returns its municipality and
 county, elevation, the weather now and over the next six hours, weather, flood and landslide
@@ -1108,6 +1109,29 @@ asks for one event more than the limit, to say whether there are more.
   so it is not used.
 - Recent events are automatic estimates at first and can be revised.
 
+
+<a id="eurostat"></a>
+### Eurostat
+
+**What it covers:** Eurostat's database of about 8,000 datasets on the economy, population, labour,
+prices, energy, environment, health and transport, for EU and EFTA countries (Norway included) and
+the EU as a whole, often down to NUTS regions (`NO08`, `NO09`).
+- `eurostat_search` finds datasets by words in their titles, every word if any title has them all,
+  otherwise all but one; best match and most recent data first.
+- `eurostat_data` reads a slice of a dataset as labelled rows: by default the last five periods
+  for Norway, Sweden, Denmark, Finland, Iceland and the EU. Any dimension can be filtered by its
+  codes, and the result lists every dimension's codes and labels, so a first call shows how to
+  narrow the next. Values carry Eurostat's flags (provisional, estimated, break in series).
+
+**Licence:** [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), commercial reuse included,
+with credit to Eurostat ([copyright notice](https://ec.europa.eu/eurostat/web/main/help/copyright-notice)).
+Data for countries outside the EU, EFTA and candidate countries, and data Eurostat took from other
+sources, are for non-commercial use only; results name any such country asked for.
+
+**Rate limits:** none published. Kildeverk spends at most 60 calls a minute. The 2 MB table of
+contents is cached for a day; data for six hours.
+
+**Known gaps:** searches match title words, not meaning; a query returns at most 2,000 rows.
 
 <a id="worldbank_wdi"></a>
 ### World Bank World Development Indicators

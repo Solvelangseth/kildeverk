@@ -144,7 +144,7 @@ must be read in full before building.
       https://nvdb-docs.atlas.vegvesen.no/). Neither page states a licence: confirm it is NLOD
       2.0, as for `vegvesen_traffic`, before release. **M** (object types and road references),
       low risk. Also listed above.
-- [ ] **Eurostat** (`eurostat`): European statistics with Norway as an EFTA country, by NUTS
+- [x] **Eurostat** (`eurostat`, built 2026-10-29): European statistics with Norway as an EFTA country, by NUTS
       region, so the `statistics_*` tools can compare Norway with its neighbours. CC BY 4.0, and
       commercial reuse is allowed with credit; no written licence is needed. Exceptions: data
       from non-Eurostat sources, and data for countries outside the EU, EFTA and candidate

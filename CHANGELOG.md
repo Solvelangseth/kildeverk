@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- A new source, Eurostat: `eurostat_search` finds datasets and `eurostat_data` reads any slice of
+  one, by default for the Nordic countries and the EU, with regions down to NUTS level.
+- The upstream gateway reads plain-text answers and repeated query parameters.
 - `transit_journeys`: plan a public transport journey from A to B with Entur, by stop, name or
   coordinates, with every leg, change, platform and real-time time.
 - `parliament_questions`: questions members of Stortinget put to ministers (written questions,

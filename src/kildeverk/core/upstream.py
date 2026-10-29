@@ -41,6 +41,10 @@ class Fetched:
     notes: list[str] = field(default_factory=list)
 
 
+# A mapping, or pairs for a parameter given more than once (geo=NO&geo=SE).
+Params = dict[str, Any] | list[tuple[str, Any]] | None
+
+
 class UpstreamClientError(ToolError):
     """Upstream answered 4xx. Sources catch this to explain it in their own terms."""
 
@@ -93,13 +97,27 @@ class Upstream:
         self,
         url: str,
         *,
-        params: dict[str, Any] | None = None,
+        params: Params = None,
         ttl: str,
         key_extra: str = "",
         accept: str = "application/json",
     ) -> Fetched:
         return await self._fetch(
             "GET", url, params=params, body=None, ttl=ttl, key_extra=key_extra, accept=accept
+        )
+
+    async def get_text(self, url: str, *, params: Params = None, ttl: str) -> Fetched:
+        """For upstreams that answer plain text (Eurostat's catalogue); `json` holds the text."""
+
+        return await self._fetch(
+            "GET",
+            url,
+            params=params,
+            body=None,
+            ttl=ttl,
+            key_extra="",
+            accept="text/plain",
+            fmt="text",
         )
 
     async def get_xml(
@@ -161,7 +179,7 @@ class Upstream:
         method: str,
         url: str,
         *,
-        params: dict[str, Any] | None,
+        params: Params,
         body: Any,
         ttl: str,
         key_extra: str,
@@ -342,6 +360,8 @@ class Upstream:
 
 
 def _parse(body: bytes, fmt: str) -> Any:
+    if fmt == "text":
+        return body.decode("utf-8")
     # Python's expat refuses external entities and entity expansion attacks by default.
     return ET.fromstring(body) if fmt == "xml" else json.loads(body)
 

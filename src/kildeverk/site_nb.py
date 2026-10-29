@@ -290,6 +290,26 @@ SOURCES: dict[str, SourceText] = {
             "Avganger mellomlagres i 30 sekunder",
         ],
     ),
+    "eurostat": SourceText(
+        "Eurostat",
+        "Eurostat (Europakommisjonen)",
+        [
+            (
+                "Eurostats database med rundt 8 000 datasett om økonomi, befolkning, arbeid, "
+                "priser, energi, miljø, helse og transport for EU- og EFTA-land, Norge medregnet, "
+                "og EU samlet, ofte per region"
+            ),
+            "Søk i datasettitler, og et hvilket som helst utsnitt av et datasett som rader",
+        ],
+        [
+            (
+                "Tall for land utenfor EU, EFTA og kandidatlandene, og tall Eurostat har hentet fra "
+                "andre kilder, er bare til ikke-kommersiell bruk; svarene sier fra om slike land"
+            ),
+            "Søket treffer ord i titler, ikke betydning",
+            "Et kall gir høyst 2 000 rader; filtrer dimensjonene for færre",
+        ],
+    ),
     "worldbank_wdi": SourceText(
         "Verdensbankens utviklingsindikatorer",
         "Verdensbanken",
@@ -637,6 +657,14 @@ TOOLS: dict[str, ToolText] = {
         "Alle kommuner eller fylker rangert på én statistikk, eller på endringen siden et "
         "tidligere år.",
     ),
+    "eurostat_search": ToolText(
+        "Søk i Eurostat",
+        "Finn Eurostat-datasett etter ord i tittelen, for å sammenligne Norge med Europa.",
+    ),
+    "eurostat_data": ToolText(
+        "Hent tall fra Eurostat",
+        "Et utsnitt av et Eurostat-datasett for Norden og EU, eller regioner, som rader.",
+    ),
     "world_indicators": ToolText(
         "Norge mot andre land",
         "Verdensbankens indikatorer, som BNP per innbygger og levealder, for Norge og andre land.",
@@ -858,7 +886,7 @@ THEMES: list[tuple[str, str, list[str]]] = [
     ),
     (
         "Statistikk",
-        "Alt SSB publiserer i Statistikkbanken, og Verdensbanken for andre land.",
+        "Alt SSB publiserer i Statistikkbanken, og Verdensbanken og Eurostat for andre land.",
         [
             "statistics_search_tables",
             "statistics_describe_table",
@@ -866,6 +894,8 @@ THEMES: list[tuple[str, str, list[str]]] = [
             "statistics_series",
             "statistics_rank",
             "world_indicators",
+            "eurostat_search",
+            "eurostat_data",
         ],
     ),
     (
@@ -986,6 +1016,7 @@ PUBLISHERS: dict[str, str] = {
     "U.S. Geological Survey (USGS)": "USGS",
     "Avinor AS": "Avinor",
     "The World Bank": "Verdensbanken",
+    "Eurostat (European Commission)": "Eurostat",
     "University of Bergen and the Language Council of Norway (Språkrådet)": "UiB og Språkrådet",
 }
 
