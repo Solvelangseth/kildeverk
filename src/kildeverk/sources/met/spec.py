@@ -114,3 +114,106 @@ METALERTS = SourceSpec(
         "Warning areas are returned as names, not polygons",
     ],
 )
+
+NOWCAST_URL = "https://api.met.no/weatherapi/nowcast/2.0/complete"
+OCEANFORECAST_URL = "https://api.met.no/weatherapi/oceanforecast/2.0/complete"
+AIRQUALITY_URL = "https://api.met.no/weatherapi/airqualityforecast/0.1/"
+
+# MET's limit is per application across its products; each product here stays far below it.
+_MET_BUDGET = Budget(
+    rate_per_s=50 / 60,
+    capacity=10,
+    upstream_limit="20 requests per second per application; respect Expires; identify with "
+    "User-Agent; at most 4 coordinate decimals",
+)
+_MET_LICENCE = Licence(
+    id="CC-BY-4.0",
+    name="Creative Commons Attribution 4.0 International (also offered under NLOD 2.0)",
+    url="https://creativecommons.org/licenses/by/4.0/",
+)
+
+NOWCAST = SourceSpec(
+    id="met_nowcast",
+    name="MET Norway Nowcast",
+    publisher=PUBLISHER,
+    homepage="https://api.met.no/",
+    docs_url="https://api.met.no/weatherapi/nowcast/2.0/documentation",
+    terms_url="https://api.met.no/doc/License",
+    licence=_MET_LICENCE,
+    budget=_MET_BUDGET,
+    cache_ttls_s={"nowcast": 300},
+    honour_expires=True,
+    covers=[
+        (
+            "Precipitation every five minutes for the next two hours anywhere in the Nordic area, "
+            "from weather radar, with the temperature, wind and humidity now"
+        ),
+    ],
+    known_gaps=[
+        "Only the Nordic area: Svalbard and the open sea far from the coast are outside",
+        (
+            "Where radar coverage is reduced the precipitation is less reliable; each result says "
+            "how good the coverage is"
+        ),
+        "Two hours ahead only; weather_forecast covers the days after",
+    ],
+)
+
+OCEANFORECAST = SourceSpec(
+    id="met_oceanforecast",
+    name="MET Norway Oceanforecast",
+    publisher=PUBLISHER,
+    homepage="https://api.met.no/",
+    docs_url="https://api.met.no/weatherapi/oceanforecast/2.0/documentation",
+    terms_url="https://api.met.no/doc/License",
+    licence=_MET_LICENCE,
+    budget=_MET_BUDGET,
+    cache_ttls_s={"ocean": 3_600},
+    honour_expires=True,
+    covers=[
+        (
+            "Ocean forecast for sea points along the Norwegian coast and in the seas around it: "
+            "wave height and direction, sea temperature, and current speed and direction, hourly "
+            "for about eight days"
+        ),
+    ],
+    known_gaps=[
+        (
+            "Points on land or far into a fjord have no forecast; each result gives the sea grid "
+            "point it is for"
+        ),
+        "Wave period and swell are not in the API",
+    ],
+)
+
+AIRQUALITY = SourceSpec(
+    id="met_airquality",
+    name="MET Norway Airqualityforecast",
+    publisher=PUBLISHER,
+    homepage="https://api.met.no/",
+    docs_url=f"{AIRQUALITY_URL}documentation",
+    terms_url="https://api.met.no/doc/License",
+    licence=_MET_LICENCE,
+    budget=_MET_BUDGET,
+    cache_ttls_s={"air": 3_600},
+    honour_expires=True,
+    covers=[
+        (
+            "Air quality forecast for any place in Norway, by municipality, part of a municipality "
+            "or the smallest statistical area: the air quality index and NO2, PM10, PM2.5 and "
+            "ozone, hourly for about two days"
+        ),
+        (
+            "Where the pollution comes from: traffic exhaust, road dust, heating (mostly wood "
+            "burning), shipping, industry or pollution carried in from elsewhere"
+        ),
+    ],
+    known_gaps=[
+        (
+            "MET still calls this API version 0.1 and has not changed it since 2018, so treat it "
+            "as less settled than MET's other products"
+        ),
+        "Norway only",
+        "A model forecast, not measurements; measured air quality (NILU) is not included",
+    ],
+)

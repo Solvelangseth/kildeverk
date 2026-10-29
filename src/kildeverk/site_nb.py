@@ -169,6 +169,64 @@ SOURCES: dict[str, SourceText] = {
             "Varselområder kommer som navn, ikke som polygoner",
         ],
     ),
+    "met_nowcast": SourceText(
+        "MET nåvarsel",
+        "Meteorologisk institutt (MET)",
+        [
+            (
+                "Nedbør hvert femte minutt de neste to timene hvor som helst i Norden, fra "
+                "værradar, med temperatur, vind og fuktighet nå"
+            ),
+        ],
+        [
+            "Bare Norden: Svalbard og åpent hav langt fra kysten er utenfor",
+            (
+                "Der radardekningen er redusert, er nedbøren mindre sikker; hvert svar sier hvor "
+                "god dekningen er"
+            ),
+            "Bare to timer frem; weather_forecast dekker dagene etter",
+        ],
+    ),
+    "met_oceanforecast": SourceText(
+        "MET havvarsel",
+        "Meteorologisk institutt (MET)",
+        [
+            (
+                "Havvarsel for punkter langs norskekysten og i havområdene rundt: bølgehøyde og "
+                "-retning, sjøtemperatur og strømfart og -retning, time for time i omtrent åtte døgn"
+            ),
+        ],
+        [
+            (
+                "Punkter på land eller langt inne i en fjord har ikke varsel; hvert svar oppgir "
+                "rutenettpunktet i sjøen varselet gjelder"
+            ),
+            "Bølgeperiode og dønning er ikke med i API-et",
+        ],
+    ),
+    "met_airquality": SourceText(
+        "MET luftkvalitetsvarsel",
+        "Meteorologisk institutt (MET)",
+        [
+            (
+                "Varsel for luftkvalitet hvor som helst i Norge, for kommunen, delområdet eller "
+                "grunnkretsen: luftkvalitetsindeks og NO2, PM10, PM2,5 og ozon, time for time i "
+                "omtrent to døgn"
+            ),
+            (
+                "Hvor forurensningen kommer fra: eksos, veistøv, oppvarming (mest vedfyring), "
+                "skipsfart, industri eller langtransportert forurensning"
+            ),
+        ],
+        [
+            (
+                "MET kaller fortsatt API-et versjon 0.1 og har ikke endret det siden 2018, så det "
+                "er mindre stabilt enn METs andre produkter"
+            ),
+            "Bare Norge",
+            "Et modellvarsel, ikke målinger; målt luftkvalitet (NILU) er ikke med",
+        ],
+    ),
     "nve_hydapi": SourceText(
         "NVE HydAPI",
         "Norges vassdrags- og energidirektorat (NVE)",
@@ -436,8 +494,8 @@ SOURCES: dict[str, SourceText] = {
 TOOLS: dict[str, ToolText] = {
     "place_overview": ToolText(
         "Oversikt over et sted",
-        "Alt om et punkt i ett kall: kommune, høyde, været nå, farevarsler, nærmeste "
-        "holdeplasser og stedsnavn.",
+        "Alt om et punkt i ett kall: kommune, høyde, været nå, om det blir regn snart, "
+        "farevarsler, nærmeste holdeplasser og stedsnavn.",
     ),
     "municipality_profile": ToolText(
         "Profil av en kommune",
@@ -494,6 +552,18 @@ TOOLS: dict[str, ToolText] = {
     "weather_forecast": ToolText(
         "Værvarsel for et punkt",
         "Temperatur, nedbør, vind og mer for en hvilken som helst koordinat, opptil ti døgn frem.",
+    ),
+    "weather_nowcast": ToolText(
+        "Regn de neste to timene",
+        "Nedbør hvert femte minutt fra radar, når regnet starter eller slutter, og været nå.",
+    ),
+    "air_quality_forecast": ToolText(
+        "Luftkvalitetsvarsel",
+        "Luftkvalitet time for time i to døgn, med forurensningen bak og hvor den kommer fra.",
+    ),
+    "sea_forecast": ToolText(
+        "Bølger og sjøtemperatur",
+        "Bølgehøyde, sjøtemperatur og strøm langs kysten, time for time i opptil åtte døgn.",
     ),
     "weather_warnings": ToolText(
         "Farevarsler for vær",
@@ -664,9 +734,11 @@ THEMES: list[tuple[str, str, list[str]]] = [
     ),
     (
         "Vær og klima",
-        "Varsler, farevarsler og målinger fra Meteorologisk institutt.",
+        "Varsler, farevarsler, luftkvalitet og målinger fra Meteorologisk institutt.",
         [
+            "weather_nowcast",
             "weather_forecast",
+            "air_quality_forecast",
             "weather_warnings",
             "weather_find_stations",
             "weather_station_elements",
@@ -688,8 +760,8 @@ THEMES: list[tuple[str, str, list[str]]] = [
     ),
     (
         "Kart, steder og havet",
-        "Adresser, stedsnavn, høyder og vannstand fra Kartverket.",
-        ["addresses_search", "places_search", "terrain_elevation", "sea_level"],
+        "Adresser, stedsnavn og høyder fra Kartverket, vannstand og havvarsel.",
+        ["addresses_search", "places_search", "terrain_elevation", "sea_level", "sea_forecast"],
     ),
     (
         "Reise og trafikk",

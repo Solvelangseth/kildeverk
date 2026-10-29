@@ -276,6 +276,19 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ("parliament_members", {"period": "2021-2025", "party": "SV"}),
         ("parliament_members", {"period": "2025-2029"}),
     ],
+    "met_nowcast": [
+        ("weather_nowcast", {"lat": 60.3913, "lon": 5.3221}),
+        ("weather_nowcast", {"lat": 78.22, "lon": 15.65}),
+    ],
+    "met_oceanforecast": [
+        ("sea_forecast", {"lat": 60.1, "lon": 4.9, "hours": 24}),
+        ("sea_forecast", {"lat": 61.5, "lon": 9.0}),
+    ],
+    "met_airquality": [
+        ("air_quality_forecast", {"lat": 59.9139, "lon": 10.7522}),
+        ("air_quality_forecast", {"lat": 63.4305, "lon": 10.3951, "area": "kommune"}),
+        ("air_quality_forecast", {"lat": 55.0, "lon": 3.0}),
+    ],
     "brreg_accounts": [
         ("companies_accounts", {"org_number": "923609016"}),
         ("companies_accounts", {"org_number": "983974899", "kind": "company", "year": 2025}),

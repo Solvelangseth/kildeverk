@@ -67,6 +67,14 @@ PARTS = {
         },
         "provenance": [_prov("met_metalerts")],
     },
+    "weather_nowcast": {
+        "data": {
+            "raining_now": False,
+            "rain_starts_at": "2026-10-29T10:35:00Z",
+            "rain_stops_at": None,
+        },
+        "provenance": [_prov("met_nowcast")],
+    },
     "transit_find_stops": {
         "data": {
             "stops": [
@@ -122,6 +130,8 @@ async def test_overview_combines_every_part(ctx, parts):
     assert data["municipality"]["name"] == "Bergen" and data["elevation_m"] == 4.07
     assert data["weather"]["next_6h_precipitation_mm"] == 2.7
     assert data["weather"]["next_6h_temperature_range_c"] == [10.2, 11.2]
+    assert data["weather"]["raining_now"] is False
+    assert data["weather"]["rain_starts_at"] == "2026-10-29T10:35:00Z"
     assert [w["kind"] for w in data["warnings"]] == ["weather", "flood"]
     assert data["nearest_stops"][0]["name"] == "Olav Kyrres gate"
     assert ("hazards_flood_landslide", {"municipality": "4601"}) in calls
@@ -130,6 +140,7 @@ async def test_overview_combines_every_part(ctx, parts):
     assert {p["source_id"] for p in result["provenance"]} == {
         "kartverket",
         "met_locationforecast",
+        "met_nowcast",
         "met_metalerts",
         "entur_geocoder",
         "nve_varsom",

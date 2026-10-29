@@ -1,0 +1,25 @@
+[
+ {
+  "method": "GET",
+  "url": "https://api.met.no/weatherapi/nowcast/2.0/complete?lat=60.391&lon=5.322",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json",
+   "last-modified": "Thu, 29 Oct 2026 17:16:16 GMT",
+   "expires": "Thu, 29 Oct 2026 17:19:16 GMT"
+  },
+  "response": "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[5.322,60.391,6]},\"properties\":{\"meta\":{\"updated_at\":\"2026-10-29T17:12:23Z\",\"units\":{\"air_temperature\":\"celsius\",\"apparent_air_temperature\":\"celsius\",\"precipitation_amount\":\"mm\",\"precipitation_rate\":\"mm/h\",\"relative_humidity\":\"%\",\"ultraviolet_index_clear_sky\":\"1\",\"wind_from_direction\":\"degrees\",\"wind_speed\":\"m/s\",\"wind_speed_of_gust\":\"m/s\"},\"radar_coverage\":\"ok\"},\"timeseries\":[{\"time\":\"2026-10-29T17:15:00Z\",\"data\":{\"instant\":{\"details\":{\"air_temperature\":12.1,\"apparent_air_temperature\":11.7,\"precipitation_rate\":0.0,\"relative_humidity\":97.7,\"ultraviolet_index_clear_sky\":0.0,\"wind_from_direction\":155.8,\"wind_speed\":1.8,\"wind_speed_of_gust\":3.0}},\"next_1_hours\":{\"summary\":{\"symbol_code\":\"cloudy\"},\"details\":{\"precipitation_amount\":0.0}}}},{\"time\":\"2026-10-29T17:20:00Z\",\"data\":{\"instant\":{\"details\":{\"precipitation_rate\":0.0}}}},{\"time\":\"2026-10-29T17:25:00Z\",\"data\":{\"instant\":{\"details\":{\"precipitation_rate\":0.0}}}},{\"time\":\"2026-10-29T17:30:00Z\",\"data\":{\"instant\":{\"details\":{\"precipitation_rate\":0.0}}}},{\"time\":\"2026-10-29T17:35:00Z\",\"data\":{\"instant\":{\"details\":{\"precipitation_rate\":0.0}}}},{\"time\":\"2026-10-29T17:40:00Z\",\"data\":{\"instant\":{\"details\":{\"precipitation_rate\":0.0}}}},{\"time\":\"2026-10-29T17:45:00Z\",\"data\":{\"instant\":{\"details\":{\"precipitation_rate\":0.0}}}},{\"time\":\"2026-10-29T17:50:00Z\",\"data\":{\"instant\":{\"details\":{\"precipitation_rate\":0.0}}}},{\"time\":\"2026-10-29T17:55:00Z\",\"data\":{\"instant\":{\"details\":{\"precipitation_rate\":0.0}}}},{\"time\":\"2026-10-29T18:00:00Z\",\"data\":{\"instant\":{\"details\":{\"precipitation_rate\":0.0}}}},{\"time\":\"2026-10-29T18:05:00Z\",\"data\":{\"instant\":{\"details\":{\"precipitation_rate\":0.0}}}},{\"time\":\"2026-10-29T18:10:00Z\",\"data\":{\"instant\":{\"details\":{\"precipitation_rate\":0.0}}}},{\"time\":\"2026-10-29T18:15:00Z\",\"data\":{\"instant\":{\"details\":{\"precipitation_rate\":0.0}}}},{\"time\":\"2026-10-29T18:20:00Z\",\"data\":{\"instant\":{\"details\":{\"precipitation_rate\":0.0}}}},{\"time\":\"2026-10-29T18:25:00Z\",\"data\":{\"instant\":{\"details\":{\"precipitation_rate\":0.0}}}},{\"time\":\"2026-10-29T18:30:00Z\",\"data\":{\"instant\":{\"details\":{\"precipitation_rate\":0.0}}}},{\"time\":\"2026-10-29T18:35:00Z\",\"data\":{\"instant\":{\"details\":{\"precipitation_rate\":0.0}}}},{\"time\":\"2026-10-29T18:40:00Z\",\"data\":{\"instant\":{\"details\":{\"precipitation_rate\":0.0}}}},{\"time\":\"2026-10-29T18:45:00Z\",\"data\":{\"instant\":{\"details\":{\"precipitation_rate\":0.0}}}},{\"time\":\"2026-10-29T18:50:00Z\",\"data\":{\"instant\":{\"details\":{\"precipitation_rate\":0.1}}}},{\"time\":\"2026-10-29T18:55:00Z\",\"data\":{\"instant\":{\"details\":{\"precipitation_rate\":0.0}}}},{\"time\":\"2026-10-29T19:00:00Z\",\"data\":{\"instant\":{\"details\":{\"precipitation_rate\":0.0}}}},{\"time\":\"2026-10-29T19:05:00Z\",\"data\":{\"instant\":{\"details\":{\"precipitation_rate\":0.0}}}}]}}"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.met.no/weatherapi/nowcast/2.0/complete?lat=78.22&lon=15.65",
+  "body": "",
+  "status": 422,
+  "headers": {
+   "content-type": "text/plain;charset=UTF-8",
+   "expires": "Thu, 29 Oct 2026 17:16:35 GMT"
+  },
+  "response": "422 Unprocessable Entity\nThe location is outside the geographic area supported by the product.\n  latitude:  78\n  longitude:  15\n  Nowcast is only available for the Nordic area \nSpecified parameters:\n  * lon = 15.65\n  * lat = 78.22\n"
+ }
+]

@@ -11,9 +11,12 @@ from kildeverk.sources.entur.spec import GEOCODER as ENTUR_GEOCODER
 from kildeverk.sources.entur.spec import JOURNEY_PLANNER as ENTUR_JOURNEY_PLANNER
 from kildeverk.sources.kartverket.spec import SPEC as KARTVERKET
 from kildeverk.sources.kartverket_sea.spec import SPEC as KARTVERKET_SEA
+from kildeverk.sources.met.spec import AIRQUALITY as MET_AIRQUALITY
 from kildeverk.sources.met.spec import FROST as MET_FROST
 from kildeverk.sources.met.spec import LOCATIONFORECAST as MET_LOCATIONFORECAST
 from kildeverk.sources.met.spec import METALERTS as MET_METALERTS
+from kildeverk.sources.met.spec import NOWCAST as MET_NOWCAST
+from kildeverk.sources.met.spec import OCEANFORECAST as MET_OCEANFORECAST
 from kildeverk.sources.norges_bank.spec import SPEC as NORGES_BANK
 from kildeverk.sources.nve_hydapi.spec import SPEC as NVE_HYDAPI
 from kildeverk.sources.nve_reservoirs.spec import SPEC as NVE_RESERVOIRS
@@ -32,6 +35,9 @@ SOURCES: tuple[SourceSpec, ...] = (
     MET_LOCATIONFORECAST,
     MET_FROST,
     MET_METALERTS,
+    MET_NOWCAST,
+    MET_OCEANFORECAST,
+    MET_AIRQUALITY,
     NVE_HYDAPI,
     ENTUR_GEOCODER,
     ENTUR_JOURNEY_PLANNER,
@@ -60,6 +66,7 @@ def operations():
     from kildeverk.sources.kartverket_sea.ops import OPERATIONS as KARTVERKET_SEA_OPS
     from kildeverk.sources.met.alerts import OPERATIONS as MET_ALERT_OPS
     from kildeverk.sources.met.ops import OPERATIONS as MET_OPS
+    from kildeverk.sources.met.products import OPERATIONS as MET_PRODUCT_OPS
     from kildeverk.sources.norges_bank.ops import OPERATIONS as NORGES_BANK_OPS
     from kildeverk.sources.nve_hydapi.ops import OPERATIONS as NVE_OPS
     from kildeverk.sources.nve_reservoirs.ops import OPERATIONS as NVE_RESERVOIRS_OPS
@@ -77,6 +84,7 @@ def operations():
         *BRREG_ACCOUNTS_OPS,
         *MET_OPS,
         *MET_ALERT_OPS,
+        *MET_PRODUCT_OPS,
         *NVE_OPS,
         *ENTUR_OPS,
         *KARTVERKET_OPS,

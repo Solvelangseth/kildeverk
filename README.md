@@ -1,7 +1,7 @@
 # Kildeverk
 
 Live Norwegian public data for AI agents and people. Kildeverk is an MCP server
-and a read-only JSON API over 20 official data services from 12 Norwegian publishers:
+and a read-only JSON API over 23 official data services from 12 Norwegian publishers:
 statistics, companies, weather, water, warnings, transport, maps, the sea, money,
 energy, parliament, roads and schools. Every result says exactly where it came from.
 
@@ -25,6 +25,9 @@ publishers whose data it reads.
 | [Regnskapsregisteret](#brreg_accounts): annual accounts | ✅ available | `companies_accounts` |
 | [MET Norway Locationforecast](#met_locationforecast) | ✅ available | `weather_forecast` |
 | [MET Norway MetAlerts](#met_metalerts): weather warnings | ✅ available | `weather_warnings` |
+| [MET Norway Nowcast](#met_nowcast): rain in the next two hours | ✅ available | `weather_nowcast` |
+| [MET Norway Oceanforecast](#met_oceanforecast): waves and sea temperature | ✅ available | `sea_forecast` |
+| [MET Norway Airqualityforecast](#met_airquality) | ✅ available | `air_quality_forecast` |
 | [MET Norway Frost](#met_frost): needs a free client id | ✅ available | `weather_find_stations`, `weather_station_elements`, `weather_observations` |
 | [NVE HydAPI](#nve_hydapi): needs a free key | ✅ available | `water_find_stations`, `water_observations` |
 | [Entur Geocoder](#entur_geocoder): stop places | ✅ available | `transit_find_stops` |
@@ -471,6 +474,55 @@ redistribution.
 - Only open data: series that need Frost's client secret are not available.
 - The newest observations can take an hour or more to appear.
 - At most ten years per call and 10,000 rows per answer.
+
+<a id="met_nowcast"></a>
+### MET Norway Nowcast: rain in the next two hours
+
+**What it covers:** `weather_nowcast` gives precipitation every five minutes for the next two
+hours anywhere in the Nordic area, from weather radar, with whether it is raining now, when rain
+starts or stops, the heaviest rate, the amount in the next hour, and the temperature, wind and
+humidity now. `place_overview` uses it to say when rain starts or stops.
+
+**Licence, rate limits:** as for [Locationforecast](#met_locationforecast). Kildeverk follows each
+answer's `Expires`, about five minutes.
+
+**Known gaps:** only the Nordic area (Svalbard is outside, and the error points to
+`weather_forecast`). With reduced radar coverage the precipitation is less reliable, and the
+result says so.
+
+<a id="met_oceanforecast"></a>
+### MET Norway Oceanforecast: waves and sea temperature
+
+**What it covers:** `sea_forecast` gives, for a point at sea along the Norwegian coast, the
+significant wave height and direction, the sea temperature, and the current speed and direction,
+hourly for up to about eight days, with the highest waves ahead. The forecast is for the nearest
+sea grid point, which the result gives.
+
+**Licence, rate limits:** as for [Locationforecast](#met_locationforecast); cached for an hour or
+as long as `Expires` says.
+
+**Known gaps:** points on land or far into a fjord have no forecast, and the error says so. Wave
+period and swell are not in the API.
+
+<a id="met_airquality"></a>
+### MET Norway Airqualityforecast
+
+**What it covers:** `air_quality_forecast` gives the forecast air quality at a point in Norway,
+hour by hour for about two days, for the smallest statistical area (`grunnkrets`, a few streets),
+part of the municipality, or the whole municipality. Each hour has the air quality index (1 to 5),
+MET's level (low, moderate, high, very high), the pollutant behind it, and the NO2, PM10, PM2.5 and
+ozone concentrations. The worst hour also says where its pollution comes from: traffic exhaust,
+road dust and wear, heating (mostly wood burning), shipping, industry, or pollution carried in
+from elsewhere.
+
+**Licence, rate limits:** as for [Locationforecast](#met_locationforecast).
+
+**Behaviour worth knowing:** upstream lists the hours out of order and sometimes twice; Kildeverk
+keeps the last copy of each hour, sorts them, and starts from the current hour.
+
+**Known gaps:** MET still calls this API version 0.1, unchanged since 2018, so treat it as less
+settled than MET's other products. It is a model forecast for Norway only; measured air quality
+(NILU) is not included.
 
 <a id="nve_hydapi"></a>
 ### NVE HydAPI

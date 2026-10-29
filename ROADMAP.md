@@ -92,7 +92,7 @@ or a credential and cannot be done from the code alone.
 - [ ] Entur journey planning from A to B.
 - [ ] Kartverket return levels for storm surge (the 20-, 200- and 1000-year water levels).
 - [ ] Stortinget questions to ministers.
-- [ ] MET ocean forecast (waves and sea temperature).
+- [x] MET ocean forecast (waves and sea temperature).
 - [ ] Statens vegvesen's national road database (NVDB): speed limits, tunnels, bridges.
 
 ## New sources: shortlist (checked 2026-10-29)
@@ -120,7 +120,8 @@ must be read in full before building.
       Enhetsregisteret API, and accounts are under `data.brreg.no/regnskapsregisteret`. **S**, low
       risk. Roles name private persons, so return them for one organisation at a time and never
       make them searchable by person.
-- [ ] **MET: ocean forecast, nowcast and air-quality forecast** (extend `met`): waves and sea
+- [x] **MET: ocean forecast, nowcast and air-quality forecast** (built 2026-10-29 as `met_nowcast`,
+      `met_oceanforecast` and `met_airquality`): waves and sea
       temperature at a point, precipitation over the next two hours, and the air-quality index
       per municipality or station. Same terms as the existing MET tools: CC BY 4.0, an
       identifying User-Agent, at most 20 requests per second per application, coordinates to four

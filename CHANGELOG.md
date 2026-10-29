@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Three more MET Norway products: `weather_nowcast` (radar precipitation every five minutes for the
+  next two hours), `sea_forecast` (waves, sea temperature and currents along the coast) and
+  `air_quality_forecast` (the air quality index and pollutants hour by hour, and where the worst
+  hour's pollution comes from). `place_overview` now says when rain starts or stops.
 - A new source, Regnskapsregisteret, with `companies_accounts`: the last three years' revenue,
   results, assets, equity and debt for any company that files accounts, company and group, in the
   currency it reports in, with operating margin, equity ratio and revenue change.

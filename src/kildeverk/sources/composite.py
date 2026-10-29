@@ -39,6 +39,11 @@ class WeatherNow(BaseModel):
     symbol: str | None
     next_6h_precipitation_mm: float | None
     next_6h_temperature_range_c: list[float] | None
+    raining_now: bool | None = Field(default=None, description="From the radar nowcast.")
+    rain_starts_at: dt.datetime | None = Field(
+        default=None, description="Within the next two hours, from the radar nowcast."
+    )
+    rain_stops_at: dt.datetime | None = None
 
 
 class Warning(BaseModel):
@@ -89,10 +94,11 @@ def _time(value: Any) -> dt.datetime | None:
 
 async def place_overview(ctx: Context, args: PlaceOverviewInput) -> Result[PlaceOverviewOutput]:
     point = {"lat": args.lat, "lon": args.lon}
-    region, height, forecast, alerts, stops, places = await asyncio.gather(
+    region, height, forecast, radar, alerts, stops, places = await asyncio.gather(
         _part(ctx, "regions_at_point", point),
         _part(ctx, "terrain_elevation", {"points": [point]}),
         _part(ctx, "weather_forecast", {**point, "hours": 6}),
+        _part(ctx, "weather_nowcast", point),
         _part(ctx, "weather_warnings", point),
         _part(ctx, "transit_find_stops", {**point, "radius_km": 1, "limit": 3}),
         _part(ctx, "places_search", {**point, "radius_m": 1000, "limit": 5}),
@@ -115,6 +121,7 @@ async def place_overview(ctx: Context, args: PlaceOverviewInput) -> Result[Place
         "municipality": region,
         "elevation": height,
         "weather": forecast,
+        "rain nowcast": radar,
         "weather warnings": alerts,
         "nearest stops": stops,
         "nearby places": places,
@@ -144,6 +151,11 @@ async def place_overview(ctx: Context, args: PlaceOverviewInput) -> Result[Place
             next_6h_precipitation_mm=round(sum(rain), 1) if rain else None,
             next_6h_temperature_range_c=[min(temps), max(temps)] if temps else None,
         )
+        if isinstance(radar, dict):
+            r = radar["data"]
+            weather.raining_now = r["raining_now"]
+            weather.rain_starts_at = _time(r["rain_starts_at"])
+            weather.rain_stops_at = _time(r["rain_stops_at"])
 
     warnings: list[Warning] = []
     if isinstance(alerts, dict):
@@ -1287,7 +1299,8 @@ OPERATIONS = (
         title="Overview of a place",
         description=(
             "Everything Kildeverk knows about a point in Norway in one call: its municipality "
-            "and county, elevation, the weather now and over the next 6 hours, weather, flood "
+            "and county, elevation, the weather now and over the next 6 hours, when rain starts "
+            "or stops in the next two hours (radar nowcast), weather, flood "
             "and landslide warnings in force, the nearest public transport stops and named "
             "places nearby, plus ready-made follow-up calls. Parts that fail become notes."
         ),
@@ -1297,6 +1310,7 @@ OPERATIONS = (
         source_ids=(
             "kartverket",
             "met_locationforecast",
+            "met_nowcast",
             "met_metalerts",
             "nve_varsom",
             "entur_geocoder",
