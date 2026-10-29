@@ -109,6 +109,19 @@ _ANNOTATIONS = types.ToolAnnotations(
 )
 
 
+def _lean(schema: Any) -> Any:
+    """The schema without the titles Pydantic derives from field names ('Table Id' for table_id).
+
+    A property that is itself called 'title' keeps its schema, since that value is an object.
+    """
+
+    if isinstance(schema, dict):
+        return {k: _lean(v) for k, v in schema.items() if not (k == "title" and isinstance(v, str))}
+    if isinstance(schema, list):
+        return [_lean(v) for v in schema]
+    return schema
+
+
 def _result(payload: dict[str, Any], *, is_error: bool = False) -> types.CallToolResult:
     return types.CallToolResult(
         content=[types.TextContent(type="text", text=json.dumps(payload, ensure_ascii=False))],
@@ -141,13 +154,16 @@ def _recipe_prompts() -> dict[str, tuple[str, str]]:
 
 def build_mcp_server(get_context: Callable[[], Context]) -> Server:
     ops = {op.name: op for op in operations()}
+    # No output schemas, and no derived titles: each output schema repeated the whole result
+    # envelope, and together they were three quarters of a 109,000-token tool list that clients
+    # load before the first question. Results still carry structured content, the instructions
+    # describe their shape, and the OpenAPI document keeps the full schemas.
     tools = [
         types.Tool(
             name=op.name,
             title=op.title,
             description=op.description,
-            input_schema=op.input_schema(),
-            output_schema=op.output_schema(),
+            input_schema=_lean(op.input_schema()),
             annotations=_ANNOTATIONS,
         )
         for op in ops.values()

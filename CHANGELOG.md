@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- The MCP tool list is about 21,000 tokens instead of 109,000: tools no longer declare output
+  schemas (each repeated the whole result envelope) or the titles Pydantic derives from argument
+  names. Results still carry structured content, and the OpenAPI document keeps full schemas.
 - A new source, the national road database (NVDB): `road_at_point` gives the road at a point with
   its category, speed limit, daily traffic, height limit and bridge or tunnel.
 - A new source, Eurostat: `eurostat_search` finds datasets and `eurostat_data` reads any slice of

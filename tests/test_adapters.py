@@ -26,8 +26,19 @@ async def test_mcp_lists_every_tool_with_schemas(ctx):
     assert set(tools) == TOOL_NAMES
     data_tool = tools["statistics_get_data"]
     assert data_tool.input_schema["properties"]["table_id"]["pattern"]
-    assert "provenance" in data_tool.output_schema["properties"]
+    assert data_tool.output_schema is None
     assert data_tool.annotations.read_only_hint is True
+
+
+async def test_the_tool_list_stays_small_enough_to_load(ctx):
+    # Clients load every tool definition before the first question. Output schemas once made
+    # this list 109,000 tokens; at about four characters a token, this keeps it under 30,000.
+    async with Client(build_mcp_server(lambda: ctx)) as client:
+        listed = await client.list_tools()
+    size = len(
+        json.dumps([t.model_dump(exclude_none=True) for t in listed.tools], ensure_ascii=False)
+    )
+    assert size < 120_000, f"the tool list is about {size // 4:,} tokens"
 
 
 async def test_mcp_call_returns_structured_result(ctx):
