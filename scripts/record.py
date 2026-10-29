@@ -276,6 +276,36 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ("parliament_members", {"period": "2021-2025", "party": "SV"}),
         ("parliament_members", {"period": "2025-2029"}),
     ],
+    "elhub": [
+        (
+            "electricity_municipality",
+            {"municipality": "4601", "from_date": "2026-10-22", "to_date": "2026-10-24"},
+        ),
+        # The autumn clock change: 25 hours, and an old code followed to today's.
+        (
+            "electricity_municipality",
+            {
+                "municipality": "1201",
+                "from_date": "2026-10-25",
+                "to_date": "2026-10-25",
+                "resolution": "hour",
+            },
+        ),
+        (
+            "electricity_municipality",
+            {"municipality": "Suldal", "from_date": "2026-10-27", "to_date": "2026-10-27"},
+        ),
+        (
+            "electricity_municipality",
+            {"municipality": "9999", "from_date": "2026-10-27", "to_date": "2026-10-27"},
+        ),
+        ("electricity_price_areas", {"from_date": "2026-10-27", "to_date": "2026-10-27"}),
+        # Longer than one request may span, so it is fetched in two.
+        (
+            "electricity_price_areas",
+            {"areas": ["NO4"], "from_date": "2026-01-01", "to_date": "2026-01-30"},
+        ),
+    ],
     "vegvesen_traffic": [
         ("traffic_find_points", {"name": "Nygårdstunnelen"}),
         ("traffic_find_points", {"lat": 59.91, "lon": 10.75, "radius_km": 1}),
@@ -366,8 +396,21 @@ def _reservoir_years(url: str, body):
     return body
 
 
+def _elhub_midnights(url: str, body):
+    # A month of hourly rows per area is large; long answers keep only each day's first hour.
+    for item in body.get("data") or [] if isinstance(body, dict) else []:
+        for key, rows in item.get("attributes", {}).items():
+            if isinstance(rows, list) and len(rows) > 1000:
+                item["attributes"][key] = [r for r in rows if "T00:00:00" in r["startTime"]]
+    return body
+
+
 # Whole-response trims, for responses too large to keep in full.
-TRIM = {"nve_reservoirs": _reservoir_years}
+TRIM = {"nve_reservoirs": _reservoir_years, "elhub": _elhub_midnights}
+
+# Sources whose tools also call other sources: only their own host is recorded, since the
+# other sources' recordings already hold the rest.
+OWN_HOSTS = {"elhub": "api.elhub.no"}
 
 
 def _scrub(value, keys: set[str]):
@@ -408,6 +451,9 @@ async def record(source_id: str) -> None:
             if trim:
                 body = trim(exchange["url"].split("?")[0], body)
             exchange["response"] = json.dumps(body, ensure_ascii=False)
+
+    if host := OWN_HOSTS.get(source_id):
+        transport.exchanges = [e for e in transport.exchanges if f"//{host}/" in e["url"]]
 
     out = FIXTURES / source_id / "cassette.json"
     out.parent.mkdir(parents=True, exist_ok=True)

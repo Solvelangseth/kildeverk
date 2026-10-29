@@ -234,6 +234,20 @@ async def test_profile_combines_sources(ctx, monkeypatch):
         },
         "hazards_flood_landslide": {"data": {"warnings": []}, "provenance": [_prov("nve_varsom")]},
         "weather_warnings": {"data": {"warnings": []}, "provenance": [_prov("met_metalerts")]},
+        "electricity_municipality": {
+            "data": {
+                "from_date": "2026-10-22",
+                "to_date": "2026-10-28",
+                "days_with_figures": 7,
+                "average_mwh_per_day": 9721.5,
+                "by_group": [
+                    {"group": "private", "mwh": 37037.0, "share_pct": 54.4, "metering_points": 1}
+                ],
+                "capacity_mw": 125.8,
+                "capacity": [{"kind": "hydro", "mw": 72.8, "prosumer_mw": 0.0}],
+            },
+            "provenance": [_prov("elhub")],
+        },
     }
     calls = []
 
@@ -251,6 +265,11 @@ async def test_profile_combines_sources(ctx, monkeypatch):
     assert data["population"]["latest"] == 294860 and data["companies_registered"] == 58393
     assert data["schools"] == {"total": 235, "primary": 93, "secondary": 32, "private": 112}
     assert data["traffic_points"] == 172
+    power = data["electricity"]
+    assert power["kwh_per_inhabitant_per_day"] == 33.0  # 9,721.5 MWh a day over 294,860 people
+    assert power["private_kwh_per_inhabitant_per_day"] == 17.9
+    assert (power["private_share_pct"], power["largest_capacity_kind"]) == (54.4, "hydro")
+    assert ("electricity_municipality", {"municipality": "4601"}) in calls
     assert ("weather_warnings", {"county": "46"}) in calls
     population_calls = [a for t, a in calls if t == "statistics_get_data"]
     assert population_calls[0]["codelists"] == {"Region": "agg_KommSummer"}
@@ -278,6 +297,7 @@ async def test_compare_skips_duplicates_and_reports_failures(ctx, monkeypatch):
                 "companies_registered": companies,
                 "schools": {"total": 10},
                 "traffic_points": 3,
+                "electricity": {"kwh_per_inhabitant_per_day": 30.0, "installed_capacity_mw": 5.0},
                 "warnings": [],
             },
             "provenance": [_prov("ssb_statbank")],
@@ -303,5 +323,6 @@ async def test_compare_skips_duplicates_and_reports_failures(ctx, monkeypatch):
     rows = result["data"]["rows"]
     assert [r["code"] for r in rows] == ["4601", "1103"]
     assert rows[0]["companies_per_1000"] == 200.0
+    assert rows[0]["electricity_kwh_per_inhabitant_per_day"] == 30.0
     assert result["data"]["failed"] == ["Nowhere"]
     assert any("already in the comparison" in n for n in result["notes"])

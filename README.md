@@ -1,7 +1,7 @@
 # Kildeverk
 
 Live Norwegian public data for AI agents and people. Kildeverk is an MCP server
-and a read-only JSON API over 18 official data services from 11 Norwegian publishers:
+and a read-only JSON API over 19 official data services from 12 Norwegian publishers:
 statistics, companies, weather, water, warnings, transport, maps, the sea, money,
 energy, parliament, roads and schools. Every result says exactly where it came from.
 
@@ -34,6 +34,7 @@ publishers whose data it reads.
 | [NVE Varsom](#nve_varsom): flood, landslide and avalanche warnings | ✅ available | `hazards_flood_landslide`, `hazards_avalanche` |
 | [data.norge.no](#datanorge): the national data catalogue | ✅ available | `catalog_search` |
 | [NVE reservoir statistics](#nve_reservoirs): hydropower reservoir fill | ✅ available | `energy_reservoirs` |
+| [Elhub](#elhub): electricity consumption and production | ✅ available | `electricity_municipality`, `electricity_price_areas` |
 | [Stortinget](#stortinget): cases, votes and members | ✅ available | `parliament_cases`, `parliament_case`, `parliament_members` |
 | [Statens vegvesen traffic data](#vegvesen_traffic) | ✅ available | `traffic_find_points`, `traffic_volumes` |
 | [National School Register](#udir_nsr) | ✅ available | `schools_search`, `schools_get` |
@@ -45,7 +46,8 @@ calls the other tools, so each part keeps its own provenance, budget and cache, 
 fails becomes a note while the rest still answers. `municipality_profile` takes a municipality code,
 old or current, or a name, follows it through the reforms with [SSB Klass](#ssb_klass), and returns
 population and its change, registered companies and the largest employers, schools by level and
-ownership, traffic counting points, and the warnings in force. Its population series is SSB's,
+ownership, traffic counting points, electricity use per inhabitant from [Elhub](#elhub), and the
+warnings in force. Its population series is SSB's,
 summed to today's borders, so the change reaches back past the 2020 and 2024 reforms.
 `compare_municipalities` puts two to five of these side by side.
 
@@ -763,6 +765,48 @@ reservoirs every week.
 
 **Known gaps:**
 - Individual reservoirs are not published, only area totals.
+
+<a id="elhub"></a>
+### Elhub: electricity consumption and production
+
+**What it covers:** metered electricity from Elhub, the national data hub every Norwegian meter
+reports to.
+- `electricity_municipality` gives one municipality's consumption, per day or per hour, split into
+  private customers (homes and cabins), business (services) and industry, with each group's share
+  and number of metering points. It also gives the production capacity installed in the
+  municipality by kind (hydro, wind, solar, thermal, other), including how much of it is on
+  prosumer meters such as rooftop solar. Accepts codes, old or current, and names.
+- `electricity_price_areas` gives consumption and production per day and for the period in the
+  price areas NO1-NO5: consumption by households, cabins and primary, secondary and tertiary
+  industry, and production by hydro, wind, solar, thermal and other. With all five areas it adds a
+  total for Norway.
+- `municipality_profile` and `compare_municipalities` include the last seven days' use per
+  inhabitant, in total and for homes and cabins, and the installed capacity.
+
+**Licence:** [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), credit Elhub, as stated in
+the terms of use on [Elhub's API portal](https://api.elhub.no/). The public APIs need no key.
+
+**Rate limits:** 5 calls a second per user (IP address), and Elhub asks users not to overload it.
+Kildeverk spends at most 4 a second.
+
+**Caching:** periods ending in the last three days for 1 hour; older ones for a day.
+
+**Behaviour worth knowing:**
+- Periods are whole days in Norwegian time, from 2021-01-01, at most 31 days per call; by default
+  the last seven full days.
+- Elhub serves municipality consumption one day per request, so a week costs seven calls (plus one
+  for capacity). Price areas take up to a month per request.
+- The autumn clock change gives a day of 25 hours, and the hourly rows keep both 02:00 hours.
+- Figures are what grid companies report, and Elhub revises them as late readings arrive.
+- `net_mwh` for a price area is production minus metered consumption. Grid losses are in neither,
+  so it shows roughly whether an area produced more than it used, not its exchange with
+  neighbours.
+
+**Known gaps:**
+- Production per municipality: Elhub's municipal figures cover only prosumers, so only capacity
+  is shown.
+- Exchange between price areas, 15-minute values and Norgespris figures are not exposed yet.
+- Datasets by industry code or supplier need Maskinporten access.
 
 <a id="stortinget"></a>
 ### Stortinget: cases, votes and members

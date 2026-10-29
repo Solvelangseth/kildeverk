@@ -254,6 +254,21 @@ class Schools(BaseModel):
     private: int
 
 
+class Electricity(BaseModel):
+    from_date: dt.date
+    to_date: dt.date
+    average_mwh_per_day: float | None
+    private_share_pct: float | None = Field(description="Homes and cabins, share of all use.")
+    kwh_per_inhabitant_per_day: float | None = Field(
+        description="All use, business and industry included, per inhabitant."
+    )
+    private_kwh_per_inhabitant_per_day: float | None = Field(
+        description="Homes and cabins only, per inhabitant."
+    )
+    installed_capacity_mw: float = Field(description="Production capacity in the municipality.")
+    largest_capacity_kind: str | None
+
+
 class MunicipalityProfileOutput(BaseModel):
     code: str
     name: str
@@ -266,6 +281,7 @@ class MunicipalityProfileOutput(BaseModel):
     largest_employers: list[Employer]
     schools: Schools | None
     traffic_points: int | None = Field(description="Operational traffic counting points.")
+    electricity: Electricity | None = Field(description="The last seven full days, from Elhub.")
     warnings: list[Warning]
     follow_up: list[NextCall]
 
@@ -378,6 +394,7 @@ async def municipality_profile(
         traffic,
         hazards,
         weather,
+        electricity,
     ) = await asyncio.gather(
         _population_part(ctx, code),
         _part(
@@ -390,6 +407,7 @@ async def municipality_profile(
         _part(ctx, "traffic_find_points", {"municipality": code, "limit": 50}),
         _part(ctx, "hazards_flood_landslide", {"municipality": code}),
         _part(ctx, "weather_warnings", {"county": code[:2]}),
+        _part(ctx, "electricity_municipality", {"municipality": code}),
     )
     parts = {
         "region": resolved,
@@ -399,6 +417,7 @@ async def municipality_profile(
         "traffic points": traffic,
         "flood and landslide warnings": hazards,
         "weather warnings": weather,
+        "electricity": electricity,
     }
     provenance: list[Provenance] = []
     notes: list[str] = []
@@ -463,6 +482,13 @@ async def municipality_profile(
         ]
     if warnings and any(w.kind == "weather" for w in warnings):
         notes.append("Weather warnings are for the whole county; check each warning's area.")
+    power = _electricity(electricity, people)
+    if power:
+        notes.append(
+            "Electricity is the last seven full days, so it follows the season and the weather. "
+            "Use per inhabitant includes business and industry; the private figure is homes and "
+            "cabins only."
+        )
 
     return Result(
         data=MunicipalityProfileOutput(
@@ -477,16 +503,46 @@ async def municipality_profile(
             largest_employers=employers,
             schools=school_counts,
             traffic_points=traffic["data"]["total_matches"] if isinstance(traffic, dict) else None,
+            electricity=power,
             warnings=warnings,
             follow_up=[
                 NextCall(tool="statistics_search_tables", arguments={"query": f"{name} kommune"}),
                 NextCall(tool="schools_search", arguments={"municipality": code}),
                 NextCall(tool="traffic_find_points", arguments={"municipality": code}),
                 NextCall(tool="addresses_search", arguments={"municipality": code, "limit": 5}),
+                NextCall(tool="electricity_municipality", arguments={"municipality": code}),
             ],
         ),
         provenance=provenance,
         notes=notes,
+    )
+
+
+def _electricity(part: dict[str, Any] | ToolError, people: Population | None) -> Electricity | None:
+    if not isinstance(part, dict):
+        return None
+    d = part["data"]
+    per_day = d["average_mwh_per_day"]
+    private = next((g for g in d["by_group"] if g["group"] == "private"), None)
+    inhabitants = people.latest if people else None
+
+    def per_person(mwh_per_day: float | None) -> float | None:
+        if mwh_per_day is None or not inhabitants:
+            return None
+        return round(mwh_per_day * 1000 / inhabitants, 1)
+
+    private_per_day = (
+        private["mwh"] / d["days_with_figures"] if private and d["days_with_figures"] else None
+    )
+    return Electricity(
+        from_date=d["from_date"],
+        to_date=d["to_date"],
+        average_mwh_per_day=per_day,
+        private_share_pct=private["share_pct"] if private else None,
+        kwh_per_inhabitant_per_day=per_person(per_day),
+        private_kwh_per_inhabitant_per_day=per_person(private_per_day),
+        installed_capacity_mw=d["capacity_mw"],
+        largest_capacity_kind=d["capacity"][0]["kind"] if d["capacity"] else None,
     )
 
 
@@ -514,6 +570,13 @@ class ComparedRow(BaseModel):
     companies_per_1000: float | None
     schools: int | None
     traffic_points: int | None
+    electricity_kwh_per_inhabitant_per_day: float | None = Field(
+        description="All use over the last seven full days, business and industry included."
+    )
+    private_electricity_kwh_per_inhabitant_per_day: float | None = Field(
+        description="Homes and cabins only."
+    )
+    installed_capacity_mw: float | None
     warnings_in_force: int
 
 
@@ -544,10 +607,13 @@ async def compare_municipalities(ctx: Context, args: CompareInput) -> Result[Com
         seen.add(d["code"])
         provenance.extend(Provenance.model_validate(p) for p in profile["provenance"])
         notes.extend(
-            f"{d['name']}: {n}" for n in profile["notes"] if not n.startswith("School counts")
+            f"{d['name']}: {n}"
+            for n in profile["notes"]
+            if not n.startswith(("School counts", "Electricity is the last"))
         )
         people = d["population"] or {}
         companies = d["companies_registered"]
+        power = d.get("electricity") or {}
         rows.append(
             ComparedRow(
                 code=d["code"],
@@ -562,6 +628,11 @@ async def compare_municipalities(ctx: Context, args: CompareInput) -> Result[Com
                 else None,
                 schools=(d["schools"] or {}).get("total"),
                 traffic_points=d["traffic_points"],
+                electricity_kwh_per_inhabitant_per_day=power.get("kwh_per_inhabitant_per_day"),
+                private_electricity_kwh_per_inhabitant_per_day=power.get(
+                    "private_kwh_per_inhabitant_per_day"
+                ),
+                installed_capacity_mw=power.get("installed_capacity_mw"),
                 warnings_in_force=len(d["warnings"]),
             )
         )
@@ -569,6 +640,11 @@ async def compare_municipalities(ctx: Context, args: CompareInput) -> Result[Com
         notes.append("Fewer than two distinct municipalities to compare.")
     rows.sort(key=lambda r: r.population or 0, reverse=True)
     notes.append("School counts include every unit the register calls a school.")
+    if any(r.electricity_kwh_per_inhabitant_per_day is not None for r in rows):
+        notes.append(
+            "Electricity per inhabitant is the last seven full days. The total includes business "
+            "and industry, so it reflects the local economy as much as homes."
+        )
     return Result(
         data=CompareOutput(rows=rows, failed=failed),
         provenance=provenance,
@@ -1204,8 +1280,9 @@ OPERATIONS = (
             "One Norwegian municipality from several sources at once: population and how it "
             "changed (SSB), registered companies and the largest employers (Brønnøysund), "
             "schools by level and ownership (Udir), traffic counting points (Statens vegvesen), "
-            "and weather, flood and landslide warnings in force. Accepts today's code, a code "
-            "from before the 2020 or 2024 reforms, or a name."
+            "electricity use per inhabitant and installed production capacity over the last week "
+            "(Elhub), and weather, flood and landslide warnings in force. Accepts today's code, a "
+            "code from before the 2020 or 2024 reforms, or a name."
         ),
         input_model=MunicipalityProfileInput,
         output_model=MunicipalityProfileOutput,
@@ -1218,6 +1295,7 @@ OPERATIONS = (
             "vegvesen_traffic",
             "nve_varsom",
             "met_metalerts",
+            "elhub",
         ),
         http_method="GET",
         http_path="/v1/municipalities/{municipality}/profile",
@@ -1228,8 +1306,9 @@ OPERATIONS = (
         title="Compare municipalities",
         description=(
             "Two to five Norwegian municipalities side by side: population and its change, "
-            "registered companies (also per 1,000 inhabitants), schools, traffic counting points "
-            "and warnings in force. Accepts codes, old or current, and names. Built on "
+            "registered companies (also per 1,000 inhabitants), schools, traffic counting points, "
+            "electricity use per inhabitant and warnings in force. Accepts codes, old or current, "
+            "and names. Built on "
             "municipality_profile, which gives each one in full."
         ),
         input_model=CompareInput,
@@ -1243,6 +1322,7 @@ OPERATIONS = (
             "vegvesen_traffic",
             "nve_varsom",
             "met_metalerts",
+            "elhub",
         ),
         http_method="POST",
         http_path="/v1/municipalities/compare",

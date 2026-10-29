@@ -5,6 +5,7 @@ from __future__ import annotations
 from kildeverk.core.source import SourceSpec
 from kildeverk.sources.brreg.spec import SPEC as BRREG
 from kildeverk.sources.datanorge.spec import SPEC as DATANORGE
+from kildeverk.sources.elhub.spec import SPEC as ELHUB
 from kildeverk.sources.entur.spec import GEOCODER as ENTUR_GEOCODER
 from kildeverk.sources.entur.spec import JOURNEY_PLANNER as ENTUR_JOURNEY_PLANNER
 from kildeverk.sources.kartverket.spec import SPEC as KARTVERKET
@@ -38,6 +39,7 @@ SOURCES: tuple[SourceSpec, ...] = (
     DATANORGE,
     KARTVERKET_SEA,
     NVE_RESERVOIRS,
+    ELHUB,
     STORTINGET,
     VEGVESEN_TRAFFIC,
     UDIR_NSR,
@@ -49,6 +51,7 @@ def operations():
     from kildeverk.sources import cite, composite, meta
     from kildeverk.sources.brreg.ops import OPERATIONS as BRREG_OPS
     from kildeverk.sources.datanorge.ops import OPERATIONS as DATANORGE_OPS
+    from kildeverk.sources.elhub.ops import OPERATIONS as ELHUB_OPS
     from kildeverk.sources.entur.ops import OPERATIONS as ENTUR_OPS
     from kildeverk.sources.kartverket.ops import OPERATIONS as KARTVERKET_OPS
     from kildeverk.sources.kartverket_sea.ops import OPERATIONS as KARTVERKET_SEA_OPS
@@ -78,6 +81,7 @@ def operations():
         *DATANORGE_OPS,
         *KARTVERKET_SEA_OPS,
         *NVE_RESERVOIRS_OPS,
+        *ELHUB_OPS,
         *STORTINGET_OPS,
         *VEGVESEN_TRAFFIC_OPS,
         *UDIR_NSR_OPS,

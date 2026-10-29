@@ -106,7 +106,7 @@ must be read in full before building.
 
 ### Next up: clear licence, no key
 
-- [ ] **Elhub energy data** (`elhub_energy`): electricity consumption and production per
+- [x] **Elhub energy data** (`elhub`, built 2026-10-29): electricity consumption and production per
       municipality, grid area and price area. Feeds `municipality_profile` directly.
       Licence: "The datasets are licenced by CC BY 4.0", and public APIs "do not require any
       authorization" (https://api.elhub.no, not re-read; `/energy-data/v0/municipalities`

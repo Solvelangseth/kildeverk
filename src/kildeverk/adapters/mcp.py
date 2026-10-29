@@ -36,6 +36,8 @@ GUIDE = """# Choosing a Kildeverk tool
   what was measured; `weather_warnings` for official warnings.
 - **Water and hazards:** `water_find_stations` and `water_observations`; `hazards_flood_landslide`,
   `hazards_avalanche`; `sea_level` on the coast; `energy_reservoirs` for hydropower.
+- **Electricity:** `electricity_municipality` for use and installed capacity in a municipality;
+  `electricity_price_areas` for consumption and production in NO1-NO5.
 - **Getting around:** `transit_find_stops`, then `transit_departures`; `traffic_find_points`, then
   `traffic_volumes` for road traffic.
 - **Maps:** `addresses_search`, `places_search`, `terrain_elevation`, `regions_at_point`.

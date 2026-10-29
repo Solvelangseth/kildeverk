@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- A new source, Elhub, with two tools. `electricity_municipality` gives a municipality's
+  electricity use per day or hour by private, business and industry, and its installed production
+  capacity by kind. `electricity_price_areas` gives consumption and production in NO1-NO5.
+  `municipality_profile` and `compare_municipalities` now include electricity use per inhabitant.
 - The hosted service is live at https://kildeverk.fly.dev (MCP at `/mcp`).
 - The website is in Norwegian and redesigned: a getting-started panel per client, example
   questions to copy, the recipes in Norwegian, tools grouped by theme with search, and code and

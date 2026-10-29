@@ -316,6 +316,38 @@ SOURCES: dict[str, SourceText] = {
             "Enkeltmagasiner publiseres ikke; bare summer per område",
         ],
     ),
+    "elhub": SourceText(
+        "Elhub energidata",
+        "Elhub AS",
+        [
+            (
+                "Strømforbruk i hver kommune, time for time siden 2021, fordelt på privatkunder "
+                "(boliger og hytter), næring (tjenester) og industri, med antall målepunkter"
+            ),
+            (
+                "Installert produksjonskapasitet i hver kommune etter type: vann, vind, sol, termisk "
+                "og annet, og hvor mye av den som er hos plusskunder"
+            ),
+            (
+                "Forbruk og produksjon i hvert prisområde (NO1–NO5): forbruk hos husholdninger, hytter "
+                "og primær-, sekundær- og tertiærnæring; produksjon fra vann, vind, sol, termisk og "
+                "annet"
+            ),
+        ],
+        [
+            "Elhub gir kommunetall én dag per forespørsel, så et kall dekker høyst 31 dager",
+            (
+                "Produksjon per kommune er ikke med: Elhubs kommunetall gjelder bare plusskunder og "
+                "ville undervurdert steder med kraftverk kraftig, så bare kapasiteten vises"
+            ),
+            (
+                "Tallene er slik nettselskapene rapporterer dem, og Elhub retter dem når sene eller "
+                "korrigerte målerverdier kommer inn; de siste dagene er minst sikre"
+            ),
+            "Utveksling mellom prisområder, kvartersverdier og Norgespris er ikke tatt med ennå",
+            "Datasett etter næringskode eller leverandør krever Maskinporten og brukes ikke",
+        ],
+    ),
     "stortinget": SourceText(
         "Stortingets åpne data",
         "Stortinget",
@@ -381,12 +413,13 @@ TOOLS: dict[str, ToolText] = {
     ),
     "municipality_profile": ToolText(
         "Profil av en kommune",
-        "Folketall og endring, foretak og største arbeidsgivere, skoler, trafikkpunkter og "
-        "farevarsler for én kommune.",
+        "Folketall og endring, foretak og største arbeidsgivere, skoler, trafikkpunkter, "
+        "strømforbruk og farevarsler for én kommune.",
     ),
     "compare_municipalities": ToolText(
         "Sammenlign kommuner",
-        "To til fem kommuner side om side, med foretak per 1 000 innbyggere.",
+        "To til fem kommuner side om side, med foretak per 1 000 innbyggere og strøm per "
+        "innbygger.",
     ),
     "statistics_search_tables": ToolText(
         "Søk i SSBs tabeller",
@@ -461,6 +494,15 @@ TOOLS: dict[str, ToolText] = {
     "energy_reservoirs": ToolText(
         "Fyllingsgrad i vannmagasinene",
         "Hvor fulle vannmagasinene er, for landet og hvert prisområde, mot de siste 20 årene.",
+    ),
+    "electricity_municipality": ToolText(
+        "Strømforbruk i en kommune",
+        "Forbruk per dag eller time for privatkunder, næring og industri, og installert "
+        "produksjonskapasitet etter type.",
+    ),
+    "electricity_price_areas": ToolText(
+        "Strøm per prisområde",
+        "Forbruk og produksjon i NO1–NO5 per dag, etter forbruksgruppe og kraftkilde.",
     ),
     "hazards_flood_landslide": ToolText(
         "Flom- og jordskredvarsler",
@@ -600,11 +642,13 @@ THEMES: list[tuple[str, str, list[str]]] = [
     ),
     (
         "Vann, energi og naturfare",
-        "Elver, magasiner, flom, jordskred og snøskred fra NVE.",
+        "Elver, magasiner, strøm, flom, jordskred og snøskred fra NVE og Elhub.",
         [
             "water_find_stations",
             "water_observations",
             "energy_reservoirs",
+            "electricity_municipality",
+            "electricity_price_areas",
             "hazards_flood_landslide",
             "hazards_avalanche",
         ],
@@ -657,6 +701,7 @@ PUBLISHERS: dict[str, str] = {
     "Stortinget (the Norwegian parliament)": "Stortinget",
     "Norwegian Public Roads Administration (Statens vegvesen)": "Statens vegvesen",
     "Norwegian Directorate for Education and Training (Udir)": "Udir",
+    "Elhub AS": "Elhub",
 }
 
 LICENCES: dict[str, str] = {"not-stated": "ingen lisens oppgitt"}
