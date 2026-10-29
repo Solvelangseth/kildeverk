@@ -45,6 +45,45 @@ SPEC = SourceSpec(
             "match, but a two-digit division prefix like '62' usually still finds the right firms"
         ),
         f"A search can page through at most {MAX_RESULT_WINDOW:,} results",
-        "Financial statements are a different register and are not included",
+        "Annual accounts are a separate register; companies_accounts reads them",
+    ],
+)
+
+ACCOUNTS_URL = "https://data.brreg.no/regnskapsregisteret/regnskap"
+
+ACCOUNTS = SourceSpec(
+    id="brreg_accounts",
+    name="Regnskapsregisteret (Brønnøysund Register Centre)",
+    publisher="Brønnøysund Register Centre (Brønnøysundregistrene)",
+    homepage="https://www.brreg.no/",
+    docs_url=f"{ACCOUNTS_URL}/v3/api-docs",
+    # data.norge.no lists the open API as the distribution "Nøkkeltall fra årsregnskapet" under
+    # NLOD 2.0: "Den åpne delen er tilgjengelig for alle".
+    terms_url="https://data.norge.no/datasets/8132460c-91ab-3950-a54b-a54ee20c62e9",
+    licence=Licence(
+        id="NLOD-2.0",
+        name="Norwegian Licence for Open Government Data 2.0",
+        url="https://data.norge.no/nlod/en/2.0",
+    ),
+    budget=Budget(rate_per_s=1, capacity=15, upstream_limit="none published"),
+    # Accounts are filed once a year; a day is plenty.
+    cache_ttls_s={"accounts": 86_400},
+    covers=[
+        (
+            "Key figures from the annual accounts companies file, for the last three years: "
+            "revenue, operating profit, profit before tax, tax, net result, assets, equity, debt "
+            "and cash"
+        ),
+        (
+            "Company accounts and, for parent companies, group accounts, with the currency, the "
+            "accounting rules (Norwegian GAAP or IFRS) and whether they were audited"
+        ),
+    ],
+    known_gaps=[
+        "Only the last three years are open; Brreg sells older accounts",
+        ("Public bodies, sole proprietorships and others that do not file accounts have none here"),
+        "Notes, the board's report, the auditor's report and cash flow are not in the open API",
+        "Figures are in the currency each company reports in; Equinor, for one, reports in USD",
+        "Small companies may leave out lines such as sales revenue or tax; those are empty",
     ],
 )

@@ -112,7 +112,8 @@ must be read in full before building.
       authorization" (https://api.elhub.no, not re-read; `/energy-data/v0/municipalities`
       answered without a key). Limit: 5 calls per second. **S**, low risk (versioned `v0`, so
       watch for a `v1`).
-- [ ] **Brønnøysund roles and annual accounts** (extend `brreg`): board, CEO and auditor for an
+- [x] **Brønnøysund annual accounts** (`brreg_accounts`, built 2026-10-29; roles left out, as
+      they name people) and roles (extend `brreg`): board, CEO and auditor for an
       organisation number, and key figures from the latest accounts. "Datasettene følger Norsk
       lisens for åpne data (NLOD)", "ikke nødvendig å registrere seg"
       (https://www.brreg.no/produkter-og-tjenester/apne-data/). Roles are under the existing

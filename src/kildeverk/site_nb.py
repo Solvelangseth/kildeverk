@@ -83,7 +83,35 @@ SOURCES: dict[str, SourceText] = {
                 "ikke, men et tosifret prefiks som '62' finner som regel riktige foretak"
             ),
             "Et søk kan bla gjennom høyst 10 000 treff",
-            "Regnskap ligger i et annet register og er ikke med",
+            "Regnskap ligger i et eget register; companies_accounts leser det",
+        ],
+    ),
+    "brreg_accounts": SourceText(
+        "Regnskapsregisteret",
+        "Brønnøysundregistrene",
+        [
+            (
+                "Nøkkeltall fra årsregnskapene selskapene sender inn, for de tre siste årene: "
+                "driftsinntekter, driftsresultat, resultat før skatt, skatt, årsresultat, eiendeler, "
+                "egenkapital, gjeld og bankinnskudd"
+            ),
+            (
+                "Selskapsregnskap og, for morselskaper, konsernregnskap, med valuta, regnskapsregler "
+                "(NGAAP eller IFRS) og om regnskapet er revidert"
+            ),
+        ],
+        [
+            "Bare de tre siste årene er åpne; eldre regnskap selger Brreg",
+            (
+                "Offentlige virksomheter, enkeltpersonforetak og andre uten regnskapsplikt har ingen "
+                "regnskap her"
+            ),
+            (
+                "Noter, styrets årsberetning, revisjonsberetning og kontantstrøm er ikke med i det "
+                "åpne API-et"
+            ),
+            "Beløpene er i valutaen selskapet rapporterer i; Equinor rapporterer for eksempel i USD",
+            "Små foretak kan utelate linjer som salgsinntekter eller skatt; de står da tomme",
         ],
     ),
     "met_locationforecast": SourceText(
@@ -413,8 +441,8 @@ TOOLS: dict[str, ToolText] = {
     ),
     "municipality_profile": ToolText(
         "Profil av en kommune",
-        "Folketall og endring, foretak og største arbeidsgivere, skoler, trafikkpunkter, "
-        "strømforbruk og farevarsler for én kommune.",
+        "Folketall og endring, foretak og største arbeidsgivere med omsetning, skoler, "
+        "trafikkpunkter, strømforbruk og farevarsler for én kommune.",
     ),
     "compare_municipalities": ToolText(
         "Sammenlign kommuner",
@@ -553,6 +581,11 @@ TOOLS: dict[str, ToolText] = {
         "Slå opp en virksomhet",
         "Én virksomhet etter organisasjonsnummer, med næring, ansatte, adresser og underenheter.",
     ),
+    "companies_accounts": ToolText(
+        "Årsregnskap for et selskap",
+        "Driftsinntekter, resultat, egenkapital og gjeld fra de tre siste årsregnskapene, med "
+        "driftsmargin og egenkapitalandel.",
+    ),
     "schools_search": ToolText(
         "Finn skoler",
         "Grunnskoler og videregående skoler etter navn, kommune eller fylke.",
@@ -665,8 +698,14 @@ THEMES: list[tuple[str, str, list[str]]] = [
     ),
     (
         "Virksomheter og skoler",
-        "Enhetsregisteret og Nasjonalt skoleregister.",
-        ["companies_search", "companies_get", "schools_search", "schools_get"],
+        "Enhetsregisteret, Regnskapsregisteret og Nasjonalt skoleregister.",
+        [
+            "companies_search",
+            "companies_get",
+            "companies_accounts",
+            "schools_search",
+            "schools_get",
+        ],
     ),
     (
         "Penger og renter",

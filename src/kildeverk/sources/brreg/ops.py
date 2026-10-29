@@ -273,6 +273,11 @@ async def get(ctx: Context, args: GetInput) -> Result[Company]:
     notes = list(fetched.notes)
     if company.deleted_on:
         notes.append(f"This entity was deleted from the register on {company.deleted_on}.")
+    if company.last_annual_accounts:
+        notes.append(
+            f"Its last filed accounts are for {company.last_annual_accounts}; companies_accounts "
+            "gives the key figures."
+        )
 
     if args.include_subunits and kind == "main_unit":
         listed = await up.get_json(
@@ -337,7 +342,8 @@ OPERATIONS = (
             "Get one entity by its nine-digit organisation number: name, legal form, industries, "
             "addresses, employees, share capital, register memberships, bankruptcy and "
             "liquidation status, former names, and optionally its sub-units. Works for sub-units "
-            "too. Roles and contact details are not included."
+            "too. Roles and contact details are not included; for revenue and results, use "
+            "companies_accounts."
         ),
         input_model=GetInput,
         output_model=Company,

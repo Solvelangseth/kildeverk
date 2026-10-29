@@ -223,7 +223,13 @@ async def test_profile_combines_sources(ctx, monkeypatch):
                         "name": "BERGEN KOMMUNE",
                         "employees": 32820,
                         "industry": None,
-                    }
+                    },
+                    {
+                        "org_number": "983974910",
+                        "name": "HELSE BERGEN HF",
+                        "employees": 13000,
+                        "industry": None,
+                    },
                 ],
             },
             "provenance": [_prov("brreg")],
@@ -256,6 +262,11 @@ async def test_profile_combines_sources(ctx, monkeypatch):
         if tool == "schools_search":
             key = arguments.get("level") or arguments.get("ownership") or "all"
             return school({"all": 235, "primary": 93, "secondary": 32, "private": 112}[key])
+        if tool == "companies_accounts":
+            if arguments["org_number"] == "964338531":
+                return ToolError(ErrorCode.NOT_FOUND, "No open accounts.")
+            year = {"year": 2025, "revenue": 1.2e10, "net_result": -5e6, "currency": "NOK"}
+            return {"data": {"accounts": [year]}, "provenance": [_prov("brreg_accounts")]}
         return answers[tool]
 
     monkeypatch.setattr(composite, "_part", fake)
@@ -270,6 +281,15 @@ async def test_profile_combines_sources(ctx, monkeypatch):
     assert power["private_kwh_per_inhabitant_per_day"] == 17.9
     assert (power["private_share_pct"], power["largest_capacity_kind"]) == (54.4, "hydro")
     assert ("electricity_municipality", {"municipality": "4601"}) in calls
+    municipality, hospital = data["largest_employers"]
+    assert municipality["revenue"] is None
+    assert (hospital["accounts_year"], hospital["revenue"], hospital["currency"]) == (
+        2025,
+        1.2e10,
+        "NOK",
+    )
+    assert ("companies_accounts", {"org_number": "983974910", "kind": "company"}) in calls
+    assert any(n.startswith("Employers without revenue") for n in result["notes"])
     assert ("weather_warnings", {"county": "46"}) in calls
     population_calls = [a for t, a in calls if t == "statistics_get_data"]
     assert population_calls[0]["codelists"] == {"Region": "agg_KommSummer"}
@@ -310,7 +330,10 @@ async def test_compare_skips_duplicates_and_reports_failures(ctx, monkeypatch):
         "Stavanger": profile("1103", "Stavanger", 150000, 30000),
     }
 
+    asked = []
+
     async def fake(ctx, tool, arguments):
+        asked.append(arguments)
         name = arguments["municipality"]
         if name not in answers:
             return ToolError(ErrorCode.NOT_FOUND, f"No municipality is called '{name}'.")
@@ -320,6 +343,7 @@ async def test_compare_skips_duplicates_and_reports_failures(ctx, monkeypatch):
     result = await OPS["compare_municipalities"].invoke(
         ctx, {"municipalities": ["Stavanger", "Bergen", "1201", "Nowhere"]}
     )
+    assert {a.get("employer_accounts") for a in asked} == {False}
     rows = result["data"]["rows"]
     assert [r["code"] for r in rows] == ["4601", "1103"]
     assert rows[0]["companies_per_1000"] == 200.0

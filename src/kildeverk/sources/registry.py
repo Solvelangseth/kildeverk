@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from kildeverk.core.source import SourceSpec
+from kildeverk.sources.brreg.spec import ACCOUNTS as BRREG_ACCOUNTS
 from kildeverk.sources.brreg.spec import SPEC as BRREG
 from kildeverk.sources.datanorge.spec import SPEC as DATANORGE
 from kildeverk.sources.elhub.spec import SPEC as ELHUB
@@ -27,6 +28,7 @@ SOURCES: tuple[SourceSpec, ...] = (
     SSB_STATBANK,
     SSB_KLASS,
     BRREG,
+    BRREG_ACCOUNTS,
     MET_LOCATIONFORECAST,
     MET_FROST,
     MET_METALERTS,
@@ -49,6 +51,7 @@ SOURCES: tuple[SourceSpec, ...] = (
 def operations():
     # Imported late: handlers need Context, and Context needs SOURCES.
     from kildeverk.sources import cite, composite, meta
+    from kildeverk.sources.brreg.accounts import OPERATIONS as BRREG_ACCOUNTS_OPS
     from kildeverk.sources.brreg.ops import OPERATIONS as BRREG_OPS
     from kildeverk.sources.datanorge.ops import OPERATIONS as DATANORGE_OPS
     from kildeverk.sources.elhub.ops import OPERATIONS as ELHUB_OPS
@@ -71,6 +74,7 @@ def operations():
         *SSB_STATBANK_OPS,
         *SSB_KLASS_OPS,
         *BRREG_OPS,
+        *BRREG_ACCOUNTS_OPS,
         *MET_OPS,
         *MET_ALERT_OPS,
         *NVE_OPS,

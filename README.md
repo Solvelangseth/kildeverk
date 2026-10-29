@@ -1,7 +1,7 @@
 # Kildeverk
 
 Live Norwegian public data for AI agents and people. Kildeverk is an MCP server
-and a read-only JSON API over 19 official data services from 12 Norwegian publishers:
+and a read-only JSON API over 20 official data services from 12 Norwegian publishers:
 statistics, companies, weather, water, warnings, transport, maps, the sea, money,
 energy, parliament, roads and schools. Every result says exactly where it came from.
 
@@ -22,6 +22,7 @@ publishers whose data it reads.
 | [SSB Statbank](#ssb_statbank) | ✅ available | `statistics_search_tables`, `statistics_describe_table`, `statistics_get_data` |
 | [SSB Klass](#ssb_klass): regions and harmonisation across the 2020 and 2024 reforms | ✅ available | `regions_list`, `regions_resolve`, `regions_changes`, `regions_harmonise` |
 | [Brønnøysund Register Centre (Enhetsregisteret)](#brreg) | ✅ available | `companies_search`, `companies_get` |
+| [Regnskapsregisteret](#brreg_accounts): annual accounts | ✅ available | `companies_accounts` |
 | [MET Norway Locationforecast](#met_locationforecast) | ✅ available | `weather_forecast` |
 | [MET Norway MetAlerts](#met_metalerts): weather warnings | ✅ available | `weather_warnings` |
 | [MET Norway Frost](#met_frost): needs a free client id | ✅ available | `weather_find_stations`, `weather_station_elements`, `weather_observations` |
@@ -341,8 +342,41 @@ public bodies, together with their sub-units (establishments).
 - Industry codes are SN2025, which Brreg switched to in 2025, so SN2007 codes such as `62.010` no
   longer match. A two-digit division such as `62` does, and an empty result adds a note saying so.
 - One search pages through at most 10,000 results.
-- Financial statements, the register of beneficial owners and corporate group structure are not
-  included.
+- The register of beneficial owners and corporate group structure are not included. Annual
+  accounts are a separate source, [Regnskapsregisteret](#brreg_accounts).
+
+<a id="brreg_accounts"></a>
+### Regnskapsregisteret: annual accounts
+
+**What it covers:** key figures from the annual accounts Norwegian companies file with the
+Brønnøysund Register Centre.
+- `companies_accounts` gives, for one organisation number, the last three years' revenue, sales
+  revenue, operating costs, salary costs, operating profit, net financial items, profit before tax,
+  tax, net result, total, fixed and current assets, cash, equity and debt, with the operating
+  margin, the equity ratio and the change in revenue from the year before. It gives company
+  accounts and, for parent companies, group accounts, each with its currency, its accounting rules
+  (NGAAP, IFRS or simplified IFRS), and whether it was audited.
+- `municipality_profile` adds the latest revenue and net result to each of the largest employers.
+  `compare_municipalities` leaves this out to save calls.
+
+**Licence:** [NLOD 2.0](https://data.norge.no/nlod/en/2.0). data.norge.no lists the open API as the
+distribution "Nøkkeltall fra årsregnskapet" under NLOD 2.0
+([the catalogue entry](https://data.norge.no/datasets/8132460c-91ab-3950-a54b-a54ee20c62e9)).
+
+**Rate limits:** none published. Kildeverk spends at most 75 calls a minute.
+
+**Caching:** a day; accounts are filed once a year.
+
+**Behaviour worth knowing:**
+- Amounts are in the currency each company reports in. Equinor, for one, reports in USD; the
+  notes say so whenever a result is not in NOK.
+- Public bodies, sole proprietorships and others that do not file accounts have none. The error
+  says so and suggests `companies_get` instead.
+- Small companies may leave out lines such as sales revenue or tax; those fields are empty, not 0.
+
+**Known gaps:**
+- Only the last three years are open; Brreg sells older accounts.
+- Notes, the board's report, the auditor's report and cash flow are not in the open API.
 
 <a id="met_locationforecast"></a>
 ### MET Norway Locationforecast

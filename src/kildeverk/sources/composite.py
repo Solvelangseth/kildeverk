@@ -230,6 +230,10 @@ class MunicipalityProfileInput(BaseModel):
         max_length=60,
         description="A municipality code, old or current ('1201', '4601'), or a name ('Bergen').",
     )
+    employer_accounts: bool = Field(
+        default=True,
+        description="Give the largest employers' latest revenue and result (one call each).",
+    )
 
 
 class Population(BaseModel):
@@ -245,6 +249,10 @@ class Employer(BaseModel):
     name: str
     employees: int | None
     industry: str | None
+    accounts_year: int | None = None
+    revenue: float | None = Field(default=None, description="From its own latest accounts.")
+    net_result: float | None = None
+    currency: str | None = None
 
 
 class Schools(BaseModel):
@@ -448,6 +456,27 @@ async def municipality_profile(
         if isinstance(companies, dict)
         else []
     )
+    if args.employer_accounts and employers:
+        filed = await asyncio.gather(
+            *(
+                _part(ctx, "companies_accounts", {"org_number": e.org_number, "kind": "company"})
+                for e in employers
+            )
+        )
+        for employer, part in zip(employers, filed, strict=True):
+            if isinstance(part, ToolError) or not part["data"]["accounts"]:
+                continue
+            latest = part["data"]["accounts"][0]
+            employer.accounts_year = latest["year"]
+            employer.revenue = latest["revenue"]
+            employer.net_result = latest["net_result"]
+            employer.currency = latest["currency"]
+            provenance.extend(Provenance.model_validate(p) for p in part["provenance"])
+        if any(e.revenue is None for e in employers):
+            notes.append(
+                "Employers without revenue file no open accounts: public bodies, sole "
+                "proprietorships and the like."
+            )
     school_counts = None
     counts = [schools, primary, secondary, private]
     if all(isinstance(c, dict) for c in counts):
@@ -588,7 +617,10 @@ class CompareOutput(BaseModel):
 async def compare_municipalities(ctx: Context, args: CompareInput) -> Result[CompareOutput]:
     asked = list(dict.fromkeys(m.strip() for m in args.municipalities))
     profiles = await asyncio.gather(
-        *(_part(ctx, "municipality_profile", {"municipality": m}) for m in asked)
+        *(
+            _part(ctx, "municipality_profile", {"municipality": m, "employer_accounts": False})
+            for m in asked
+        )
     )
     rows: list[ComparedRow] = []
     failed: list[str] = []
@@ -609,7 +641,7 @@ async def compare_municipalities(ctx: Context, args: CompareInput) -> Result[Com
         notes.extend(
             f"{d['name']}: {n}"
             for n in profile["notes"]
-            if not n.startswith(("School counts", "Electricity is the last"))
+            if not n.startswith(("School counts", "Electricity is the last", "Employers without"))
         )
         people = d["population"] or {}
         companies = d["companies_registered"]
@@ -1279,8 +1311,9 @@ OPERATIONS = (
         description=(
             "One Norwegian municipality from several sources at once: population and how it "
             "changed (SSB), registered companies and the largest employers (Brønnøysund), "
-            "schools by level and ownership (Udir), traffic counting points (Statens vegvesen), "
-            "electricity use per inhabitant and installed production capacity over the last week "
+            "with their latest revenue and result (Regnskapsregisteret), schools by level and "
+            "ownership (Udir), traffic counting points (Statens vegvesen), electricity use per "
+            "inhabitant and installed production capacity over the last week "
             "(Elhub), and weather, flood and landslide warnings in force. Accepts today's code, a "
             "code from before the 2020 or 2024 reforms, or a name."
         ),
@@ -1296,6 +1329,7 @@ OPERATIONS = (
             "nve_varsom",
             "met_metalerts",
             "elhub",
+            "brreg_accounts",
         ),
         http_method="GET",
         http_path="/v1/municipalities/{municipality}/profile",

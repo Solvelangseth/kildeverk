@@ -276,6 +276,12 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ("parliament_members", {"period": "2021-2025", "party": "SV"}),
         ("parliament_members", {"period": "2025-2029"}),
     ],
+    "brreg_accounts": [
+        ("companies_accounts", {"org_number": "923609016"}),
+        ("companies_accounts", {"org_number": "983974899", "kind": "company", "year": 2025}),
+        ("companies_accounts", {"org_number": "932267624"}),
+        ("companies_accounts", {"org_number": "940101808"}),
+    ],
     "elhub": [
         (
             "electricity_municipality",

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- A new source, Regnskapsregisteret, with `companies_accounts`: the last three years' revenue,
+  results, assets, equity and debt for any company that files accounts, company and group, in the
+  currency it reports in, with operating margin, equity ratio and revenue change.
+  `municipality_profile` adds the latest revenue and result to its largest employers.
 - A new source, Elhub, with two tools. `electricity_municipality` gives a municipality's
   electricity use per day or hour by private, business and industry, and its installed production
   capacity by kind. `electricity_price_areas` gives consumption and production in NO1-NO5.
