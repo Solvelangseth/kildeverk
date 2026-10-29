@@ -1,7 +1,7 @@
 # Kildeverk
 
 Live Norwegian public data for AI agents and people. Kildeverk is an MCP server
-and a read-only JSON API over 26 official data services from 14 publishers, 13 of them Norwegian:
+and a read-only JSON API over 27 official data services from 15 publishers, 14 of them Norwegian:
 statistics, companies, weather, water, warnings, transport, maps, the sea, money,
 energy, parliament, roads and schools. Every result says exactly where it came from.
 
@@ -32,6 +32,7 @@ publishers whose data it reads.
 | [NVE HydAPI](#nve_hydapi): needs a free key | ✅ available | `water_find_stations`, `water_observations` |
 | [Entur Geocoder](#entur_geocoder): stop places | ✅ available | `transit_find_stops` |
 | [Entur Journey Planner](#entur_journeyplanner): departures | ✅ available | `transit_departures` |
+| [Avinor](#avinor): flight departures and arrivals | ✅ available | `flights_airport` |
 | [Kartverket](#kartverket): addresses, place names, elevation, municipality at a point | ✅ available | `addresses_search`, `places_search`, `terrain_elevation`, `regions_at_point` |
 | [Kartverket water level and tides](#kartverket_sea_level) | ✅ available | `sea_level` |
 | [Norges Bank](#norges_bank): exchange rates and the policy rate | ✅ available | `currency_exchange_rates`, `rates_policy_rate` |
@@ -635,6 +636,30 @@ identical questions costs one upstream call; the result says when it came from t
 **Known gaps:**
 - Journey planning from A to B is not exposed yet.
 - Groups of stop places (all of "Oslo", say) are not searched; use a stop place or a quay.
+
+<a id="avinor"></a>
+### Avinor flight data
+
+**What it covers:** `flights_airport` gives departures and arrivals at a Norwegian airport, from an
+hour ago to seven hours ahead by default (up to 24 hours either way): flight number, airline, the
+other airport and any stops, whether the flight is domestic, Schengen or international, the
+scheduled time, the new or actual time with the delay in minutes, gate, check-in, baggage belt, and
+whether it is delayed or cancelled. It takes an IATA code or the airport's name, and filters by
+direction, the other airport or a flight number.
+
+**Licence:** Avinor's own terms: "We do not impose any limitations on how data is used", within
+Norwegian law, and Avinor may end access for uses that harm its reputation
+([terms](https://partner.avinor.no/en/services/flight-data/)). Content must be labelled "Flight
+data from Avinor", linked to avinor.no and close to the data; every result carries that label.
+
+**Rate limits:** Avinor asks that flight times be fetched at most every three minutes and cached,
+and that end users never reach its service directly. Kildeverk caches flight times for three
+minutes and the airport, airline and status names for a day, and spends at most 20 calls a minute.
+
+**Behaviour worth knowing:** the feed is ISO-8859-1 XML. Times are UTC.
+
+**Known gaps:** only airports in Avinor's feed (Avinor's own and some others, such as Sandefjord
+Torp). Avinor gives no guarantee that the content is complete or up to date.
 
 <a id="kartverket"></a>
 ### Kartverket: addresses, place names and elevation

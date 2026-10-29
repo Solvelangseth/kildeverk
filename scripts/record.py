@@ -325,6 +325,11 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ("dictionary_lookup", {"word": "fjrod"}),
         ("dictionary_lookup", {"word": "spring*", "dictionary": "bm", "limit": 2}),
     ],
+    "avinor": [
+        ("flights_airport", {"airport": "BGO", "direction": "departures"}),
+        ("flights_airport", {"airport": "Tromsø", "other_airport": "OSL", "hours_ahead": 12}),
+        ("flights_airport", {"airport": "Narnia"}),
+    ],
     "usgs_earthquakes": [
         (
             "hazards_earthquakes",

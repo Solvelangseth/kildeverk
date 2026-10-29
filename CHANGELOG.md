@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- A new source, Avinor: `flights_airport` gives departures and arrivals at a Norwegian airport,
+  with delays, gates and baggage belts, labelled "Flight data from Avinor" as Avinor requires.
+- Test recordings keep non-UTF-8 bodies (Avinor's ISO-8859-1 XML) in their own encoding.
 - A new source, Ordbøkene: `dictionary_lookup` looks a word up in Bokmålsordboka and
   Nynorskordboka, with meanings, examples, inflection, word class and origin.
 - A new source, Regobs: `hazards_field_observations` gives field observations of avalanches,

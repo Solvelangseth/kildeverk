@@ -42,7 +42,7 @@ GUIDE = """# Choosing a Kildeverk tool
 - **Air and sea:** `air_quality_forecast`; `sea_forecast` for waves and sea temperature.
 - **Electricity:** `electricity_municipality` for use and installed capacity in a municipality;
   `electricity_price_areas` for consumption and production in NO1-NO5.
-- **Getting around:** `transit_find_stops`, then `transit_departures`; `traffic_find_points`, then
+- **Getting around:** `transit_find_stops`, then `transit_departures`; `flights_airport` for flights; `traffic_find_points`, then
   `traffic_volumes` for road traffic.
 - **Maps:** `addresses_search`, `places_search`, `terrain_elevation`, `regions_at_point`.
 - **Money:** `currency_exchange_rates`, `rates_policy_rate`.

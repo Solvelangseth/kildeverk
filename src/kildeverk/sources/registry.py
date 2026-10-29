@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from kildeverk.core.source import SourceSpec
+from kildeverk.sources.avinor.spec import SPEC as AVINOR
 from kildeverk.sources.brreg.spec import ACCOUNTS as BRREG_ACCOUNTS
 from kildeverk.sources.brreg.spec import SPEC as BRREG
 from kildeverk.sources.datanorge.spec import SPEC as DATANORGE
@@ -57,12 +58,14 @@ SOURCES: tuple[SourceSpec, ...] = (
     UDIR_NSR,
     USGS_EARTHQUAKES,
     ORDBOKENE,
+    AVINOR,
 )
 
 
 def operations():
     # Imported late: handlers need Context, and Context needs SOURCES.
     from kildeverk.sources import cite, composite, meta
+    from kildeverk.sources.avinor.ops import OPERATIONS as AVINOR_OPS
     from kildeverk.sources.brreg.accounts import OPERATIONS as BRREG_ACCOUNTS_OPS
     from kildeverk.sources.brreg.ops import OPERATIONS as BRREG_OPS
     from kildeverk.sources.datanorge.ops import OPERATIONS as DATANORGE_OPS
@@ -111,6 +114,7 @@ def operations():
         *UDIR_NSR_OPS,
         *USGS_OPS,
         *ORDBOKENE_OPS,
+        *AVINOR_OPS,
         *composite.OPERATIONS,
         *cite.OPERATIONS,
         *meta.OPERATIONS,

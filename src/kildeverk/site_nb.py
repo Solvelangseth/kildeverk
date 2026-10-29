@@ -287,6 +287,26 @@ SOURCES: dict[str, SourceText] = {
             "Avganger mellomlagres i 30 sekunder",
         ],
     ),
+    "avinor": SourceText(
+        "Avinor flydata",
+        "Avinor AS",
+        [
+            (
+                "Avganger og ankomster på norske flyplasser fra en time siden til flere timer frem: "
+                "flynummer, flyselskap, den andre flyplassen og mellomlandinger, rutetid og ny "
+                "eller faktisk tid, gate, innsjekk, bagasjebånd, og om flyet er forsinket eller "
+                "innstilt"
+            ),
+        ],
+        [
+            (
+                "Bare flyplasser i Avinors strøm: Avinors egne og noen andre, som Sandefjord Torp; "
+                "en flyplass utenfor gir ingen fly"
+            ),
+            "Tidene er høyst tre minutter gamle, etter Avinors egen regel",
+            "Avinor garanterer ikke at innholdet er fullstendig eller oppdatert",
+        ],
+    ),
     "kartverket": SourceText(
         "Kartverket: adresser, stedsnavn og høyde",
         "Kartverket",
@@ -708,6 +728,10 @@ TOOLS: dict[str, ToolText] = {
         "Neste buss, tog, trikk, T-bane eller ferje fra en holdeplass, med sanntid, forsinkelser "
         "og avvik.",
     ),
+    "flights_airport": ToolText(
+        "Fly på en flyplass",
+        "Avganger og ankomster med tider, forsinkelser, gate og bagasjebånd, fra Avinor.",
+    ),
     "traffic_find_points": ToolText(
         "Finn trafikktellepunkter",
         "Statens vegvesens tellepunkter etter navn, kommune, vei eller avstand.",
@@ -845,8 +869,14 @@ THEMES: list[tuple[str, str, list[str]]] = [
     ),
     (
         "Reise og trafikk",
-        "Kollektivtrafikk fra Entur og veitrafikk fra Statens vegvesen.",
-        ["transit_find_stops", "transit_departures", "traffic_find_points", "traffic_volumes"],
+        "Kollektivtrafikk fra Entur, fly fra Avinor og veitrafikk fra Statens vegvesen.",
+        [
+            "transit_find_stops",
+            "transit_departures",
+            "flights_airport",
+            "traffic_find_points",
+            "traffic_volumes",
+        ],
     ),
     (
         "Virksomheter og skoler",
@@ -900,6 +930,7 @@ PUBLISHERS: dict[str, str] = {
     "Norwegian Directorate for Education and Training (Udir)": "Udir",
     "Elhub AS": "Elhub",
     "U.S. Geological Survey (USGS)": "USGS",
+    "Avinor AS": "Avinor",
     "University of Bergen and the Language Council of Norway (Språkrådet)": "UiB og Språkrådet",
 }
 

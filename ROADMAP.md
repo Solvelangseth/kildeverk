@@ -158,7 +158,7 @@ must be read in full before building.
       FDSN event service, no key, at most 20,000 events per query
       (https://earthquake.usgs.gov/fdsnws/event/1/). **S**, low risk. NNSN's Norwegian catalogue
       would be better for small Norwegian events, but its licence is unclear (below).
-- [ ] **Avinor flight data** (`avinor_flights`): departures and arrivals at Avinor's 43 airports.
+- [x] **Avinor flight data** (`avinor`, built 2026-10-29): departures and arrivals at Avinor's 43 airports.
       "We do not impose any limitations on how data is used". Label the content "Flight data from
       Avinor" with a link to avinor.no, fetch flight times at most every 3 minutes, and cache.
       Avinor may end access if a use harms its reputation. No key

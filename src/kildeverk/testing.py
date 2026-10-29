@@ -28,14 +28,23 @@ class RecordingTransport(httpx.AsyncBaseTransport):
     async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
         response = await self._inner.handle_async_request(request)
         content = await response.aread()
+        # Kept as readable text in the body's own encoding (Avinor's XML is ISO-8859-1), and
+        # encoded back the same way on replay.
+        try:
+            text, encoding = content.decode(), "utf-8"
+        except UnicodeDecodeError:
+            encoding = response.charset_encoding or "iso-8859-1"
+            text = content.decode(encoding)
         exchange = {
             "method": request.method,
             "url": str(request.url),
             "body": request.content.decode() if request.content else "",
             "status": response.status_code,
             "headers": {k: v for k, v in response.headers.items() if k.lower() in _KEPT_HEADERS},
-            "response": content.decode(),
+            "response": text,
         }
+        if encoding != "utf-8":
+            exchange["encoding"] = encoding
         if exchange not in self.exchanges:
             self.exchanges.append(exchange)
         # The body is already decoded, so the encoding headers no longer describe it.
@@ -72,6 +81,6 @@ class ReplayTransport(httpx.AsyncBaseTransport):
         return httpx.Response(
             exchange["status"],
             headers=exchange["headers"],
-            content=exchange["response"].encode(),
+            content=exchange["response"].encode(exchange.get("encoding", "utf-8")),
             request=request,
         )
