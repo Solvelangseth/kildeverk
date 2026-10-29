@@ -174,7 +174,7 @@ must be read in full before building.
       "Bokmålsordboka/Nynorskordboka, Universitetet i Bergen og Språkrådet, ordbøkene.no, CC-BY
       4.0" (https://www.uib.no/en/node/182212). No key. **S**, low risk. Only a modest fit, but very
       clean.
-- [ ] **World Bank indicators** (`worldbank`): country indicators (GDP, population, emissions)
+- [x] **World Bank indicators** (`worldbank_wdi`, built 2026-10-29; WDI only): country indicators (GDP, population, emissions)
       for international comparisons. The default licence is CC BY 4.0. Some datasets carry their
       own terms, which the module must pass on
       (https://datacatalog.worldbank.org/public-licenses). No key. **S**, low risk.

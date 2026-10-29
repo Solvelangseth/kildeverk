@@ -31,6 +31,7 @@ GUIDE = """# Choosing a Kildeverk tool
   `statistics_describe_table` for codes, then `statistics_get_data`. For one region over time,
   `statistics_series` does it in one call and keeps the series unbroken across the reforms. To
   find the highest, lowest or fastest-growing regions, `statistics_rank`.
+- **Norway against other countries:** `world_indicators` (World Bank).
 - **A company:** `companies_search`, then `companies_get`; `companies_accounts` for revenue
   and results.
 - **Weather:** `weather_nowcast` for rain in the next two hours; `weather_forecast` ahead;

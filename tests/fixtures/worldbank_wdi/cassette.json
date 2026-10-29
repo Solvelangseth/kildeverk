@@ -1,0 +1,302 @@
+[
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/indicator/NY.GDP.PCAP.CD?format=json",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 06:30:09 GMT",
+   "last-modified": "Thu, 29 Oct 2026 05:21:34 GMT"
+  },
+  "response": "[{\"page\":1,\"pages\":1,\"per_page\":\"50\",\"total\":1},[{\"id\":\"NY.GDP.PCAP.CD\",\"name\":\"GDP per capita (current US$)\",\"unit\":\"\",\"source\":{\"id\":\"2\",\"value\":\"World Development Indicators\"},\"sourceNote\":\"Gross domestic product is the total income earned through the production of goods and services in an economic territory during an accounting period. It can be measured in three different ways: using either the expenditure approach, the income approach, or the production approach. The core indicator has been divided by the general population to achieve a per capita estimate.This indicator is expressed in current prices, meaning no adjustment has been made to account for price changes over time. This indicator is expressed in United States dollars.\",\"sourceOrganization\":\"Country official statistics, National Statistical Organizations and\\/or Central Banks;\\u000aNational Accounts data files, Organisation for Economic Co-operation and Development (OECD);\\u000aStaff estimates, World Bank (WB)\",\"topics\":[{\"id\":\"3\",\"value\":\"Economy & Growth\"}]}]]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/country/NOR;SWE;DNK;FIN;ISL/indicator/NY.GDP.PCAP.CD?format=json&per_page=1000&mrnev=1",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 17:35:42 GMT",
+   "last-modified": "Thu, 29 Oct 2026 17:34:33 GMT"
+  },
+  "response": "[{\"page\":1,\"pages\":1,\"per_page\":1000,\"total\":5,\"sourceid\":null,\"lastupdated\":\"2026-10-08\"},[{\"indicator\":{\"id\":\"NY.GDP.PCAP.CD\",\"value\":\"GDP per capita (current US$)\"},\"country\":{\"id\":\"DK\",\"value\":\"Denmark\"},\"countryiso3code\":\"DNK\",\"date\":\"2025\",\"value\":76970.1535217919,\"obs_status\":\"\",\"decimal\":1},{\"indicator\":{\"id\":\"NY.GDP.PCAP.CD\",\"value\":\"GDP per capita (current US$)\"},\"country\":{\"id\":\"FI\",\"value\":\"Finland\"},\"countryiso3code\":\"FIN\",\"date\":\"2025\",\"value\":56148.580949046,\"obs_status\":\"\",\"decimal\":1},{\"indicator\":{\"id\":\"NY.GDP.PCAP.CD\",\"value\":\"GDP per capita (current US$)\"},\"country\":{\"id\":\"IS\",\"value\":\"Iceland\"},\"countryiso3code\":\"ISL\",\"date\":\"2025\",\"value\":98323.4849517418,\"obs_status\":\"\",\"decimal\":1},{\"indicator\":{\"id\":\"NY.GDP.PCAP.CD\",\"value\":\"GDP per capita (current US$)\"},\"country\":{\"id\":\"NO\",\"value\":\"Norway\"},\"countryiso3code\":\"NOR\",\"date\":\"2025\",\"value\":94594.1929573987,\"obs_status\":\"\",\"decimal\":1},{\"indicator\":{\"id\":\"NY.GDP.PCAP.CD\",\"value\":\"GDP per capita (current US$)\"},\"country\":{\"id\":\"SE\",\"value\":\"Sweden\"},\"countryiso3code\":\"SWE\",\"date\":\"2025\",\"value\":63133.2126736715,\"obs_status\":\"\",\"decimal\":1}]]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/indicator/SP.DYN.LE00.IN?format=json",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 03:32:37 GMT",
+   "last-modified": "Wed, 28 Oct 2026 05:09:56 GMT"
+  },
+  "response": "[{\"page\":1,\"pages\":1,\"per_page\":\"50\",\"total\":1},[{\"id\":\"SP.DYN.LE00.IN\",\"name\":\"Life expectancy at birth, total (years)\",\"unit\":\"\",\"source\":{\"id\":\"2\",\"value\":\"World Development Indicators\"},\"sourceNote\":\"Life expectancy at birth indicates the number of years a newborn infant would live if prevailing patterns of mortality at the time of its birth were to stay the same throughout its life.\",\"sourceOrganization\":\"World Population Prospects, United Nations (UN), uri: UN Population Division;\\u000aStatistical databases and publications from national statistical offices, National Statistical Offices (NSOs), note: Derived from male and female life expectancy at birth from sources such as statistical databases and publications from national statistical offices.;\\u000aDemographic Statistics, Eurostat (ESTAT), note: Derived from male and female life expectancy at birth from sources such as Eurostat: Demographic Statistics.\",\"topics\":[{\"id\":\"8\",\"value\":\"Health \"}]}]]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/country/NOR;WLD;EUU/indicator/SP.DYN.LE00.IN?format=json&per_page=1000&date=2015%3A2020",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 17:35:42 GMT",
+   "last-modified": "Thu, 29 Oct 2026 17:34:35 GMT"
+  },
+  "response": "[{\"page\":1,\"pages\":1,\"per_page\":1000,\"total\":18,\"sourceid\":\"2\",\"lastupdated\":\"2026-10-08\"},[{\"indicator\":{\"id\":\"SP.DYN.LE00.IN\",\"value\":\"Life expectancy at birth, total (years)\"},\"country\":{\"id\":\"EU\",\"value\":\"European Union\"},\"countryiso3code\":\"EUU\",\"date\":\"2020\",\"value\":80.4414754678551,\"unit\":\"\",\"obs_status\":\"\",\"decimal\":0},{\"indicator\":{\"id\":\"SP.DYN.LE00.IN\",\"value\":\"Life expectancy at birth, total (years)\"},\"country\":{\"id\":\"EU\",\"value\":\"European Union\"},\"countryiso3code\":\"EUU\",\"date\":\"2019\",\"value\":81.3194524901834,\"unit\":\"\",\"obs_status\":\"\",\"decimal\":0},{\"indicator\":{\"id\":\"SP.DYN.LE00.IN\",\"value\":\"Life expectancy at birth, total (years)\"},\"country\":{\"id\":\"EU\",\"value\":\"European Union\"},\"countryiso3code\":\"EUU\",\"date\":\"2018\",\"value\":81.0303425240609,\"unit\":\"\",\"obs_status\":\"\",\"decimal\":0},{\"indicator\":{\"id\":\"SP.DYN.LE00.IN\",\"value\":\"Life expectancy at birth, total (years)\"},\"country\":{\"id\":\"EU\",\"value\":\"European Union\"},\"countryiso3code\":\"EUU\",\"date\":\"2017\",\"value\":80.9301511681956,\"unit\":\"\",\"obs_status\":\"\",\"decimal\":0},{\"indicator\":{\"id\":\"SP.DYN.LE00.IN\",\"value\":\"Life expectancy at birth, total (years)\"},\"country\":{\"id\":\"EU\",\"value\":\"European Union\"},\"countryiso3code\":\"EUU\",\"date\":\"2016\",\"value\":80.9529785979391,\"unit\":\"\",\"obs_status\":\"\",\"decimal\":0},{\"indicator\":{\"id\":\"SP.DYN.LE00.IN\",\"value\":\"Life expectancy at birth, total (years)\"},\"country\":{\"id\":\"EU\",\"value\":\"European Union\"},\"countryiso3code\":\"EUU\",\"date\":\"2015\",\"value\":80.5707965259,\"unit\":\"\",\"obs_status\":\"\",\"decimal\":0},{\"indicator\":{\"id\":\"SP.DYN.LE00.IN\",\"value\":\"Life expectancy at birth, total (years)\"},\"country\":{\"id\":\"NO\",\"value\":\"Norway\"},\"countryiso3code\":\"NOR\",\"date\":\"2020\",\"value\":83.209756097561,\"unit\":\"\",\"obs_status\":\"\",\"decimal\":0},{\"indicator\":{\"id\":\"SP.DYN.LE00.IN\",\"value\":\"Life expectancy at birth, total (years)\"},\"country\":{\"id\":\"NO\",\"value\":\"Norway\"},\"countryiso3code\":\"NOR\",\"date\":\"2019\",\"value\":82.9585365853659,\"unit\":\"\",\"obs_status\":\"\",\"decimal\":0},{\"indicator\":{\"id\":\"SP.DYN.LE00.IN\",\"value\":\"Life expectancy at birth, total (years)\"},\"country\":{\"id\":\"NO\",\"value\":\"Norway\"},\"countryiso3code\":\"NOR\",\"date\":\"2018\",\"value\":82.7585365853659,\"unit\":\"\",\"obs_status\":\"\",\"decimal\":0},{\"indicator\":{\"id\":\"SP.DYN.LE00.IN\",\"value\":\"Life expectancy at birth, total (years)\"},\"country\":{\"id\":\"NO\",\"value\":\"Norway\"},\"countryiso3code\":\"NOR\",\"date\":\"2017\",\"value\":82.609756097561,\"unit\":\"\",\"obs_status\":\"\",\"decimal\":0},{\"indicator\":{\"id\":\"SP.DYN.LE00.IN\",\"value\":\"Life expectancy at birth, total (years)\"},\"country\":{\"id\":\"NO\",\"value\":\"Norway\"},\"countryiso3code\":\"NOR\",\"date\":\"2016\",\"value\":82.4073170731707,\"unit\":\"\",\"obs_status\":\"\",\"decimal\":0},{\"indicator\":{\"id\":\"SP.DYN.LE00.IN\",\"value\":\"Life expectancy at birth, total (years)\"},\"country\":{\"id\":\"NO\",\"value\":\"Norway\"},\"countryiso3code\":\"NOR\",\"date\":\"2015\",\"value\":82.3048780487805,\"unit\":\"\",\"obs_status\":\"\",\"decimal\":0},{\"indicator\":{\"id\":\"SP.DYN.LE00.IN\",\"value\":\"Life expectancy at birth, total (years)\"},\"country\":{\"id\":\"1W\",\"value\":\"World\"},\"countryiso3code\":\"WLD\",\"date\":\"2020\",\"value\":72.1832040176208,\"unit\":\"\",\"obs_status\":\"\",\"decimal\":0},{\"indicator\":{\"id\":\"SP.DYN.LE00.IN\",\"value\":\"Life expectancy at birth, total (years)\"},\"country\":{\"id\":\"1W\",\"value\":\"World\"},\"countryiso3code\":\"WLD\",\"date\":\"2019\",\"value\":72.869911203356,\"unit\":\"\",\"obs_status\":\"\",\"decimal\":0},{\"indicator\":{\"id\":\"SP.DYN.LE00.IN\",\"value\":\"Life expectancy at birth, total (years)\"},\"country\":{\"id\":\"1W\",\"value\":\"World\"},\"countryiso3code\":\"WLD\",\"date\":\"2018\",\"value\":72.6442408544831,\"unit\":\"\",\"obs_status\":\"\",\"decimal\":0},{\"indicator\":{\"id\":\"SP.DYN.LE00.IN\",\"value\":\"Life expectancy at birth, total (years)\"},\"country\":{\"id\":\"1W\",\"value\":\"World\"},\"countryiso3code\":\"WLD\",\"date\":\"2017\",\"value\":72.3662967648278,\"unit\":\"\",\"obs_status\":\"\",\"decimal\":0},{\"indicator\":{\"id\":\"SP.DYN.LE00.IN\",\"value\":\"Life expectancy at birth, total (years)\"},\"country\":{\"id\":\"1W\",\"value\":\"World\"},\"countryiso3code\":\"WLD\",\"date\":\"2016\",\"value\":72.1858228976021,\"unit\":\"\",\"obs_status\":\"\",\"decimal\":0},{\"indicator\":{\"id\":\"SP.DYN.LE00.IN\",\"value\":\"Life expectancy at birth, total (years)\"},\"country\":{\"id\":\"1W\",\"value\":\"World\"},\"countryiso3code\":\"WLD\",\"date\":\"2015\",\"value\":71.9656376386893,\"unit\":\"\",\"obs_status\":\"\",\"decimal\":0}]]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/indicator/EN.ATM.CO2E.PC?format=json",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 06:03:11 GMT",
+   "last-modified": "Wed, 28 Oct 2026 07:20:20 GMT"
+  },
+  "response": "[{\"page\":1,\"pages\":1,\"per_page\":\"50\",\"total\":1},[{\"id\":\"EN.ATM.CO2E.PC\",\"name\":\"CO2 emissions (metric tons per capita)\",\"unit\":\"\",\"source\":{\"id\":\"57\",\"value\":\"WDI Database Archives\"},\"sourceNote\":\"Carbon dioxide emissions are those stemming from the burning of fossil fuels and the manufacture of cement. They include carbon dioxide produced during consumption of solid, liquid, and gas fuels and gas flaring.\",\"sourceOrganization\":\"Emissions data are sourced from Climate Watch Historical GHG Emissions (1990-2020). 2023. Washington, DC: World Resources Institute. Available online at: https:\\/\\/www.climatewatchdata.org\\/ghg-emissions\",\"topics\":[{\"id\":\"19\",\"value\":\"Climate Change\"},{\"id\":\"6\",\"value\":\"Environment \"}]}]]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/country/NOR;SWE;DNK;FIN;ISL/indicator/EN.ATM.CO2E.PC?format=json&per_page=1000&mrnev=1",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 17:35:42 GMT",
+   "last-modified": "Thu, 29 Oct 2026 17:34:36 GMT"
+  },
+  "response": "[{\"message\":[{\"id\":\"175\",\"key\":\"Invalid format\",\"value\":\"The indicator was not found. It may have been deleted or archived.\"}]}]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/country/SWE/indicator/EN.ATM.CO2E.PC?format=json&per_page=1000&mrnev=1",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 17:35:43 GMT",
+   "last-modified": "Thu, 29 Oct 2026 17:35:43 GMT"
+  },
+  "response": "[{\"message\":[{\"id\":\"175\",\"key\":\"Invalid format\",\"value\":\"The indicator was not found. It may have been deleted or archived.\"}]}]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/country/NOR/indicator/EN.ATM.CO2E.PC?format=json&per_page=1000&mrnev=1",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 17:35:43 GMT",
+   "last-modified": "Thu, 29 Oct 2026 17:35:43 GMT"
+  },
+  "response": "[{\"message\":[{\"id\":\"175\",\"key\":\"Invalid format\",\"value\":\"The indicator was not found. It may have been deleted or archived.\"}]}]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/country/FIN/indicator/EN.ATM.CO2E.PC?format=json&per_page=1000&mrnev=1",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 17:35:43 GMT",
+   "last-modified": "Thu, 29 Oct 2026 17:35:43 GMT"
+  },
+  "response": "[{\"message\":[{\"id\":\"175\",\"key\":\"Invalid format\",\"value\":\"The indicator was not found. It may have been deleted or archived.\"}]}]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/country/DNK/indicator/EN.ATM.CO2E.PC?format=json&per_page=1000&mrnev=1",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 17:35:43 GMT",
+   "last-modified": "Thu, 29 Oct 2026 17:35:43 GMT"
+  },
+  "response": "[{\"message\":[{\"id\":\"175\",\"key\":\"Invalid format\",\"value\":\"The indicator was not found. It may have been deleted or archived.\"}]}]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/country/ISL/indicator/EN.ATM.CO2E.PC?format=json&per_page=1000&mrnev=1",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 17:35:43 GMT",
+   "last-modified": "Thu, 29 Oct 2026 17:35:43 GMT"
+  },
+  "response": "[{\"message\":[{\"id\":\"175\",\"key\":\"Invalid format\",\"value\":\"The indicator was not found. It may have been deleted or archived.\"}]}]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/indicator/XX.FAKE?format=json",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 17:35:44 GMT",
+   "last-modified": "Thu, 29 Oct 2026 17:34:36 GMT"
+  },
+  "response": "[{\"message\":[{\"id\":\"120\",\"key\":\"Invalid value\",\"value\":\"The provided parameter value is not valid\"}]}]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/country/NOR;SWE;DNK;FIN;ISL/indicator/XX.FAKE?format=json&per_page=1000&mrnev=1",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 17:35:45 GMT",
+   "last-modified": "Thu, 29 Oct 2026 17:34:36 GMT"
+  },
+  "response": "[{\"message\":[{\"id\":\"120\",\"key\":\"Invalid value\",\"value\":\"The provided parameter value is not valid\"}]}]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/country/NOR/indicator/XX.FAKE?format=json&per_page=1000&mrnev=1",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 17:35:46 GMT",
+   "last-modified": "Thu, 29 Oct 2026 17:35:46 GMT"
+  },
+  "response": "[{\"message\":[{\"id\":\"120\",\"key\":\"Invalid value\",\"value\":\"The provided parameter value is not valid\"}]}]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/country/SWE/indicator/XX.FAKE?format=json&per_page=1000&mrnev=1",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 17:35:47 GMT",
+   "last-modified": "Thu, 29 Oct 2026 17:35:47 GMT"
+  },
+  "response": "[{\"message\":[{\"id\":\"120\",\"key\":\"Invalid value\",\"value\":\"The provided parameter value is not valid\"}]}]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/country/DNK/indicator/XX.FAKE?format=json&per_page=1000&mrnev=1",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 17:35:48 GMT",
+   "last-modified": "Thu, 29 Oct 2026 17:35:48 GMT"
+  },
+  "response": "[{\"message\":[{\"id\":\"120\",\"key\":\"Invalid value\",\"value\":\"The provided parameter value is not valid\"}]}]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/country/FIN/indicator/XX.FAKE?format=json&per_page=1000&mrnev=1",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 17:35:50 GMT",
+   "last-modified": "Thu, 29 Oct 2026 17:35:50 GMT"
+  },
+  "response": "[{\"message\":[{\"id\":\"120\",\"key\":\"Invalid value\",\"value\":\"The provided parameter value is not valid\"}]}]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/country/ISL/indicator/XX.FAKE?format=json&per_page=1000&mrnev=1",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 17:35:50 GMT",
+   "last-modified": "Thu, 29 Oct 2026 17:35:50 GMT"
+  },
+  "response": "[{\"message\":[{\"id\":\"120\",\"key\":\"Invalid value\",\"value\":\"The provided parameter value is not valid\"}]}]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/indicator/SP.POP.TOTL?format=json",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 14:31:30 GMT",
+   "last-modified": "Thu, 29 Oct 2026 07:50:37 GMT"
+  },
+  "response": "[{\"page\":1,\"pages\":1,\"per_page\":\"50\",\"total\":1},[{\"id\":\"SP.POP.TOTL\",\"name\":\"Population, total\",\"unit\":\"\",\"source\":{\"id\":\"2\",\"value\":\"World Development Indicators\"},\"sourceNote\":\"Total population is based on the de facto definition of population, which counts all residents regardless of legal status or citizenship. The values shown are midyear estimates.\",\"sourceOrganization\":\"World Population Prospects, United Nations (UN), uri: https:\\/\\/population.un.org\\/wpp\\/, publisher: UN Population Division;\\u000aStatistical databases and publications from national statistical offices, National Statistical Offices (NSOs), uri: https:\\/\\/unstats.un.org\\/home\\/nso_sites\\/, publisher: National Statistical Offices;\\u000aEurostat: Demographic Statistics, Eurostat (ESTAT), uri: https:\\/\\/ec.europa.eu\\/eurostat\\/data\\/database?node_code=earn_ses_monthly, publisher: Eurostat;\\u000aPopulation and Vital Statistics Report (various years), United Nations (UN), uri: https:\\/\\/unstats.un.org, publisher: UN Statistics Division\",\"topics\":[{\"id\":\"19\",\"value\":\"Climate Change\"},{\"id\":\"8\",\"value\":\"Health \"}]}]]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/country/SE;NO;ZZZ/indicator/SP.POP.TOTL?format=json&per_page=1000&mrnev=1",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 17:35:52 GMT",
+   "last-modified": "Thu, 29 Oct 2026 17:35:10 GMT"
+  },
+  "response": "[{\"message\":[{\"id\":\"120\",\"key\":\"Invalid value\",\"value\":\"The provided parameter value is not valid\"}]}]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/country/SE/indicator/SP.POP.TOTL?format=json&per_page=1000&mrnev=1",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 17:35:53 GMT",
+   "last-modified": "Thu, 29 Oct 2026 17:35:23 GMT"
+  },
+  "response": "[{\"page\":1,\"pages\":1,\"per_page\":1000,\"total\":1,\"sourceid\":null,\"lastupdated\":\"2026-10-08\"},[{\"indicator\":{\"id\":\"SP.POP.TOTL\",\"value\":\"Population, total\"},\"country\":{\"id\":\"SE\",\"value\":\"Sweden\"},\"countryiso3code\":\"SWE\",\"date\":\"2025\",\"value\":10596620,\"obs_status\":\"\",\"decimal\":0}]]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/country/NO/indicator/SP.POP.TOTL?format=json&per_page=1000&mrnev=1",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 17:35:54 GMT",
+   "last-modified": "Thu, 29 Oct 2026 17:35:15 GMT"
+  },
+  "response": "[{\"page\":1,\"pages\":1,\"per_page\":1000,\"total\":1,\"sourceid\":null,\"lastupdated\":\"2026-10-08\"},[{\"indicator\":{\"id\":\"SP.POP.TOTL\",\"value\":\"Population, total\"},\"country\":{\"id\":\"NO\",\"value\":\"Norway\"},\"countryiso3code\":\"NOR\",\"date\":\"2025\",\"value\":5610870,\"obs_status\":\"\",\"decimal\":0}]]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/country/ZZZ/indicator/SP.POP.TOTL?format=json&per_page=1000&mrnev=1",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 17:35:55 GMT",
+   "last-modified": "Thu, 29 Oct 2026 17:34:55 GMT"
+  },
+  "response": "[{\"message\":[{\"id\":\"120\",\"key\":\"Invalid value\",\"value\":\"The provided parameter value is not valid\"}]}]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/indicator/SI.POV.GINI?format=json",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 15:45:08 GMT",
+   "last-modified": "Thu, 29 Oct 2026 08:54:31 GMT"
+  },
+  "response": "[{\"page\":1,\"pages\":1,\"per_page\":\"50\",\"total\":1},[{\"id\":\"SI.POV.GINI\",\"name\":\"Gini index\",\"unit\":\"\",\"source\":{\"id\":\"2\",\"value\":\"World Development Indicators\"},\"sourceNote\":\"Gini index measures the extent to which the distribution of income (or, in some cases, consumption expenditure) among individuals or households within an economy deviates from a perfectly equal distribution. A Lorenz curve plots the cumulative percentages of total income received against the cumulative number of recipients, starting with the poorest individual or household. The Gini index measures the area between the Lorenz curve and a hypothetical line of absolute equality, expressed as a percentage of the maximum area under the line. Thus a Gini index of 0 represents perfect equality, while an index of 100 implies perfect inequality.\",\"sourceOrganization\":\"World Bank, Poverty and Inequality Platform. Data are based on primary household survey data obtained from government statistical agencies and World Bank country departments. Data for high-income economies are mostly from the Luxembourg Income Study database. For more information and methodology, please see http:\\/\\/pip.worldbank.org., World Bank (WB), uri: http:\\/\\/pip.worldbank.org, note: Data are based on primary household survey data obtained from government statistical agencies and World Bank country departments. Data for high-income economies are mostly from the Luxembourg Income Study database.\",\"topics\":[{\"id\":\"11\",\"value\":\"Poverty \"}]}]]"
+ },
+ {
+  "method": "GET",
+  "url": "https://api.worldbank.org/v2/country/NOR;SWE/indicator/SI.POV.GINI?format=json&per_page=1000&date=2024%3A2025",
+  "body": "",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8",
+   "expires": "Fri, 30 Oct 2026 17:35:57 GMT",
+   "last-modified": "Thu, 29 Oct 2026 17:34:56 GMT"
+  },
+  "response": "[{\"page\":1,\"pages\":1,\"per_page\":1000,\"total\":4,\"sourceid\":\"2\",\"lastupdated\":\"2026-10-08\"},[{\"indicator\":{\"id\":\"SI.POV.GINI\",\"value\":\"Gini index\"},\"country\":{\"id\":\"NO\",\"value\":\"Norway\"},\"countryiso3code\":\"NOR\",\"date\":\"2025\",\"value\":null,\"unit\":\"\",\"obs_status\":\"\",\"decimal\":1},{\"indicator\":{\"id\":\"SI.POV.GINI\",\"value\":\"Gini index\"},\"country\":{\"id\":\"NO\",\"value\":\"Norway\"},\"countryiso3code\":\"NOR\",\"date\":\"2024\",\"value\":null,\"unit\":\"\",\"obs_status\":\"\",\"decimal\":1},{\"indicator\":{\"id\":\"SI.POV.GINI\",\"value\":\"Gini index\"},\"country\":{\"id\":\"SE\",\"value\":\"Sweden\"},\"countryiso3code\":\"SWE\",\"date\":\"2025\",\"value\":null,\"unit\":\"\",\"obs_status\":\"\",\"decimal\":1},{\"indicator\":{\"id\":\"SI.POV.GINI\",\"value\":\"Gini index\"},\"country\":{\"id\":\"SE\",\"value\":\"Sweden\"},\"countryiso3code\":\"SWE\",\"date\":\"2024\",\"value\":null,\"unit\":\"\",\"obs_status\":\"\",\"decimal\":1}]]"
+ }
+]

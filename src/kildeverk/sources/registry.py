@@ -30,6 +30,7 @@ from kildeverk.sources.stortinget.spec import SPEC as STORTINGET
 from kildeverk.sources.udir_nsr.spec import SPEC as UDIR_NSR
 from kildeverk.sources.usgs.spec import SPEC as USGS_EARTHQUAKES
 from kildeverk.sources.vegvesen_traffic.spec import SPEC as VEGVESEN_TRAFFIC
+from kildeverk.sources.worldbank.spec import SPEC as WORLDBANK
 
 SOURCES: tuple[SourceSpec, ...] = (
     SSB_STATBANK,
@@ -59,6 +60,7 @@ SOURCES: tuple[SourceSpec, ...] = (
     USGS_EARTHQUAKES,
     ORDBOKENE,
     AVINOR,
+    WORLDBANK,
 )
 
 
@@ -89,6 +91,7 @@ def operations():
     from kildeverk.sources.udir_nsr.ops import OPERATIONS as UDIR_NSR_OPS
     from kildeverk.sources.usgs.ops import OPERATIONS as USGS_OPS
     from kildeverk.sources.vegvesen_traffic.ops import OPERATIONS as VEGVESEN_TRAFFIC_OPS
+    from kildeverk.sources.worldbank.ops import OPERATIONS as WORLDBANK_OPS
 
     return (
         *SSB_STATBANK_OPS,
@@ -115,6 +118,7 @@ def operations():
         *USGS_OPS,
         *ORDBOKENE_OPS,
         *AVINOR_OPS,
+        *WORLDBANK_OPS,
         *composite.OPERATIONS,
         *cite.OPERATIONS,
         *meta.OPERATIONS,

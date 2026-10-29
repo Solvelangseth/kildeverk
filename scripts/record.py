@@ -330,6 +330,25 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ("flights_airport", {"airport": "Tromsø", "other_airport": "OSL", "hours_ahead": 12}),
         ("flights_airport", {"airport": "Narnia"}),
     ],
+    "worldbank_wdi": [
+        ("world_indicators", {"indicator": "gdp_per_capita"}),
+        (
+            "world_indicators",
+            {
+                "indicator": "SP.DYN.LE00.IN",
+                "countries": ["NOR", "WLD", "EUU"],
+                "from_year": 2015,
+                "to_year": 2020,
+            },
+        ),
+        ("world_indicators", {"indicator": "EN.ATM.CO2E.PC"}),
+        ("world_indicators", {"indicator": "XX.FAKE"}),
+        ("world_indicators", {"indicator": "population", "countries": ["SE", "NO", "ZZZ"]}),
+        (
+            "world_indicators",
+            {"indicator": "gini", "countries": ["NOR", "SWE"], "from_year": 2024, "to_year": 2025},
+        ),
+    ],
     "usgs_earthquakes": [
         (
             "hazards_earthquakes",

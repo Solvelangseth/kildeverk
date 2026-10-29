@@ -1,7 +1,7 @@
 # Kildeverk
 
 Live Norwegian public data for AI agents and people. Kildeverk is an MCP server
-and a read-only JSON API over 27 official data services from 15 publishers, 14 of them Norwegian:
+and a read-only JSON API over 28 official data services from 16 publishers, 14 of them Norwegian:
 statistics, companies, weather, water, warnings, transport, maps, the sea, money,
 energy, parliament, roads and schools. Every result says exactly where it came from.
 
@@ -46,6 +46,7 @@ publishers whose data it reads.
 | [National School Register](#udir_nsr) | ✅ available | `schools_search`, `schools_get` |
 | [Ordbøkene](#ordbokene): Bokmålsordboka and Nynorskordboka | ✅ available | `dictionary_lookup` |
 | [USGS Earthquake Catalog](#usgs_earthquakes) | ✅ available | `hazards_earthquakes` |
+| [World Bank World Development Indicators](#worldbank_wdi) | ✅ available | `world_indicators` |
 
 Three tools combine sources. `place_overview` takes a coordinate and returns its municipality and
 county, elevation, the weather now and over the next six hours, weather, flood and landslide
@@ -1092,6 +1093,30 @@ asks for one event more than the limit, to say whether there are more.
   Norwegian National Seismic Network records the smaller Norwegian ones, but its licence is unclear,
   so it is not used.
 - Recent events are automatic estimates at first and can be revised.
+
+
+<a id="worldbank_wdi"></a>
+### World Bank World Development Indicators
+
+**What it covers:** `world_indicators` gives one of the World Bank's World Development Indicators for
+Norway and other countries or regions (`WLD` for the world, `EUU` for the EU, `OED` for the OECD):
+each country's latest value, ranked, or every year in a range. It takes a WDI code or a common name
+(`gdp_per_capita`, `life_expectancy`, `co2_per_capita`, `renewable_energy_share`,
+`unemployment`, …), and by default compares the Nordic countries. The result carries the World
+Bank's definition of the indicator.
+
+**Licence:** the World Development Indicators are [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+([catalogue entry](https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators)).
+Other World Bank datasets can carry other licences, so an indicator from any other source (such as
+the WDI archives) is refused, with the current WDI indicator suggested where there is one.
+
+**Rate limits:** none published. Kildeverk spends at most 60 calls a minute.
+
+**Behaviour worth knowing:** one unknown country code makes the World Bank reject a whole request,
+so Kildeverk then asks country by country and reports only the unknown codes.
+
+**Known gaps:** yearly figures, often a year or two behind; no search, so give a code or a common
+name.
 
 ## Deploy your own
 

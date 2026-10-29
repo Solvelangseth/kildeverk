@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- A new source, the World Bank's World Development Indicators: `world_indicators` compares Norway
+  with other countries and regions on GDP, life expectancy, emissions and the rest.
 - A new source, Avinor: `flights_airport` gives departures and arrivals at a Norwegian airport,
   with delays, gates and baggage belts, labelled "Flight data from Avinor" as Avinor requires.
 - Test recordings keep non-UTF-8 bodies (Avinor's ISO-8859-1 XML) in their own encoding.

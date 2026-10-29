@@ -287,6 +287,25 @@ SOURCES: dict[str, SourceText] = {
             "Avganger mellomlagres i 30 sekunder",
         ],
     ),
+    "worldbank_wdi": SourceText(
+        "Verdensbankens utviklingsindikatorer",
+        "Verdensbanken",
+        [
+            (
+                "World Development Indicators for alle land og regioner: BNP, folketall, "
+                "levealder, arbeidsledighet, inflasjon, utslipp, energi, helse, utdanning og rundt "
+                "1 400 til, år for år, for å sammenligne Norge med andre land"
+            ),
+        ],
+        [
+            (
+                "Bare World Development Indicators: andre datasett fra Verdensbanken kan ha andre "
+                "lisenser, så indikatorer derfra avvises"
+            ),
+            "Årlige tall; siste år ligger ofte ett eller to år tilbake",
+            "Ikke søk: oppgi en indikatorkode eller et av de vanlige navnene verktøyet lister",
+        ],
+    ),
     "avinor": SourceText(
         "Avinor flydata",
         "Avinor AS",
@@ -608,6 +627,10 @@ TOOLS: dict[str, ToolText] = {
         "Alle kommuner eller fylker rangert på én statistikk, eller på endringen siden et "
         "tidligere år.",
     ),
+    "world_indicators": ToolText(
+        "Norge mot andre land",
+        "Verdensbankens indikatorer, som BNP per innbygger og levealder, for Norge og andre land.",
+    ),
     "regions_list": ToolText(
         "List kommuner eller fylker",
         "Alle kommuner eller fylker med nummer og navn, i dag eller på en dato siden 1960.",
@@ -813,13 +836,14 @@ THEMES: list[tuple[str, str, list[str]]] = [
     ),
     (
         "Statistikk",
-        "Alt SSB publiserer i Statistikkbanken.",
+        "Alt SSB publiserer i Statistikkbanken, og Verdensbanken for andre land.",
         [
             "statistics_search_tables",
             "statistics_describe_table",
             "statistics_get_data",
             "statistics_series",
             "statistics_rank",
+            "world_indicators",
         ],
     ),
     (
@@ -931,6 +955,7 @@ PUBLISHERS: dict[str, str] = {
     "Elhub AS": "Elhub",
     "U.S. Geological Survey (USGS)": "USGS",
     "Avinor AS": "Avinor",
+    "The World Bank": "Verdensbanken",
     "University of Bergen and the Language Council of Norway (Språkrådet)": "UiB og Språkrådet",
 }
 
