@@ -132,7 +132,7 @@ must be read in full before building.
 - [x] **Frost climate normals** (`weather_normals`, built 2026-10-29): 1991–2020 normals for a station, so an agent can
       say whether a month was warm or wet. Uses the Frost credential the service already has, so
       no new owner action. CC BY 4.0 as above. **S**.
-- [ ] **NVE Regobs** (`nve_regobs`): field observations of avalanches, landslides, floods and
+- [x] **NVE Regobs** (`nve_regobs`, built 2026-10-29): field observations of avalanches, landslides, floods and
       ice, by area and date. Pairs with the `nve_varsom` warnings. Data on api.nve.no is NLOD.
       Credit Regobs and the observer's username (https://api.nve.no/doc/regobs/). Search needs no
       key. The API announces shutdown dates in a `Sunset` header, which the module should show in

@@ -1,7 +1,7 @@
 # Kildeverk
 
 Live Norwegian public data for AI agents and people. Kildeverk is an MCP server
-and a read-only JSON API over 24 official data services from 13 publishers, 12 of them Norwegian:
+and a read-only JSON API over 25 official data services from 13 publishers, 12 of them Norwegian:
 statistics, companies, weather, water, warnings, transport, maps, the sea, money,
 energy, parliament, roads and schools. Every result says exactly where it came from.
 
@@ -36,6 +36,7 @@ publishers whose data it reads.
 | [Kartverket water level and tides](#kartverket_sea_level) | ✅ available | `sea_level` |
 | [Norges Bank](#norges_bank): exchange rates and the policy rate | ✅ available | `currency_exchange_rates`, `rates_policy_rate` |
 | [NVE Varsom](#nve_varsom): flood, landslide and avalanche warnings | ✅ available | `hazards_flood_landslide`, `hazards_avalanche` |
+| [Regobs](#nve_regobs): field observations of avalanches, landslides, floods and ice | ✅ available | `hazards_field_observations` |
 | [data.norge.no](#datanorge): the national data catalogue | ✅ available | `catalog_search` |
 | [NVE reservoir statistics](#nve_reservoirs): hydropower reservoir fill | ✅ available | `energy_reservoirs` |
 | [Elhub](#elhub): electricity consumption and production | ✅ available | `electricity_municipality`, `electricity_price_areas` |
@@ -761,6 +762,33 @@ level you ask for.
 - Warnings are forecasts. NVE gives no guarantee of timeliness, so check varsom.no before acting.
 - Municipality and county codes must be current (since 2024). [SSB Klass](#ssb_klass) can map older
   codes.
+
+<a id="nve_regobs"></a>
+### Regobs: field observations
+
+**What it covers:** Regobs is the observation system behind varsom.no, where NVE's observers and
+the public report what they see on the ground. `hazards_field_observations` returns observations
+near a point of snow and avalanches, landslides, floods and ice: time, place, municipality and
+forecasting region, height, the observer's username and competence level, a short text for each
+kind of observation (avalanche activity, danger signs, snow cover, landslides, water level, ice
+thickness and more), the number of pictures, and a link to the observation on regobs.no. Newest
+first; by default the last two weeks within 20 km.
+
+**Licence:** [NLOD](https://data.norge.no/nlod/en/2.0), as stated in
+[NVE's Regobs API documentation](https://api.nve.no/doc/regobs/). Regobs requires that Regobs.no
+and each observer's username are credited, and every result's notes say so.
+
+**Rate limits:** none published. Kildeverk spends at most 30 calls a minute; each search is two
+calls, one for the observations and one for the total count.
+
+**Privacy:**
+- Usernames are returned because the licence requires crediting them; nothing else about observers
+  is. A username that is an e-mail address is cut (`ola@nve.no` becomes `ola@nve`) so that it
+  credits the observer without publishing an address.
+- Pictures are counted, not returned, and the test fixtures drop them along with observer ids.
+
+**Known gaps:** observations are what people report, published as they are. Texts are in the
+observer's language and shortened past 600 characters; the link has the full observation.
 
 <a id="datanorge"></a>
 ### data.norge.no: the national data catalogue

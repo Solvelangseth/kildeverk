@@ -19,6 +19,7 @@ from kildeverk.sources.met.spec import NOWCAST as MET_NOWCAST
 from kildeverk.sources.met.spec import OCEANFORECAST as MET_OCEANFORECAST
 from kildeverk.sources.norges_bank.spec import SPEC as NORGES_BANK
 from kildeverk.sources.nve_hydapi.spec import SPEC as NVE_HYDAPI
+from kildeverk.sources.nve_regobs.spec import SPEC as NVE_REGOBS
 from kildeverk.sources.nve_reservoirs.spec import SPEC as NVE_RESERVOIRS
 from kildeverk.sources.nve_varsom.spec import SPEC as NVE_VARSOM
 from kildeverk.sources.ssb_klass.spec import SPEC as SSB_KLASS
@@ -45,6 +46,7 @@ SOURCES: tuple[SourceSpec, ...] = (
     KARTVERKET,
     NORGES_BANK,
     NVE_VARSOM,
+    NVE_REGOBS,
     DATANORGE,
     KARTVERKET_SEA,
     NVE_RESERVOIRS,
@@ -72,6 +74,7 @@ def operations():
     from kildeverk.sources.met.products import OPERATIONS as MET_PRODUCT_OPS
     from kildeverk.sources.norges_bank.ops import OPERATIONS as NORGES_BANK_OPS
     from kildeverk.sources.nve_hydapi.ops import OPERATIONS as NVE_OPS
+    from kildeverk.sources.nve_regobs.ops import OPERATIONS as NVE_REGOBS_OPS
     from kildeverk.sources.nve_reservoirs.ops import OPERATIONS as NVE_RESERVOIRS_OPS
     from kildeverk.sources.nve_varsom.ops import OPERATIONS as NVE_VARSOM_OPS
     from kildeverk.sources.ssb_klass.ops import OPERATIONS as SSB_KLASS_OPS
@@ -95,6 +98,7 @@ def operations():
         *KARTVERKET_OPS,
         *NORGES_BANK_OPS,
         *NVE_VARSOM_OPS,
+        *NVE_REGOBS_OPS,
         *DATANORGE_OPS,
         *KARTVERKET_SEA_OPS,
         *NVE_RESERVOIRS_OPS,

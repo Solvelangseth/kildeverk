@@ -350,6 +350,28 @@ SOURCES: dict[str, SourceText] = {
             ),
         ],
     ),
+    "nve_regobs": SourceText(
+        "Regobs feltobservasjoner",
+        "Norges vassdrags- og energidirektorat (NVE), via regobs.no",
+        [
+            (
+                "Feltobservasjoner av snø og snøskred, jordskred, flom og is fra Regobs, systemet "
+                "bak varsom.no: hva NVEs observatører og publikum har sett, hvor og når"
+            ),
+            (
+                "Hver observasjons tekst (skredaktivitet, faretegn, snødekke, istykkelse, vannstand "
+                "og mer), sted og kommune, observatørens brukernavn og kompetanse, og en lenke"
+            ),
+        ],
+        [
+            "Observasjonene er det folk melder inn; Regobs publiserer dem som de er",
+            "Bilder telles og lenkes via observasjonens side, men returneres ikke",
+            (
+                "Regobs krever at observatøren krediteres med brukernavn, så det returneres; et "
+                "brukernavn som er en e-postadresse, kuttes så det ikke lenger er en"
+            ),
+        ],
+    ),
     "datanorge": SourceText(
         "data.norge.no",
         "Digitaliseringsdirektoratet (Digdir)",
@@ -638,6 +660,10 @@ TOOLS: dict[str, ToolText] = {
         "Jordskjelv nær et punkt",
         "Jordskjelv fra USGS med tid, styrke, dybde og avstand, de nyeste eller de største først.",
     ),
+    "hazards_field_observations": ToolText(
+        "Feltobservasjoner av skred, flom og is",
+        "Hva folk har sett i terrenget: skredaktivitet, faretegn, jordskred, vannstand og is.",
+    ),
     "hazards_avalanche": ToolText(
         "Snøskredvarsler",
         "Faregrad, skredproblemer og råd for hver varslingsregion.",
@@ -790,6 +816,7 @@ THEMES: list[tuple[str, str, list[str]]] = [
             "hazards_flood_landslide",
             "hazards_avalanche",
             "hazards_earthquakes",
+            "hazards_field_observations",
         ],
     ),
     (
@@ -838,6 +865,7 @@ PUBLISHERS: dict[str, str] = {
     "Norwegian Meteorological Institute (MET Norway)": "Meteorologisk institutt",
     "Norwegian Water Resources and Energy Directorate (NVE)": "NVE",
     "Norwegian Water Resources and Energy Directorate (NVE), via varsom.no": "NVE (varsom.no)",
+    "Norwegian Water Resources and Energy Directorate (NVE), via regobs.no": "NVE (regobs.no)",
     "Entur AS": "Entur",
     "Norwegian Mapping Authority (Kartverket)": "Kartverket",
     "Norwegian Mapping Authority, Hydrographic Service (Kartverket)": "Kartverket",

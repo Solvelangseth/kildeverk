@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- A new source, Regobs: `hazards_field_observations` gives field observations of avalanches,
+  landslides, floods and ice near a point, crediting each observer by username as Regobs requires.
 - A first source from outside Norway: `hazards_earthquakes`, earthquakes near a point from the
   U.S. Geological Survey's catalogue (public domain).
 - `weather_normals`: a station's 30-year climate normals from Frost, and how each month of a

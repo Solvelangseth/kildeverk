@@ -282,6 +282,43 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ("weather_normals", {"station": "SN50540", "year": 2025, "period": "1961/1990"}),
         ("weather_normals", {"station": "SN18700", "year": 1900}),
     ],
+    "nve_regobs": [
+        (
+            "hazards_field_observations",
+            {
+                "lat": 69.65,
+                "lon": 18.95,
+                "radius_km": 30,
+                "hazards": ["snow"],
+                "start": "2026-03-01",
+                "end": "2026-03-31",
+                "limit": 3,
+            },
+        ),
+        (
+            "hazards_field_observations",
+            {
+                "lat": 61.1,
+                "lon": 10.4,
+                "hazards": ["flood", "landslide"],
+                "start": "2023-08-06",
+                "end": "2023-08-12",
+                "radius_km": 50,
+                "limit": 3,
+            },
+        ),
+        (
+            "hazards_field_observations",
+            {
+                "lat": 59.91,
+                "lon": 10.75,
+                "radius_km": 1,
+                "hazards": ["ice"],
+                "start": "2026-07-01",
+                "end": "2026-07-31",
+            },
+        ),
+    ],
     "usgs_earthquakes": [
         (
             "hazards_earthquakes",
@@ -441,6 +478,8 @@ SCRUB = {
     "brreg": {"telefon", "mobil", "epostadresse"},
     "stortinget": {"epost", "foedselsdato", "doedsdato", "respons_dato_tid", "versjon"},
     "met_metalerts": {"geometry", "resources"},
+    # Pictures carry photographers' names; observer ids are not needed.
+    "nve_regobs": {"Attachments", "AttachmentSummaries", "ObserverID", "ObserverGUID"},
 }
 
 
@@ -460,8 +499,23 @@ def _elhub_midnights(url: str, body):
     return body
 
 
+def _regobs_usernames(url: str, body):
+    # Usernames that are e-mail addresses are cut in the fixtures too.
+    from kildeverk.sources.nve_regobs.ops import credit_name
+
+    for item in body if isinstance(body, list) else []:
+        for holder in (item, item.get("Observer") or {}):
+            if "NickName" in holder:
+                holder["NickName"] = credit_name(holder["NickName"])
+    return body
+
+
 # Whole-response trims, for responses too large to keep in full.
-TRIM = {"nve_reservoirs": _reservoir_years, "elhub": _elhub_midnights}
+TRIM = {
+    "nve_regobs": _regobs_usernames,
+    "nve_reservoirs": _reservoir_years,
+    "elhub": _elhub_midnights,
+}
 
 # Sources whose tools also call other sources: only their own host is recorded, since the
 # other sources' recordings already hold the rest.
