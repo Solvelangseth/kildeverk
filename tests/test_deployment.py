@@ -85,4 +85,18 @@ def test_site_lists_every_source_and_tool(tmp_path: Path):
     assert 'data-tool="place_overview"' in html
     assert html.count('class="ghost cite" hidden') == len(operations())
     assert 'id="feed-form"' in html
-    assert html.count('class="panel recipe"') >= 3 and 'id="recipes"' in html
+    assert html.count('class="card recipe"') >= 3 and 'id="eksempler"' in html
+    assert '<html lang="nb">' in html and "@@" not in html
+
+
+def test_site_has_norwegian_text_for_every_source_and_tool():
+    from kildeverk import site_nb
+    from kildeverk.sources.registry import SOURCES, operations
+
+    names = {op.name for op in operations()}
+    assert {spec.id for spec in SOURCES} == set(site_nb.SOURCES)
+    assert names == set(site_nb.TOOLS)
+    themed = [name for _, _, group in site_nb.THEMES for name in group]
+    assert sorted(themed) == sorted(names), "each tool belongs to exactly one theme on the site"
+    publishers = {spec.publisher for spec in SOURCES}
+    assert publishers <= set(site_nb.PUBLISHERS)

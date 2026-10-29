@@ -1,14 +1,16 @@
 {
- "built_at": "2026-10-28T15:54+00:00",
+ "built_at": "2026-10-29T15:17+00:00",
  "recipes": [
   {
    "question": "What is it like at this spot in central Bergen right now?",
+   "question_nb": "Hvordan er det på dette stedet i Bergen sentrum akkurat nå?",
    "tool": "place_overview",
    "arguments": {
     "lat": 60.3913,
     "lon": 5.3221
    },
-   "answer": "The point is in Bergen (Vestland), 4 m above sea level. It is 11 °C with wind of 2 m/s, and no rain is expected in the next six hours. No warnings are in force. The nearest stop is Olav Kyrres gate, 144 m away.",
+   "answer": "The point is in Bergen (Vestland), 4 m above sea level. It is 13 °C with wind of 1 m/s, and no rain is expected in the next six hours. No warnings are in force. The nearest stop is Olav Kyrres gate, 144 m away.",
+   "answer_nb": "Punktet ligger i Bergen (Vestland), 4 meter over havet. Det er 13 °C og 1 m/s vind, og det ventes ikke nedbør de neste seks timene. Ingen farevarsler gjelder. Nærmeste holdeplass er Olav Kyrres gate, 144 meter unna.",
    "sources": [
     {
      "publisher": "Entur AS",
@@ -31,6 +33,7 @@
   },
   {
    "question": "Which municipalities have grown fastest since 2015?",
+   "question_nb": "Hvilke kommuner har vokst mest siden 2015?",
    "tool": "statistics_rank",
    "arguments": {
     "table_id": "07459",
@@ -39,6 +42,7 @@
     "limit": 5
    },
    "answer": "Among municipalities with at least 10 000 people, the fastest growing from 2015 to 2026 were Lørenskog (+47%), Nannestad (+40%), Ullensaker (+38%). Norway as a whole grew 8.9%.",
+   "answer_nb": "Blant kommuner med minst 10 000 innbyggere vokste disse mest fra 2015 til 2026: Lørenskog (+47 %), Nannestad (+40 %) og Ullensaker (+38 %). Landet som helhet vokste 8,9 %.",
    "sources": [
     {
      "publisher": "Statistics Norway (SSB)",
@@ -49,6 +53,7 @@
   },
   {
    "question": "How has Tromsø's population changed since 2010, across the reforms?",
+   "question_nb": "Hvordan har folketallet i Tromsø endret seg siden 2010, gjennom reformene?",
    "tool": "statistics_series",
    "arguments": {
     "table_id": "07459",
@@ -56,6 +61,7 @@
     "from_year": 2010
    },
    "answer": "Tromsø had 67 305 inhabitants in 2010 and 79 943 in 2026, up 18.8%, counted within today's borders across the 2020 and 2024 reforms.",
+   "answer_nb": "Tromsø hadde 67 305 innbyggere i 2010 og 79 943 i 2026, en økning på 18,8 %, regnet innenfor dagens grenser gjennom reformene i 2020 og 2024.",
    "sources": [
     {
      "publisher": "Statistics Norway (SSB)",
@@ -66,11 +72,13 @@
   },
   {
    "question": "How did the parties vote on the proposal to curb energy prices?",
+   "question_nb": "Hvordan stemte partiene over forslaget om å dempe energiprisene?",
    "tool": "parliament_case",
    "arguments": {
     "case_id": 200084
    },
    "answer": "Representantforslag om tiltak for å dempe økte energipriser og levekostnader: the vote ended 68–29, adopted. Parties mostly voting against: FrP.",
+   "answer_nb": "Representantforslag om tiltak for å dempe økte energipriser og levekostnader: voteringen endte 68–29, og forslaget ble vedtatt. Partier som for det meste stemte imot: FrP.",
    "sources": [
     {
      "publisher": "Stortinget (the Norwegian parliament)",
@@ -81,6 +89,7 @@
   },
   {
    "question": "How do Bergen, Trondheim and Stavanger compare?",
+   "question_nb": "Hvordan står Bergen, Trondheim og Stavanger seg mot hverandre?",
    "tool": "compare_municipalities",
    "arguments": {
     "municipalities": [
@@ -90,6 +99,7 @@
     ]
    },
    "answer": "Bergen: 294 860 people (+6.3% since 2016), 198 companies per 1 000. Trondheim - Tråante: 218 460 people (+12.9% since 2016), 192 companies per 1 000. Stavanger: 151 669 people (+7.8% since 2016), 192 companies per 1 000.",
+   "answer_nb": "Bergen: 294 860 innbyggere (+6,3 % siden 2016), 198 foretak per 1 000. Trondheim - Tråante: 218 460 innbyggere (+12,9 % siden 2016), 192 foretak per 1 000. Stavanger: 151 669 innbyggere (+7,8 % siden 2016), 192 foretak per 1 000.",
    "sources": [
     {
      "publisher": "Brønnøysund Register Centre (Brønnøysundregistrene)",

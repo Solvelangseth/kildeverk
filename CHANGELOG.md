@@ -3,6 +3,9 @@
 ## Unreleased
 
 - The hosted service is live at https://kildeverk.fly.dev (MCP at `/mcp`).
+- The website is in Norwegian and redesigned: a getting-started panel per client, example
+  questions to copy, the recipes in Norwegian, tools grouped by theme with search, and code and
+  result boxes that wrap and grow instead of scrolling. The tools stay in English.
 - The container starts as root only to take ownership of the mounted cache volume, then runs the
   service as an unprivileged user.
 
