@@ -25,6 +25,7 @@ from kildeverk.sources.ssb_klass.spec import SPEC as SSB_KLASS
 from kildeverk.sources.ssb_statbank.spec import SPEC as SSB_STATBANK
 from kildeverk.sources.stortinget.spec import SPEC as STORTINGET
 from kildeverk.sources.udir_nsr.spec import SPEC as UDIR_NSR
+from kildeverk.sources.usgs.spec import SPEC as USGS_EARTHQUAKES
 from kildeverk.sources.vegvesen_traffic.spec import SPEC as VEGVESEN_TRAFFIC
 
 SOURCES: tuple[SourceSpec, ...] = (
@@ -51,6 +52,7 @@ SOURCES: tuple[SourceSpec, ...] = (
     STORTINGET,
     VEGVESEN_TRAFFIC,
     UDIR_NSR,
+    USGS_EARTHQUAKES,
 )
 
 
@@ -76,6 +78,7 @@ def operations():
     from kildeverk.sources.ssb_statbank.ops import OPERATIONS as SSB_STATBANK_OPS
     from kildeverk.sources.stortinget.ops import OPERATIONS as STORTINGET_OPS
     from kildeverk.sources.udir_nsr.ops import OPERATIONS as UDIR_NSR_OPS
+    from kildeverk.sources.usgs.ops import OPERATIONS as USGS_OPS
     from kildeverk.sources.vegvesen_traffic.ops import OPERATIONS as VEGVESEN_TRAFFIC_OPS
 
     return (
@@ -99,6 +102,7 @@ def operations():
         *STORTINGET_OPS,
         *VEGVESEN_TRAFFIC_OPS,
         *UDIR_NSR_OPS,
+        *USGS_OPS,
         *composite.OPERATIONS,
         *cite.OPERATIONS,
         *meta.OPERATIONS,

@@ -1,7 +1,7 @@
 # Kildeverk
 
 Live Norwegian public data for AI agents and people. Kildeverk is an MCP server
-and a read-only JSON API over 23 official data services from 12 Norwegian publishers:
+and a read-only JSON API over 24 official data services from 13 publishers, 12 of them Norwegian:
 statistics, companies, weather, water, warnings, transport, maps, the sea, money,
 energy, parliament, roads and schools. Every result says exactly where it came from.
 
@@ -42,6 +42,7 @@ publishers whose data it reads.
 | [Stortinget](#stortinget): cases, votes and members | ✅ available | `parliament_cases`, `parliament_case`, `parliament_members` |
 | [Statens vegvesen traffic data](#vegvesen_traffic) | ✅ available | `traffic_find_points`, `traffic_volumes` |
 | [National School Register](#udir_nsr) | ✅ available | `schools_search`, `schools_get` |
+| [USGS Earthquake Catalog](#usgs_earthquakes) | ✅ available | `hazards_earthquakes` |
 
 Three tools combine sources. `place_overview` takes a coordinate and returns its municipality and
 county, elevation, the weather now and over the next six hours, weather, flood and landslide
@@ -990,6 +991,30 @@ private, and Norwegian schools abroad.
 - Pupil numbers are the register's latest figure, not a time series.
 
 <a id="deploy-your-own"></a>
+
+<a id="usgs_earthquakes"></a>
+### USGS Earthquake Catalog
+
+**What it covers:** `hazards_earthquakes` gives earthquakes near a point from the U.S. Geological
+Survey's worldwide catalogue: time, magnitude and its type, depth, place, distance from the point,
+whether USGS has reviewed the event, how many people reported feeling it, and the event page. By
+default the last year within 500 km and magnitude 2.5 and up, newest first; it can order by
+magnitude instead.
+
+**Licence:** USGS-produced data are in the U.S. public domain; USGS asks for credit to the U.S.
+Geological Survey ([copyrights and credits](https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits)).
+
+**Rate limits:** at most 20,000 events per query. Kildeverk spends at most 60 calls a minute and
+asks for one event more than the limit, to say whether there are more.
+
+**Caching:** searches ending in the last 30 days for 10 minutes; older ones for a day.
+
+**Known gaps:**
+- Outside the United States the catalogue misses many earthquakes below about magnitude 4. The
+  Norwegian National Seismic Network records the smaller Norwegian ones, but its licence is unclear,
+  so it is not used.
+- Recent events are automatic estimates at first and can be revised.
+
 ## Deploy your own
 
 The service is one process with one SQLite cache, so it runs on one small machine. The

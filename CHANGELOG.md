@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- A first source from outside Norway: `hazards_earthquakes`, earthquakes near a point from the
+  U.S. Geological Survey's catalogue (public domain).
 - `weather_normals`: a station's 30-year climate normals from Frost, and how each month of a
   given year compared with them.
 - Three more MET Norway products: `weather_nowcast` (radar precipitation every five minutes for the

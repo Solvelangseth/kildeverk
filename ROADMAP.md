@@ -151,7 +151,7 @@ must be read in full before building.
       countries, are non-commercial only
       (https://ec.europa.eu/eurostat/web/main/help/copyright-notice). No key. **M** (SDMX and
       JSON-stat; flag third-party datasets), low risk.
-- [ ] **USGS earthquakes** (`usgs_quakes`): recent and historical earthquakes near a point or in
+- [x] **USGS earthquakes** (`usgs_earthquakes`, built 2026-10-29): recent and historical earthquakes near a point or in
       a box, a natural addition to the warnings. "USGS-authored or produced data and information
       are considered to be in the U.S. Public Domain", and credit to "U.S. Geological Survey" is
       requested (https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits).

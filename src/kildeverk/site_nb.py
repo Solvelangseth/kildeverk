@@ -492,6 +492,25 @@ SOURCES: dict[str, SourceText] = {
             "Resultater, lærertetthet og annen skolestatistikk er ikke med",
         ],
     ),
+    "usgs_earthquakes": SourceText(
+        "USGS jordskjelvkatalog",
+        "U.S. Geological Survey (USGS)",
+        [
+            (
+                "Jordskjelv i hele verden fra USGS-katalogen, nær et hvilket som helst punkt: tid, "
+                "styrke, dybde, sted, om USGS har kontrollert det, hvor mange som meldte at de "
+                "kjente det, og en lenke til hendelsen"
+            ),
+        ],
+        [
+            (
+                "Utenfor USA mangler katalogen mange skjelv under omtrent styrke 4; Norsk "
+                "Nasjonalt Seismisk Nettverk registrerer de mindre norske, men lisensen er uklar, "
+                "så det brukes ikke"
+            ),
+            "Nye hendelser er automatiske anslag først og kan bli endret",
+        ],
+    ),
 }
 
 
@@ -614,6 +633,10 @@ TOOLS: dict[str, ToolText] = {
     "hazards_flood_landslide": ToolText(
         "Flom- og jordskredvarsler",
         "NVEs varsler fra varsom.no for landet, et fylke eller en kommune.",
+    ),
+    "hazards_earthquakes": ToolText(
+        "Jordskjelv nær et punkt",
+        "Jordskjelv fra USGS med tid, styrke, dybde og avstand, de nyeste eller de største først.",
     ),
     "hazards_avalanche": ToolText(
         "Snøskredvarsler",
@@ -757,7 +780,7 @@ THEMES: list[tuple[str, str, list[str]]] = [
     ),
     (
         "Vann, energi og naturfare",
-        "Elver, magasiner, strøm, flom, jordskred og snøskred fra NVE og Elhub.",
+        "Elver, magasiner, strøm, flom, skred og jordskjelv fra NVE, Elhub og USGS.",
         [
             "water_find_stations",
             "water_observations",
@@ -766,6 +789,7 @@ THEMES: list[tuple[str, str, list[str]]] = [
             "electricity_price_areas",
             "hazards_flood_landslide",
             "hazards_avalanche",
+            "hazards_earthquakes",
         ],
     ),
     (
@@ -823,6 +847,7 @@ PUBLISHERS: dict[str, str] = {
     "Norwegian Public Roads Administration (Statens vegvesen)": "Statens vegvesen",
     "Norwegian Directorate for Education and Training (Udir)": "Udir",
     "Elhub AS": "Elhub",
+    "U.S. Geological Survey (USGS)": "USGS",
 }
 
 LICENCES: dict[str, str] = {"not-stated": "ingen lisens oppgitt"}

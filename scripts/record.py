@@ -282,6 +282,36 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ("weather_normals", {"station": "SN50540", "year": 2025, "period": "1961/1990"}),
         ("weather_normals", {"station": "SN18700", "year": 1900}),
     ],
+    "usgs_earthquakes": [
+        (
+            "hazards_earthquakes",
+            {
+                "lat": 60.4,
+                "lon": 5.3,
+                "radius_km": 300,
+                "start": "2000-01-01",
+                "end": "2025-12-31",
+                "min_magnitude": 4,
+                "order": "magnitude",
+                "limit": 5,
+            },
+        ),
+        (
+            "hazards_earthquakes",
+            {"lat": 66.9, "lon": 13.6, "start": "2025-10-01", "end": "2026-10-01"},
+        ),
+        (
+            "hazards_earthquakes",
+            {
+                "lat": 59.9,
+                "lon": 10.7,
+                "radius_km": 10,
+                "start": "2025-01-01",
+                "end": "2025-12-31",
+                "min_magnitude": 5,
+            },
+        ),
+    ],
     "met_nowcast": [
         ("weather_nowcast", {"lat": 60.3913, "lon": 5.3221}),
         ("weather_nowcast", {"lat": 78.22, "lon": 15.65}),

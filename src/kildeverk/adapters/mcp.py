@@ -37,7 +37,8 @@ GUIDE = """# Choosing a Kildeverk tool
   `weather_find_stations` and `weather_observations` for what was measured; `weather_normals`
   for whether a month was warmer or wetter than normal; `weather_warnings` for official warnings.
 - **Water and hazards:** `water_find_stations` and `water_observations`; `hazards_flood_landslide`,
-  `hazards_avalanche`; `sea_level` on the coast; `energy_reservoirs` for hydropower.
+  `hazards_avalanche`, `hazards_earthquakes`; `sea_level` on the coast; `energy_reservoirs` for
+  hydropower.
 - **Air and sea:** `air_quality_forecast`; `sea_forecast` for waves and sea temperature.
 - **Electricity:** `electricity_municipality` for use and installed capacity in a municipality;
   `electricity_price_areas` for consumption and production in NO1-NO5.
