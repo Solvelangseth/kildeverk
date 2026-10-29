@@ -95,6 +95,240 @@ or a credential and cannot be done from the code alone.
 - [ ] MET ocean forecast (waves and sea temperature).
 - [ ] Statens vegvesen's national road database (NVDB): speed limits, tunnels, bridges.
 
+## New sources: shortlist (checked 2026-10-29)
+
+Candidates for new source modules, Norwegian and international, checked against each provider's
+own documentation. Ranked within each group by value to an agent × licence clarity ÷ effort.
+Effort: **S** (a day, one or two tools), **M** (a few days, a query language or many endpoints),
+**L** (a week or more, or a self-hosted service). Licence quotes are the provider's own words,
+shortened. "Not re-read" means the terms come from a search summary of the provider's page and
+must be read in full before building.
+
+### Next up: clear licence, no key
+
+- [ ] **Elhub energy data** (`elhub_energy`): electricity consumption and production per
+      municipality, grid area and price area. Feeds `municipality_profile` directly.
+      Licence: "The datasets are licenced by CC BY 4.0", and public APIs "do not require any
+      authorization" (https://api.elhub.no, not re-read; `/energy-data/v0/municipalities`
+      answered without a key). Limit: 5 calls per second. **S**, low risk (versioned `v0`, so
+      watch for a `v1`).
+- [ ] **Brønnøysund roles and annual accounts** (extend `brreg`): board, CEO and auditor for an
+      organisation number, and key figures from the latest accounts. "Datasettene følger Norsk
+      lisens for åpne data (NLOD)", "ikke nødvendig å registrere seg"
+      (https://www.brreg.no/produkter-og-tjenester/apne-data/). Roles are under the existing
+      Enhetsregisteret API, and accounts are under `data.brreg.no/regnskapsregisteret`. **S**, low
+      risk. Roles name private persons, so return them for one organisation at a time and never
+      make them searchable by person.
+- [ ] **MET: ocean forecast, nowcast and air-quality forecast** (extend `met`): waves and sea
+      temperature at a point, precipitation over the next two hours, and the air-quality index
+      per municipality or station. Same terms as the existing MET tools: CC BY 4.0, an
+      identifying User-Agent, at most 20 requests per second per application, coordinates to four
+      decimals (https://api.met.no/doc/TermsOfService). The ocean forecast has been in production
+      since 2021. The air-quality forecast is still "beta", with no changelog entry since 2018,
+      so treat it as fragile. **S** each. The ocean forecast is also listed above under "More from
+      the same publishers".
+- [ ] **Frost climate normals** (extend `met`): 1991–2020 normals for a station, so an agent can
+      say whether a month was warm or wet. Uses the Frost credential the service already has, so
+      no new owner action. CC BY 4.0 as above. **S**.
+- [ ] **NVE Regobs** (`nve_regobs`): field observations of avalanches, landslides, floods and
+      ice, by area and date. Pairs with the `nve_varsom` warnings. Data on api.nve.no is NLOD.
+      Credit Regobs and the observer's username (https://api.nve.no/doc/regobs/). Search needs no
+      key. The API announces shutdown dates in a `Sunset` header, which the module should show in
+      `service_status` (https://api.regobs.no/v5/). **S–M**, medium risk (the old version shuts
+      down six months after a new one ships).
+- [ ] **Vegvesen NVDB road objects** (`vegvesen_nvdb`): speed limits, tunnels, bridges and height
+      limits near a point or along a road. Most reads need "ingen autentisering". The API logs an
+      `X-Client` header and has a rate limiter (https://nvdbapiles.atlas.vegvesen.no/,
+      https://nvdb-docs.atlas.vegvesen.no/). Neither page states a licence: confirm it is NLOD
+      2.0, as for `vegvesen_traffic`, before release. **M** (object types and road references),
+      low risk. Also listed above.
+- [ ] **Eurostat** (`eurostat`): European statistics with Norway as an EFTA country, by NUTS
+      region, so the `statistics_*` tools can compare Norway with its neighbours. CC BY 4.0, and
+      commercial reuse is allowed with credit; no written licence is needed. Exceptions: data
+      from non-Eurostat sources, and data for countries outside the EU, EFTA and candidate
+      countries, are non-commercial only
+      (https://ec.europa.eu/eurostat/web/main/help/copyright-notice). No key. **M** (SDMX and
+      JSON-stat; flag third-party datasets), low risk.
+- [ ] **USGS earthquakes** (`usgs_quakes`): recent and historical earthquakes near a point or in
+      a box, a natural addition to the warnings. "USGS-authored or produced data and information
+      are considered to be in the U.S. Public Domain", and credit to "U.S. Geological Survey" is
+      requested (https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits).
+      FDSN event service, no key, at most 20,000 events per query
+      (https://earthquake.usgs.gov/fdsnws/event/1/). **S**, low risk. NNSN's Norwegian catalogue
+      would be better for small Norwegian events, but its licence is unclear (below).
+- [ ] **Avinor flight data** (`avinor_flights`): departures and arrivals at Avinor's 43 airports.
+      "We do not impose any limitations on how data is used". Label the content "Flight data from
+      Avinor" with a link to avinor.no, fetch flight times at most every 3 minutes, and cache.
+      Avinor may end access if a use harms its reputation. No key
+      (https://partner.avinor.no/en/services/flight-data/). **S**, medium risk (an XML feed with no
+      support).
+- [ ] **TED procurement notices** (`ted_procurement`): EU/EEA tenders and awards, including
+      Norwegian buyers, searchable by buyer, CPV code and place. Notices "can be freely reused,
+      for commercial or non-commercial purposes" (Decision 2011/833/EU). Site text is CC BY 4.0
+      and metadata is CC0 (https://ted.europa.eu/en/legal-notice). Search needs no key
+      (https://docs.ted.europa.eu/api/latest/search.html). **M** (expert query syntax), low risk.
+- [ ] **Ordbøkene** (`ordbokene`): Bokmål and Nynorsk dictionary lookups (spelling, inflection,
+      meaning). CC BY 4.0 for the content and API data, with the required credit
+      "Bokmålsordboka/Nynorskordboka, Universitetet i Bergen og Språkrådet, ordbøkene.no, CC-BY
+      4.0" (https://www.uib.no/en/node/182212). No key. **S**, low risk. Only a modest fit, but very
+      clean.
+- [ ] **World Bank indicators** (`worldbank`): country indicators (GDP, population, emissions)
+      for international comparisons. The default licence is CC BY 4.0. Some datasets carry their
+      own terms, which the module must pass on
+      (https://datacatalog.worldbank.org/public-licenses). No key. **S**, low risk.
+- [ ] **Sokkeldirektoratet FactPages** (`sodir_factpages`): fields, wells, licences and
+      production on the Norwegian shelf. "The content on the FactPages may be used in accordance
+      with … NLOD". Third-party reports, core images and logs are excluded
+      (https://factpages.sodir.no/). CSV/XML exports, and an Esri REST service at
+      `factmaps.sodir.no/api/rest` (the old `/arcgis/rest` path is retired). **M**, medium risk
+      (URLs have changed since the directorate was renamed).
+- [ ] **GBIF species occurrences** (`gbif_species`): species recorded near a point, including the
+      Norwegian records Artsdatabanken passes to GBIF. Each record carries its own licence (CC0,
+      CC BY or CC BY-NC). The module should filter to CC0 and CC BY and cite each dataset
+      (https://www.gbif.org/terms, not re-read: the page refused automated fetches). Search needs
+      no key. **M**, low risk. Better than Artskart while Artskart's terms are unclear.
+- [ ] **OECD and ECB statistics** (`oecd`, `ecb`): international economic series. OECD's terms
+      allow any use with credit to the OECD, and the API is limited to about 20 queries per minute
+      (https://www.oecd.org/en/about/terms-conditions.html, not re-read; OECD's own pages give
+      conflicting limits). ECB data may be reused free "on the condition that the source is
+      quoted", and the figures must not be modified
+      (https://www.ecb.europa.eu/stats/ecb_statistics/governance_and_quality_framework/html/usage_policy.en.html,
+      not re-read). **M** each. Low priority, since Eurostat and Norges Bank cover most of it.
+- [ ] **Wikidata** (`wikidata`): identifiers, coordinates and links for places, organisations and
+      people, to join other sources together. Structured data is "released into the public domain
+      under Creative Commons Zero" (https://www.wikidata.org/wiki/Wikidata:Licensing). No key, but
+      the query service needs an identifying User-Agent. **M**, low risk.
+
+### Needs owner: keys or registration
+
+- [ ] **BarentsWatch fish health and AIS** (`barentswatch`) **(needs owner)**: salmon lice and
+      disease per aquaculture site, and ship positions. Register an application (an OpenID Connect
+      client). "Where no other notice is given the data is provided under the … (NLOD)". No
+      parallel bulk downloads (https://developer.barentswatch.no/docs/intro). **M**, low risk.
+- [ ] **NOBIL charging stations** (`nobil`) **(needs owner)**: chargers near a point or in a
+      municipality. Ask Enova for an API key. "NOBIL by Enova is licensed under a Creative Commons
+      Attribution 4.0 International License" (https://info.nobil.no/api). **S**, low risk.
+- [ ] **ENTSO-E prices and load** (`entsoe`) **(needs owner)**: day-ahead prices for NO1–NO5, plus
+      load and generation. Register on the Transparency Platform and request a security token.
+      Its terms page did not load in this check, so read it before building
+      (https://transparency.entsoe.eu/). **M**, medium risk (XML, many document types).
+- [ ] **NASA FIRMS active fires** (`nasa_firms`) **(needs owner)**: satellite fire detections
+      near a point. Free MAP_KEY by email, 5,000 transactions per 10 minutes
+      (https://firms.modaps.eosdis.nasa.gov/api/map_key/). The page states no reuse terms. NASA
+      data is usually unrestricted, but confirm FIRMS' citation request. **S**, low risk.
+- [ ] **NAV job vacancies** (`nav_jobs`) **(needs owner)**: open vacancies by municipality and
+      occupation. Register as a consumer by email, accepting the terms, to get a private token.
+      Consumers must keep ads current through the feed (https://navikt.github.io/pam-stilling-feed).
+      Read the full terms before deciding. **M**, medium risk (a feed to mirror, not a search).
+- [ ] **eInnsyn public records** (`einnsyn`) **(needs owner)**: journal entries from public
+      bodies. An API key goes in an `API-KEY` header and is issued manually through Digdir's
+      service desk (https://github.com/felleslosninger/einnsyn-api-spec). Terms not found yet.
+      **M**, medium risk (the new platform is still settling).
+- [ ] **N2YO satellite passes** (`n2yo`) **(needs owner)**: when the ISS or another satellite
+      passes over a place. Free key after registration, 1,000 position and 100 pass requests per
+      hour (https://www.n2yo.com/api/). The terms may change at any time and do not clearly allow
+      commercial use. **S**, low value, so last in this group.
+
+### Licence unclear: ask first
+
+Each needs one written answer before building. Already-built sources come first.
+
+- [ ] **Norges Bank** (built): ask Norges Bank's statistics department (via
+      https://www.norges-bank.no/): "Under which licence may the exchange-rate and interest-rate
+      series from data.norges-bank.no be redistributed by a third-party API, and what credit do
+      you want?"
+- [ ] **NVE Varsom landslide forecasts** (built): ask NVE (via https://api.nve.no/): "Does the
+      api.nve.no NLOD statement cover the landslide forecast API at api01.nve.no, including
+      redistribution by another service?"
+- [ ] **data.norge search** (built): ask Digdir (data.norge.no): "Is
+      search.api.fellesdatakatalog.digdir.no a supported public API for third parties, and under
+      which terms?"
+- [ ] **FHI Statistikk Open API** (`fhi_statistics`): health statistics per municipality from
+      Norgeshelsa, Kommunehelsa and the cause-of-death register. High value. No licence or limits
+      are stated (https://www.fhi.no/ta/statistikkalender_og_statistikk/apen-api-og-statistikk/,
+      https://statistikk-data.fhi.no/swagger/index.html). Ask FHI (through issues on
+      https://github.com/folkehelseinstituttet/Fhi.Statistikk.OpenAPI): "Which licence applies to
+      data from FHI Statistikk Open API, and are there rate limits?"
+- [ ] **Finanstilsynet short positions and licence register** (`finanstilsynet`): APIs at
+      `ssr.finanstilsynet.no/api/v2/` and `api.finanstilsynet.no/registry/`, with no key but no
+      licence named (https://finanstilsynet.no/analyser-og-statistikk/api-for-apne-data). Ask
+      ssr@finanstilsynet.no and virksomhetsregisteret@finanstilsynet.no: "Is data from these APIs
+      under NLOD, and may it be redistributed?"
+- [ ] **NILU measured air quality** (`nilu_airquality`): measurements per station. "Dataene som
+      hentes fra dette API kan ikke modifiseres", and credit api.nilu.no. No licence is named
+      (https://api.nilu.no/). Ask NILU: "Under which licence is api.nilu.no data, and does 'not
+      modified' allow unit conversion and combining it with other sources?"
+- [ ] **Valgresultat** (`valg`): election results per municipality and polling district. High
+      value. JSON at `valgresultat.no/api/` answers, but there is no documentation and no terms,
+      so it counts as undocumented for now. Ask Valgdirektoratet (https://www.valgdirektoratet.no/):
+      "Is the valgresultat.no API a supported public API, where is it documented, and under which
+      licence?"
+- [ ] **Artskart** (`artskart`): Geonorge says "no conditions apply", but the records come from
+      many contributors and the API's help page is gone (https://artsdatabanken.no/Pages/180954/).
+      Ask Artsdatabanken: "Which licence applies to observations from the Artskart public API:
+      per record, or one for the whole?" Use GBIF meanwhile.
+- [ ] **Riksantikvaren Kulturminnesøk / Askeladden** (`kulturminner`): heritage sites near a
+      point. The dataset is NLOD on Geonorge, but the supported production endpoint is unclear
+      (the record found is on a test server). Ask Riksantikvaren: "Which WFS or REST endpoint for
+      'Kulturminner – Lokaliteter, Enkeltminner og Sikringssoner' should third parties use?"
+- [ ] **Store norske leksikon** (`snl`): its JSON search answers, but only "fri gjenbruk"
+      articles are CC BY-SA 3.0, one at a time, and the licence does not apply to whole works
+      (https://snl.no/.licenses/free, not re-read). Ask SNL's editors: "May a public API return a
+      short excerpt and a link for single articles on request?"
+- [ ] **NNSN earthquakes** (`nnsn_quakes`): the Norwegian catalogue via FDSN
+      (https://nnsn.geo.uib.no/nnsn_eqcat/). The FDSN network record leaves the licence blank. Ask
+      NNSN at UiB: "Under which licence is the NNSN event catalogue?"
+- [ ] **Lovdata public data** (`lovdata`): "Benytt datagrunnlaget fritt for eksperimentering og
+      forskning med KI" (https://api.lovdata.no/). Ask Lovdata: "Is the free dataset NLOD, and may
+      a public API serve statutes and regulations from it?"
+- [ ] **NVA research results** (`nva`): search works without a key, but no licence for the
+      metadata was found. Ask Sikt: "Under which licence is metadata from api.nva.unit.no?"
+- [ ] **Nasjonalbiblioteket** (`nb`): `api.nb.no` answers without a key, but no terms page was
+      found. Ask NB: "Which terms apply to metadata and free-content search through api.nb.no?"
+- [ ] **NGU radon and geology** (`ngu`): older metadata says NGU data may not be reused in other
+      WMS/WFS services without permission. Ask NGU: "May point lookups of radon susceptibility be
+      returned through a third-party API, and under which licence?"
+- [ ] **Mattilsynet smilefjes** (`smilefjes`): inspection results as CSV on data.norge.no. There
+      is no API, and the licence is "open" but not named. Ask Mattilsynet: "Is the smilefjes
+      dataset NLOD, and is the CSV URL stable?"
+- [ ] **Miljødirektoratet: contaminated ground and emissions per municipality**
+      (`miljodirektoratet`): contaminated ground is NLOD 2.0 according to Geonorge. Emissions per
+      municipality are files with no stated licence and no API. Ask Miljødirektoratet: "Which
+      licence applies to the municipal emissions inventory, and is there an API for it?"
+- [ ] **Arkivverket 1910 census** (`arkivverket`): data.norge.no mentions a JSON API but gives no
+      documentation or licence, and it may need a key. Ask postmottak@arkivverket.no: "Is there a
+      documented public API for the 1910 census, and under which licence?"
+
+### Rejected
+
+- **OpenStreetMap via the public Overpass API**: the ODbL is share-alike ("you may distribute the
+  result only under the same license", https://www.openstreetmap.org/copyright), which would
+  bind Kildeverk's combined results. The public instance also asks regular users to stay around
+  100 queries a day and points commercial use to self-hosted or paid servers
+  (https://wiki.openstreetmap.org/wiki/Overpass_API). Reconsider only with a self-hosted extract
+  (**L**) whose results are kept apart from other sources.
+- **Vinmonopolet**: the API terms limit use to developing, testing and supporting an integration,
+  and the 2019 version forbids passing on ("redistribute, or syndicate") access to the APIs
+  (https://api.vinmonopolet.no/, not re-read). An open API relaying the data would do exactly
+  that.
+- **Hva koster strømmen**: a private service relaying ENTSO-E prices, with no licence. Go to
+  ENTSO-E (needs owner) instead.
+- **Statnett driftsdata `restapi`**: an index of endpoints with no documentation or terms
+  (https://driftsdata.statnett.no/restapi). It is undocumented, so it stays out unless Statnett
+  documents it.
+- **Politiloggen, Kystdatahuset, Yr bathing temperatures, Oslo Børs NewsWeb**: no documented
+  public API was found from the provider. AIS is covered by BarentsWatch (needs owner).
+- **Bane NOR train data**: already reaches Kildeverk through Entur.
+
+### Not checked in this pass
+
+Doffin, Aksjonærregisteret, NBIM holdings, Patentstyret, Fiskeridirektoratet (vessel and
+aquaculture APIs answer at `api.fiskeridir.no`, but no licence was found), Vann-nett, Naturbase,
+Rovbase, Udir/DBH (an API answers at `dbh.hkdir.no`), Autosys, Anleggsregisteret,
+Statsregnskapet, Helsenorge waiting times, the ship registers, DMP medicine shortages,
+Arbeidstilsynet, Kystverket lights, Innovasjon Norge, IMDi, DSB, Enova energy certificates, party
+financing, NVE hazard screening and Copernicus. Check these the same way before ranking them.
+
 ## Release
 
 - [x] Version 0.2.0 with a changelog.
