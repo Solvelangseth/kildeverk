@@ -116,3 +116,54 @@ def test_levels_follow_mets_classes():
         "very high",
         "very high",
     ]
+
+
+# --- weather_normals ---------------------------------------------------------------
+
+
+@pytest.fixture
+def recorded_today(monkeypatch):
+    from kildeverk.sources.met import normals
+
+    monkeypatch.setattr(normals, "_today", lambda: dt.date(2026, 10, 29))
+
+
+async def test_normals_compared_with_this_year(ctx, recorded_today):
+    result = await call(ctx, "weather_normals", station="SN18700", year=2026)
+    data = result["data"]
+    assert (data["period"], data["year"]) == ("1991/2020", 2026)
+    assert data["year_normal_temperature_c"] is not None
+    months = {m["month"]: m for m in data["months"]}
+    assert sorted(months) == list(range(1, 13))
+    september, october, november = months[9], months[10], months[11]
+    assert september["complete"] is True and october["complete"] is False
+    assert november["observed_temperature_c"] is None and november["complete"] is None
+    assert september["temperature_anomaly_c"] == pytest.approx(
+        september["observed_temperature_c"] - september["normal_temperature_c"], abs=0.05
+    )
+    assert september["precipitation_pct_of_normal"] == round(
+        september["observed_precipitation_mm"] / september["normal_precipitation_mm"] * 100
+    )
+    assert any("not over" in n for n in result["notes"])
+    assert [p["licence"]["id"] for p in result["provenance"]] == ["CC-BY-3.0-NO", "CC-BY-3.0-NO"]
+
+
+async def test_an_older_normal_period(ctx, recorded_today):
+    data = (await call(ctx, "weather_normals", station="SN50540", year=2025, period="1961/1990"))[
+        "data"
+    ]
+    assert data["period"] == "1961/1990"
+    assert all(m["complete"] is True for m in data["months"])
+
+
+async def test_a_year_without_observations_keeps_the_normals(ctx, recorded_today):
+    result = await call(ctx, "weather_normals", station="SN18700", year=1900)
+    assert all(m["observed_temperature_c"] is None for m in result["data"]["months"])
+    assert result["data"]["months"][0]["normal_temperature_c"] is not None
+    assert any("no monthly temperature" in n for n in result["notes"])
+    assert len(result["provenance"]) == 1
+
+
+async def test_a_future_year_is_refused(ctx, recorded_today):
+    error = await fails(ctx, "weather_normals", station="SN18700", year=2027)
+    assert error["code"] == "INVALID_ARGUMENT"

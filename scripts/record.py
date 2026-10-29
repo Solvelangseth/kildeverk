@@ -276,6 +276,12 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ("parliament_members", {"period": "2021-2025", "party": "SV"}),
         ("parliament_members", {"period": "2025-2029"}),
     ],
+    # Recorded apart from met_frost, so the existing Frost recordings stay as they are.
+    "met_frost_normals": [
+        ("weather_normals", {"station": "SN18700", "year": 2026}),
+        ("weather_normals", {"station": "SN50540", "year": 2025, "period": "1961/1990"}),
+        ("weather_normals", {"station": "SN18700", "year": 1900}),
+    ],
     "met_nowcast": [
         ("weather_nowcast", {"lat": 60.3913, "lon": 5.3221}),
         ("weather_nowcast", {"lat": 78.22, "lon": 15.65}),

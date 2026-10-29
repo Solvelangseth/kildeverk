@@ -137,6 +137,10 @@ SOURCES: dict[str, SourceText] = {
             "Værstasjoner: finn dem etter posisjon eller navn, med plassering, høyde og eier",
             "Hva hver stasjon måler, og siden når",
             (
+                "Klimanormaler for 1991–2020, 1961–1990 og 1931–1960: månedlig og årlig "
+                "middeltemperatur og nedbør"
+            ),
+            (
                 "Observasjoner og døgn- eller timeverdier: temperatur, nedbør, vind, snødybde, "
                 "fuktighet, lufttrykk og hundrevis av andre elementer"
             ),
@@ -565,6 +569,11 @@ TOOLS: dict[str, ToolText] = {
         "Bølger og sjøtemperatur",
         "Bølgehøyde, sjøtemperatur og strøm langs kysten, time for time i opptil åtte døgn.",
     ),
+    "weather_normals": ToolText(
+        "Normaler ved en værstasjon",
+        "Normaltemperatur og -nedbør for 1991–2020, og hvor varm og våt hver måned i et år var "
+        "mot normalen.",
+    ),
     "weather_warnings": ToolText(
         "Farevarsler for vær",
         "METs offisielle farevarsler for land og hav, med nivå, område, periode og råd.",
@@ -743,6 +752,7 @@ THEMES: list[tuple[str, str, list[str]]] = [
             "weather_find_stations",
             "weather_station_elements",
             "weather_observations",
+            "weather_normals",
         ],
     ),
     (

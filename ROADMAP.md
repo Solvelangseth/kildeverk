@@ -129,7 +129,7 @@ must be read in full before building.
       since 2021. The air-quality forecast is still "beta", with no changelog entry since 2018,
       so treat it as fragile. **S** each. The ocean forecast is also listed above under "More from
       the same publishers".
-- [ ] **Frost climate normals** (extend `met`): 1991–2020 normals for a station, so an agent can
+- [x] **Frost climate normals** (`weather_normals`, built 2026-10-29): 1991–2020 normals for a station, so an agent can
       say whether a month was warm or wet. Uses the Frost credential the service already has, so
       no new owner action. CC BY 4.0 as above. **S**.
 - [ ] **NVE Regobs** (`nve_regobs`): field observations of avalanches, landslides, floods and

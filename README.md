@@ -28,7 +28,7 @@ publishers whose data it reads.
 | [MET Norway Nowcast](#met_nowcast): rain in the next two hours | ✅ available | `weather_nowcast` |
 | [MET Norway Oceanforecast](#met_oceanforecast): waves and sea temperature | ✅ available | `sea_forecast` |
 | [MET Norway Airqualityforecast](#met_airquality) | ✅ available | `air_quality_forecast` |
-| [MET Norway Frost](#met_frost): needs a free client id | ✅ available | `weather_find_stations`, `weather_station_elements`, `weather_observations` |
+| [MET Norway Frost](#met_frost): needs a free client id | ✅ available | `weather_find_stations`, `weather_station_elements`, `weather_observations`, `weather_normals` |
 | [NVE HydAPI](#nve_hydapi): needs a free key | ✅ available | `water_find_stations`, `water_observations` |
 | [Entur Geocoder](#entur_geocoder): stop places | ✅ available | `transit_find_stops` |
 | [Entur Journey Planner](#entur_journeyplanner): departures | ✅ available | `transit_departures` |
@@ -442,10 +442,15 @@ caches current warnings for 5 minutes and archive months for 24 hours.
 - `weather_observations` returns hourly readings and daily or monthly aggregates over a period.
   Friendly names cover the common cases (`daily_mean_temperature`, `daily_precipitation`,
   `snow_depth`, …), and any Frost element id works too.
+- `weather_normals` gives a station's 30-year climate normals (1991-2020 by default, or 1961-1990
+  and 1931-1960): monthly and yearly mean temperature and precipitation. Given a year, it puts
+  each month's observed mean temperature and precipitation beside the normal, with the
+  difference in degrees and the precipitation as per cent of normal, and marks the month still
+  under way as incomplete.
 
 **Setup:** Frost needs a free client id from
 [frost.met.no](https://frost.met.no/auth/requestCredentials.html). Set it as
-`KILDEVERK_FROST_CLIENT_ID`. Without it, these three tools answer `NOT_CONFIGURED` and the forecast
+`KILDEVERK_FROST_CLIENT_ID`. Without it, these four tools answer `NOT_CONFIGURED` and the forecast
 still works. The id is sent as HTTP basic auth and never appears in URLs, provenance or fixtures.
 
 **Licence:** every Frost response states

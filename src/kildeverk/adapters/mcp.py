@@ -34,8 +34,8 @@ GUIDE = """# Choosing a Kildeverk tool
 - **A company:** `companies_search`, then `companies_get`; `companies_accounts` for revenue
   and results.
 - **Weather:** `weather_nowcast` for rain in the next two hours; `weather_forecast` ahead;
-  `weather_find_stations` and `weather_observations` for what was measured; `weather_warnings`
-  for official warnings.
+  `weather_find_stations` and `weather_observations` for what was measured; `weather_normals`
+  for whether a month was warmer or wetter than normal; `weather_warnings` for official warnings.
 - **Water and hazards:** `water_find_stations` and `water_observations`; `hazards_flood_landslide`,
   `hazards_avalanche`; `sea_level` on the coast; `energy_reservoirs` for hydropower.
 - **Air and sea:** `air_quality_forecast`; `sea_forecast` for waves and sea temperature.

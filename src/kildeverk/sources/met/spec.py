@@ -68,6 +68,10 @@ FROST = SourceSpec(
         "Weather stations: find by position or name, with location, elevation and operator",
         "What each station measures, and since when",
         (
+            "Climate normals for 1991-2020, 1961-1990 and 1931-1960: monthly and yearly mean "
+            "temperature and precipitation"
+        ),
+        (
             "Observations and daily or hourly aggregates: temperature, precipitation, wind, snow "
             "depth, humidity, pressure and hundreds of other elements"
         ),

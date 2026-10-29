@@ -65,6 +65,7 @@ def operations():
     from kildeverk.sources.kartverket.ops import OPERATIONS as KARTVERKET_OPS
     from kildeverk.sources.kartverket_sea.ops import OPERATIONS as KARTVERKET_SEA_OPS
     from kildeverk.sources.met.alerts import OPERATIONS as MET_ALERT_OPS
+    from kildeverk.sources.met.normals import OPERATIONS as MET_NORMALS_OPS
     from kildeverk.sources.met.ops import OPERATIONS as MET_OPS
     from kildeverk.sources.met.products import OPERATIONS as MET_PRODUCT_OPS
     from kildeverk.sources.norges_bank.ops import OPERATIONS as NORGES_BANK_OPS
@@ -83,6 +84,7 @@ def operations():
         *BRREG_OPS,
         *BRREG_ACCOUNTS_OPS,
         *MET_OPS,
+        *MET_NORMALS_OPS,
         *MET_ALERT_OPS,
         *MET_PRODUCT_OPS,
         *NVE_OPS,

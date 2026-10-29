@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `weather_normals`: a station's 30-year climate normals from Frost, and how each month of a
+  given year compared with them.
 - Three more MET Norway products: `weather_nowcast` (radar precipitation every five minutes for the
   next two hours), `sea_forecast` (waves, sea temperature and currents along the coast) and
   `air_quality_forecast` (the air quality index and pollutants hour by hour, and where the worst
