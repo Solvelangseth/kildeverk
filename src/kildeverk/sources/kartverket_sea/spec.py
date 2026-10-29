@@ -34,10 +34,13 @@ SPEC = SourceSpec(
             "forecast a few days ahead"
         ),
         "Tide tables: the times and heights of high and low water",
+        (
+            "Storm-surge return levels (1 to 1000 years), the highest and lowest levels ever "
+            "observed, and the tidal levels, in NN2000, mean sea level or chart datum"
+        ),
     ],
     known_gaps=[
         "Away from a tide gauge every value is modelled; observations exist only at the gauges",
         "Positions inland or far offshore have no data",
-        "Return levels (the 100-year storm surge and so on) are not exposed yet",
     ],
 )

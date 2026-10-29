@@ -34,7 +34,7 @@ publishers whose data it reads.
 | [Entur Journey Planner](#entur_journeyplanner): departures | ✅ available | `transit_departures` |
 | [Avinor](#avinor): flight departures and arrivals | ✅ available | `flights_airport` |
 | [Kartverket](#kartverket): addresses, place names, elevation, municipality at a point | ✅ available | `addresses_search`, `places_search`, `terrain_elevation`, `regions_at_point` |
-| [Kartverket water level and tides](#kartverket_sea_level) | ✅ available | `sea_level` |
+| [Kartverket water level and tides](#kartverket_sea_level) | ✅ available | `sea_level`, `sea_level_extremes` |
 | [Norges Bank](#norges_bank): exchange rates and the policy rate | ✅ available | `currency_exchange_rates`, `rates_policy_rate` |
 | [NVE Varsom](#nve_varsom): flood, landslide and avalanche warnings | ✅ available | `hazards_flood_landslide`, `hazards_avalanche` |
 | [Regobs](#nve_regobs): field observations of avalanches, landslides, floods and ice | ✅ available | `hazards_field_observations` |
@@ -883,8 +883,12 @@ Kildeverk spends at most 20 calls a minute.
 - A point inland or far offshore answers `NOT_FOUND` with Kartverket's reason.
 - Water level periods can be up to 31 days, tide tables up to a year.
 
-**Known gaps:**
-- Return levels (the 20-, 200- and 1000-year storm surge) are not exposed yet.
+`sea_level_extremes` gives, for a point on the coast or a gauge, the storm-surge levels reached on
+average once in 1, 5, 10, 20, 50, 100, 200 and 1000 years, the low-water return levels, the
+highest and lowest levels ever observed (with the date, or Kartverket's note when it is a year or a
+named storm), the tidal levels from highest astronomical tide down to chart datum, and the land
+uplift. It works in NN2000 by default, the height system of maps and buildings, so the levels
+compare directly with terrain heights. Sea level rise is not included.
 
 <a id="nve_reservoirs"></a>
 ### NVE reservoir statistics: hydropower reservoir fill

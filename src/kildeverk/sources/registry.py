@@ -74,6 +74,7 @@ def operations():
     from kildeverk.sources.elhub.ops import OPERATIONS as ELHUB_OPS
     from kildeverk.sources.entur.ops import OPERATIONS as ENTUR_OPS
     from kildeverk.sources.kartverket.ops import OPERATIONS as KARTVERKET_OPS
+    from kildeverk.sources.kartverket_sea.levels import OPERATIONS as SEA_LEVEL_EXTREME_OPS
     from kildeverk.sources.kartverket_sea.ops import OPERATIONS as KARTVERKET_SEA_OPS
     from kildeverk.sources.met.alerts import OPERATIONS as MET_ALERT_OPS
     from kildeverk.sources.met.normals import OPERATIONS as MET_NORMALS_OPS
@@ -110,6 +111,7 @@ def operations():
         *NVE_REGOBS_OPS,
         *DATANORGE_OPS,
         *KARTVERKET_SEA_OPS,
+        *SEA_LEVEL_EXTREME_OPS,
         *NVE_RESERVOIRS_OPS,
         *ELHUB_OPS,
         *STORTINGET_OPS,

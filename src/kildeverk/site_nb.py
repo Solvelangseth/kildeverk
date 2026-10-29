@@ -442,6 +442,10 @@ SOURCES: dict[str, SourceText] = {
                 "modellert ellers, med tidevannsprognose, værets virkning og varsel noen dager frem"
             ),
             "Tidevannstabeller: tidspunkt og høyde for høyvann og lavvann",
+            (
+                "Stormflonivåer for 1 til 1000 år, høyeste og laveste observerte vannstand og "
+                "tidevannsnivåer, i NN2000, middelvann eller sjøkartnull"
+            ),
         ],
         [
             (
@@ -449,7 +453,6 @@ SOURCES: dict[str, SourceText] = {
                 "målerne"
             ),
             "Posisjoner innlands eller langt til havs har ingen data",
-            "Returnivåer (100-årsstormflo og lignende) er ikke tatt med ennå",
         ],
     ),
     "nve_reservoirs": SourceText(
@@ -663,6 +666,10 @@ TOOLS: dict[str, ToolText] = {
     "air_quality_forecast": ToolText(
         "Luftkvalitetsvarsel",
         "Luftkvalitet time for time i to døgn, med forurensningen bak og hvor den kommer fra.",
+    ),
+    "sea_level_extremes": ToolText(
+        "Stormflo og rekordvannstand",
+        "Stormflonivåer for 1 til 1000 år, rekordene og tidevannsnivåene, i NN2000 som på land.",
     ),
     "sea_forecast": ToolText(
         "Bølger og sjøtemperatur",
@@ -889,7 +896,14 @@ THEMES: list[tuple[str, str, list[str]]] = [
     (
         "Kart, steder og havet",
         "Adresser, stedsnavn og høyder fra Kartverket, vannstand og havvarsel.",
-        ["addresses_search", "places_search", "terrain_elevation", "sea_level", "sea_forecast"],
+        [
+            "addresses_search",
+            "places_search",
+            "terrain_elevation",
+            "sea_level",
+            "sea_level_extremes",
+            "sea_forecast",
+        ],
     ),
     (
         "Reise og trafikk",

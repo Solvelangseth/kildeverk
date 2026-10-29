@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `sea_level_extremes`: storm-surge return levels, record sea levels and tidal levels at a place on
+  the coast, from Kartverket, in NN2000 so they compare with heights on land.
 - A new source, the World Bank's World Development Indicators: `world_indicators` compares Norway
   with other countries and regions on GDP, life expectancy, emissions and the rest.
 - A new source, Avinor: `flights_airport` gives departures and arrivals at a Norwegian airport,

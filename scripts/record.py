@@ -330,6 +330,13 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
         ("flights_airport", {"airport": "Tromsø", "other_airport": "OSL", "hours_ahead": 12}),
         ("flights_airport", {"airport": "Narnia"}),
     ],
+    # Recorded apart from kartverket_sea_level, so its recordings stay as they are.
+    "kartverket_sea_levels": [
+        ("sea_level_extremes", {"lat": 60.398, "lon": 5.32}),
+        ("sea_level_extremes", {"station": "OSL", "reference": "chart_datum"}),
+        ("sea_level_extremes", {"station": "HFT"}),
+        ("sea_level_extremes", {"lat": 61.5, "lon": 9.0}),
+    ],
     "worldbank_wdi": [
         ("world_indicators", {"indicator": "gdp_per_capita"}),
         (

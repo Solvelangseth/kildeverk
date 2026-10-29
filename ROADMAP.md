@@ -90,7 +90,7 @@ or a credential and cannot be done from the code alone.
 ## More from the same publishers
 
 - [ ] Entur journey planning from A to B.
-- [ ] Kartverket return levels for storm surge (the 20-, 200- and 1000-year water levels).
+- [x] Kartverket return levels for storm surge (`sea_level_extremes`).
 - [ ] Stortinget questions to ministers.
 - [x] MET ocean forecast (waves and sea temperature).
 - [ ] Statens vegvesen's national road database (NVDB): speed limits, tunnels, bridges.
