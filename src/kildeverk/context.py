@@ -41,7 +41,7 @@ class Context:
 
     async def aclose(self) -> None:
         await self.client.aclose()
-        self.cache.close()
+        await self.cache.aclose()
 
 
 def build_context(

@@ -46,9 +46,12 @@ class ResponseCache:
         self._db.execute("PRAGMA journal_mode=WAL")
         self._db.executescript(_SCHEMA)
         self._lock = asyncio.Lock()
+        self._closed = False
 
     async def get(self, key: str) -> Entry | None:
         async with self._lock:
+            if self._closed:
+                return None
             row = await asyncio.to_thread(
                 lambda: self._db.execute(
                     "SELECT body, validators, retrieved_at, expires_at FROM responses WHERE key = ?",
@@ -72,6 +75,8 @@ class ResponseCache:
         retrieved_at = time.time() if retrieved_at is None else retrieved_at
         entry = Entry(body, validators, retrieved_at, retrieved_at + ttl_s)
         async with self._lock:
+            if self._closed:
+                return entry
             await asyncio.to_thread(
                 self._db.execute,
                 "INSERT OR REPLACE INTO responses VALUES (?, ?, ?, ?, ?, ?)",
@@ -88,11 +93,15 @@ class ResponseCache:
 
     async def delete(self, key: str) -> None:
         async with self._lock:
+            if self._closed:
+                return
             await asyncio.to_thread(self._db.execute, "DELETE FROM responses WHERE key = ?", (key,))
 
     async def stats(self) -> dict[str, dict[str, int]]:
         now = time.time()
         async with self._lock:
+            if self._closed:
+                return {}
             rows = await asyncio.to_thread(
                 lambda: self._db.execute(
                     "SELECT source_id, COUNT(*), SUM(expires_at > ?) FROM responses GROUP BY source_id",
@@ -101,5 +110,10 @@ class ResponseCache:
             )
         return {source: {"entries": n, "fresh": int(fresh or 0)} for source, n, fresh in rows}
 
-    def close(self) -> None:
-        self._db.close()
+    async def aclose(self) -> None:
+        # Under the lock, so a query still running in a worker thread finishes first: closing
+        # the connection beneath it crashes the process. Calls that arrive later, from tasks a
+        # failed gather left running, find the cache closed and skip it.
+        async with self._lock:
+            self._closed = True
+            self._db.close()

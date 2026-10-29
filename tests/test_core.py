@@ -247,6 +247,22 @@ async def test_expires_header_sets_the_lifetime_when_the_source_asks():
     assert len(calls) == 2
 
 
+async def test_closing_waits_for_a_query_in_flight_and_later_calls_skip_the_cache():
+    cache = ResponseCache(":memory:")
+    await cache.put("key", source_id="s", body=b"kept", validators={}, ttl_s=60)
+    # A read is in its worker thread when the close arrives, as when a test ends while a
+    # failed gather's other tasks are still running.
+    reading = asyncio.create_task(cache.get("key"))
+    await asyncio.sleep(0)
+    await cache.aclose()
+    assert (await reading).body == b"kept"
+    assert await cache.get("key") is None
+    entry = await cache.put("later", source_id="s", body=b"x", validators={}, ttl_s=60)
+    assert entry.body == b"x"
+    await cache.delete("key")
+    assert await cache.stats() == {}
+
+
 async def test_usage_is_counted_per_tool(ctx):
     from kildeverk.core.errors import ToolError
     from kildeverk.sources.registry import operations
