@@ -1,246 +1,246 @@
 {
  "s01": {
   "answer": 5594340,
-  "built_at": "2026-10-28T20:14:35+00:00",
+  "built_at": "2026-10-29T20:17:27+00:00",
   "citations": [
-   "Statistics Norway (SSB): Statbank table 07459 (metadata). Retrieved 2026-10-28 20:14 UTC from https://data.ssb.no/api/pxwebapi/v2/tables/07459/metadata?lang=en. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
-   "Statistics Norway (SSB): Statbank table 07459: Population, by region and year. Retrieved 2026-10-28 20:14 UTC from https://data.ssb.no/api/pxwebapi/v2/tables/07459/data?lang=en&outputFormat=json-stat2&valueCodes%5BRegion%5D=0&valueCodes%5BContentsCode%5D=Personer1&valueCodes%5BTid%5D=2025. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/)."
+   "Statistics Norway (SSB): Statbank table 07459 (metadata). Retrieved 2026-10-29 20:17 UTC from https://data.ssb.no/api/pxwebapi/v2/tables/07459/metadata?lang=en. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
+   "Statistics Norway (SSB): Statbank table 07459: Population, by region and year. Retrieved 2026-10-29 20:17 UTC from https://data.ssb.no/api/pxwebapi/v2/tables/07459/data?lang=en&outputFormat=json-stat2&valueCodes%5BRegion%5D=0&valueCodes%5BContentsCode%5D=Personer1&valueCodes%5BTid%5D=2025. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/)."
   ]
  },
  "s02": {
   "answer": 67305,
-  "built_at": "2026-10-28T20:14:35+00:00",
+  "built_at": "2026-10-29T20:17:29+00:00",
   "citations": [
-   "Statistics Norway (SSB): Statbank codelist agg_KommSummer. Retrieved 2026-10-28 15:05 UTC from https://data.ssb.no/api/pxwebapi/v2/codeLists/agg_KommSummer?lang=en. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
-   "Statistics Norway (SSB): Statbank table 07459 (metadata). Retrieved 2026-10-28 20:14 UTC from https://data.ssb.no/api/pxwebapi/v2/tables/07459/metadata?lang=en. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
-   "Statistics Norway (SSB): Statbank table 07459: Population, by region and year. Retrieved 2026-10-28 15:20 UTC from https://data.ssb.no/api/pxwebapi/v2/tables/07459/data?lang=en&outputFormat=json-stat2&valueCodes%5BRegion%5D=K-5501&valueCodes%5BContentsCode%5D=Personer1&valueCodes%5BTid%5D=from%282010%29&codelist%5BRegion%5D=agg_KommSummer&outputValues%5BRegion%5D=aggregated. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/)."
+   "Statistics Norway (SSB): Statbank codelist agg_KommSummer. Retrieved 2026-10-29 15:12 UTC from https://data.ssb.no/api/pxwebapi/v2/codeLists/agg_KommSummer?lang=en. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
+   "Statistics Norway (SSB): Statbank table 07459 (metadata). Retrieved 2026-10-29 20:17 UTC from https://data.ssb.no/api/pxwebapi/v2/tables/07459/metadata?lang=en. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
+   "Statistics Norway (SSB): Statbank table 07459: Population, by region and year. Retrieved 2026-10-29 20:17 UTC from https://data.ssb.no/api/pxwebapi/v2/tables/07459/data?lang=en&outputFormat=json-stat2&valueCodes%5BRegion%5D=K-5501&valueCodes%5BContentsCode%5D=Personer1&valueCodes%5BTid%5D=from%282010%29&codelist%5BRegion%5D=agg_KommSummer&outputValues%5BRegion%5D=aggregated. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/)."
   ]
  },
  "s03": {
   "answer": 26.0,
-  "built_at": "2026-10-28T20:14:36+00:00",
+  "built_at": "2026-10-29T20:17:31+00:00",
   "citations": [
-   "Statistics Norway (SSB): Klass classification 131 (municipalities), changes. Retrieved 2026-10-28 15:02 UTC from https://data.ssb.no/api/klass/v1/classifications/131/changes?from=1960-01-01&to=2100-01-01. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
-   "Statistics Norway (SSB): Klass classification 131 (municipalities), codes. Retrieved 2026-10-28 15:02 UTC from https://data.ssb.no/api/klass/v1/classifications/131/codes?from=1960-01-01&to=2100-01-01. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
-   "Statistics Norway (SSB): Statbank table 11342 (metadata). Retrieved 2026-10-28 20:14 UTC from https://data.ssb.no/api/pxwebapi/v2/tables/11342/metadata?lang=en. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/)."
+   "Statistics Norway (SSB): Klass classification 131 (municipalities), changes. Retrieved 2026-10-29 15:12 UTC from https://data.ssb.no/api/klass/v1/classifications/131/changes?from=1960-01-01&to=2100-01-01. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
+   "Statistics Norway (SSB): Klass classification 131 (municipalities), codes. Retrieved 2026-10-29 15:12 UTC from https://data.ssb.no/api/klass/v1/classifications/131/codes?from=1960-01-01&to=2100-01-01. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
+   "Statistics Norway (SSB): Statbank table 11342 (metadata). Retrieved 2026-10-29 20:17 UTC from https://data.ssb.no/api/pxwebapi/v2/tables/11342/metadata?lang=en. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/)."
   ]
  },
  "s04": {
   "answer": "Lørenskog",
-  "built_at": "2026-10-28T20:14:36+00:00",
+  "built_at": "2026-10-29T20:17:36+00:00",
   "citations": [
-   "Statistics Norway (SSB): Statbank codelist agg_KommSummer. Retrieved 2026-10-28 15:05 UTC from https://data.ssb.no/api/pxwebapi/v2/codeLists/agg_KommSummer?lang=en. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
-   "Statistics Norway (SSB): Statbank table 07459 (metadata). Retrieved 2026-10-28 20:14 UTC from https://data.ssb.no/api/pxwebapi/v2/tables/07459/metadata?lang=en. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
-   "Statistics Norway (SSB): Statbank table 07459: Population, by region and year. Retrieved 2026-10-28 15:53 UTC from https://data.ssb.no/api/pxwebapi/v2/tables/07459/data?lang=en&outputFormat=json-stat2&valueCodes%5BRegion%5D=%2A&valueCodes%5BContentsCode%5D=Personer1&valueCodes%5BTid%5D=2015%2C2024%2C2025%2C2026&codelist%5BRegion%5D=agg_KommSummer&outputValues%5BRegion%5D=aggregated. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/)."
+   "Statistics Norway (SSB): Statbank codelist agg_KommSummer. Retrieved 2026-10-29 15:12 UTC from https://data.ssb.no/api/pxwebapi/v2/codeLists/agg_KommSummer?lang=en. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
+   "Statistics Norway (SSB): Statbank table 07459 (metadata). Retrieved 2026-10-29 20:17 UTC from https://data.ssb.no/api/pxwebapi/v2/tables/07459/metadata?lang=en. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
+   "Statistics Norway (SSB): Statbank table 07459: Population, by region and year. Retrieved 2026-10-29 20:17 UTC from https://data.ssb.no/api/pxwebapi/v2/tables/07459/data?lang=en&outputFormat=json-stat2&valueCodes%5BRegion%5D=%2A&valueCodes%5BContentsCode%5D=Personer1&valueCodes%5BTid%5D=2015%2C2024%2C2025%2C2026&codelist%5BRegion%5D=agg_KommSummer&outputValues%5BRegion%5D=aggregated. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/)."
   ]
  },
  "s05": {
   "answer": "Finnmark",
-  "built_at": "2026-10-28T20:14:38+00:00",
+  "built_at": "2026-10-29T20:17:44+00:00",
   "citations": [
-   "Statistics Norway (SSB): Statbank codelist agg_KommFylker. Retrieved 2026-10-28 15:20 UTC from https://data.ssb.no/api/pxwebapi/v2/codeLists/agg_KommFylker?lang=en. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
-   "Statistics Norway (SSB): Statbank table 07459 (metadata). Retrieved 2026-10-28 20:14 UTC from https://data.ssb.no/api/pxwebapi/v2/tables/07459/metadata?lang=en. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
-   "Statistics Norway (SSB): Statbank table 07459: Population, by region and year. Retrieved 2026-10-28 20:14 UTC from https://data.ssb.no/api/pxwebapi/v2/tables/07459/data?lang=en&outputFormat=json-stat2&valueCodes%5BRegion%5D=%2A&valueCodes%5BContentsCode%5D=Personer1&valueCodes%5BTid%5D=2024%2C2025%2C2026&codelist%5BRegion%5D=agg_KommFylker&outputValues%5BRegion%5D=aggregated. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/)."
+   "Statistics Norway (SSB): Statbank codelist agg_KommFylker. Retrieved 2026-10-29 20:17 UTC from https://data.ssb.no/api/pxwebapi/v2/codeLists/agg_KommFylker?lang=en. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
+   "Statistics Norway (SSB): Statbank table 07459 (metadata). Retrieved 2026-10-29 20:17 UTC from https://data.ssb.no/api/pxwebapi/v2/tables/07459/metadata?lang=en. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
+   "Statistics Norway (SSB): Statbank table 07459: Population, by region and year. Retrieved 2026-10-29 20:17 UTC from https://data.ssb.no/api/pxwebapi/v2/tables/07459/data?lang=en&outputFormat=json-stat2&valueCodes%5BRegion%5D=%2A&valueCodes%5BContentsCode%5D=Personer1&valueCodes%5BTid%5D=2024%2C2025%2C2026&codelist%5BRegion%5D=agg_KommFylker&outputValues%5BRegion%5D=aggregated. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/)."
   ]
  },
  "r01": {
   "answer": "4601",
-  "built_at": "2026-10-28T20:14:38+00:00",
+  "built_at": "2026-10-29T20:17:44+00:00",
   "citations": [
-   "Statistics Norway (SSB): Klass classification 131 (municipalities), changes. Retrieved 2026-10-28 15:02 UTC from https://data.ssb.no/api/klass/v1/classifications/131/changes?from=1960-01-01&to=2100-01-01. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
-   "Statistics Norway (SSB): Klass classification 131 (municipalities), codes. Retrieved 2026-10-28 15:02 UTC from https://data.ssb.no/api/klass/v1/classifications/131/codes?from=1960-01-01&to=2100-01-01. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/)."
+   "Statistics Norway (SSB): Klass classification 131 (municipalities), changes. Retrieved 2026-10-29 15:12 UTC from https://data.ssb.no/api/klass/v1/classifications/131/changes?from=1960-01-01&to=2100-01-01. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
+   "Statistics Norway (SSB): Klass classification 131 (municipalities), codes. Retrieved 2026-10-29 15:12 UTC from https://data.ssb.no/api/klass/v1/classifications/131/codes?from=1960-01-01&to=2100-01-01. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/)."
   ]
  },
  "r02": {
   "answer": "Drammen",
-  "built_at": "2026-10-28T20:14:38+00:00",
+  "built_at": "2026-10-29T20:17:44+00:00",
   "citations": [
-   "Statistics Norway (SSB): Klass classification 131 (municipalities), changes. Retrieved 2026-10-28 15:02 UTC from https://data.ssb.no/api/klass/v1/classifications/131/changes?from=1960-01-01&to=2100-01-01. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
-   "Statistics Norway (SSB): Klass classification 131 (municipalities), codes. Retrieved 2026-10-28 15:02 UTC from https://data.ssb.no/api/klass/v1/classifications/131/codes?from=1960-01-01&to=2100-01-01. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/)."
+   "Statistics Norway (SSB): Klass classification 131 (municipalities), changes. Retrieved 2026-10-29 15:12 UTC from https://data.ssb.no/api/klass/v1/classifications/131/changes?from=1960-01-01&to=2100-01-01. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
+   "Statistics Norway (SSB): Klass classification 131 (municipalities), codes. Retrieved 2026-10-29 15:12 UTC from https://data.ssb.no/api/klass/v1/classifications/131/codes?from=1960-01-01&to=2100-01-01. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/)."
   ]
  },
  "r03": {
   "answer": "Karmøy",
-  "built_at": "2026-10-28T20:14:38+00:00",
+  "built_at": "2026-10-29T20:17:45+00:00",
   "citations": [
-   "Norwegian Mapping Authority (Kartverket): Kartverket municipality at point. Retrieved 2026-10-28 20:14 UTC from https://api.kartverket.no/kommuneinfo/v1/punkt?nord=59.0&ost=5.0&koordsys=4258. Licence: Creative Commons Attribution 4.0 International (credit: © Kartverket) (https://creativecommons.org/licenses/by/4.0/)."
+   "Norwegian Mapping Authority (Kartverket): Kartverket municipality at point. Retrieved 2026-10-29 20:17 UTC from https://api.kartverket.no/kommuneinfo/v1/punkt?nord=59.0&ost=5.0&koordsys=4258. Licence: Creative Commons Attribution 4.0 International (credit: © Kartverket) (https://creativecommons.org/licenses/by/4.0/)."
   ]
  },
  "r04": {
   "answer": "1902",
-  "built_at": "2026-10-28T20:14:38+00:00",
+  "built_at": "2026-10-29T20:17:45+00:00",
   "citations": [
-   "Norwegian Mapping Authority (Kartverket): Kartverket municipality at point. Retrieved 2026-10-28 15:46 UTC from https://api.kartverket.no/kommuneinfo/v1/punkt?nord=69.65&ost=18.96&koordsys=4258. Licence: Creative Commons Attribution 4.0 International (credit: © Kartverket) (https://creativecommons.org/licenses/by/4.0/).",
-   "Statistics Norway (SSB): Klass classification 104 (counties), changes. Retrieved 2026-10-28 15:17 UTC from https://data.ssb.no/api/klass/v1/classifications/104/changes?from=1960-01-01&to=2100-01-01. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
-   "Statistics Norway (SSB): Klass classification 104 (counties), codes. Retrieved 2026-10-28 15:17 UTC from https://data.ssb.no/api/klass/v1/classifications/104/codes?from=1960-01-01&to=2100-01-01. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/)."
+   "Norwegian Mapping Authority (Kartverket): Kartverket municipality at point. Retrieved 2026-10-29 20:17 UTC from https://api.kartverket.no/kommuneinfo/v1/punkt?nord=69.65&ost=18.96&koordsys=4258. Licence: Creative Commons Attribution 4.0 International (credit: © Kartverket) (https://creativecommons.org/licenses/by/4.0/).",
+   "Statistics Norway (SSB): Klass classification 104 (counties), changes. Retrieved 2026-10-29 16:06 UTC from https://data.ssb.no/api/klass/v1/classifications/104/changes?from=1960-01-01&to=2100-01-01. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
+   "Statistics Norway (SSB): Klass classification 104 (counties), codes. Retrieved 2026-10-29 16:06 UTC from https://data.ssb.no/api/klass/v1/classifications/104/codes?from=1960-01-01&to=2100-01-01. Licence: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/)."
   ]
  },
  "c01": {
   "answer": "923609016",
-  "built_at": "2026-10-28T20:14:38+00:00",
+  "built_at": "2026-10-29T20:17:45+00:00",
   "citations": [
-   "Brønnøysund Register Centre (Brønnøysundregistrene): Enhetsregisteret search. Retrieved 2026-10-28 20:14 UTC from https://data.brreg.no/enhetsregisteret/api/enheter?size=5&page=0&navn=equinor&konkurs=false. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0)."
+   "Brønnøysund Register Centre (Brønnøysundregistrene): Enhetsregisteret search. Retrieved 2026-10-29 20:17 UTC from https://data.brreg.no/enhetsregisteret/api/enheter?size=5&page=0&navn=equinor&konkurs=false. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0)."
   ]
  },
  "c02": {
   "answer": "UNIVERSITETSSYKEHUSET NORD-NORGE HF",
-  "built_at": "2026-10-28T20:14:38+00:00",
+  "built_at": "2026-10-29T20:17:45+00:00",
   "citations": [
-   "Brønnøysund Register Centre (Brønnøysundregistrene): Enhetsregisteret search. Retrieved 2026-10-28 20:14 UTC from https://data.brreg.no/enhetsregisteret/api/enheter?size=1&page=0&kommunenummer=5501&konkurs=false&sort=antallAnsatte%2CDESC. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0)."
+   "Brønnøysund Register Centre (Brønnøysundregistrene): Enhetsregisteret search. Retrieved 2026-10-29 20:17 UTC from https://data.brreg.no/enhetsregisteret/api/enheter?size=1&page=0&kommunenummer=5501&konkurs=false&sort=antallAnsatte%2CDESC. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0)."
   ]
  },
  "w01": {
   "answer": -4.9,
-  "built_at": "2026-10-28T20:14:39+00:00",
+  "built_at": "2026-10-29T20:17:45+00:00",
   "citations": [
-   "Norwegian Meteorological Institute (MET Norway): Frost observations from SN18700, 2024-01-01T00:00:00Z/2024-01-02T00:00:00Z. Retrieved 2026-10-28 20:14 UTC from https://frost.met.no/observations/v0.jsonld?sources=SN18700&elements=mean%28air_temperature+P1D%29&referencetime=2024-01-01T00%3A00%3A00Z%2F2024-01-02T00%3A00%3A00Z&timeoffsets=default&levels=default. Licence: Creative Commons Attribution 3.0 Norway (https://creativecommons.org/licenses/by/3.0/no/)."
+   "Norwegian Meteorological Institute (MET Norway): Frost observations from SN18700, 2024-01-01T00:00:00Z/2024-01-02T00:00:00Z. Retrieved 2026-10-29 20:17 UTC from https://frost.met.no/observations/v0.jsonld?sources=SN18700&elements=mean%28air_temperature+P1D%29&referencetime=2024-01-01T00%3A00%3A00Z%2F2024-01-02T00%3A00%3A00Z&timeoffsets=default&levels=default. Licence: Creative Commons Attribution 3.0 Norway (https://creativecommons.org/licenses/by/3.0/no/)."
   ]
  },
  "w02": {
   "answer": "red",
-  "built_at": "2026-10-28T20:14:40+00:00",
+  "built_at": "2026-10-29T20:17:46+00:00",
   "citations": [
-   "Norwegian Meteorological Institute (MET Norway): MetAlerts, 2023-08. Retrieved 2026-10-28 20:14 UTC from https://api.met.no/weatherapi/metalerts/2.0/archive.json?lang=en&period=2023-08. Licence: Creative Commons Attribution 4.0 International (also offered under NLOD 2.0) (https://creativecommons.org/licenses/by/4.0/)."
+   "Norwegian Meteorological Institute (MET Norway): MetAlerts, 2023-08. Retrieved 2026-10-29 20:17 UTC from https://api.met.no/weatherapi/metalerts/2.0/archive.json?lang=en&period=2023-08. Licence: Creative Commons Attribution 4.0 International (also offered under NLOD 2.0) (https://creativecommons.org/licenses/by/4.0/)."
   ]
  },
  "w03": {
   "answer": "red",
-  "built_at": "2026-10-28T20:14:41+00:00",
+  "built_at": "2026-10-29T20:17:46+00:00",
   "citations": [
-   "Norwegian Water Resources and Energy Directorate (NVE), via varsom.no: NVE flood warnings (2023-08-08 to 2023-08-08). Retrieved 2026-10-28 20:14 UTC from https://api01.nve.no/hydrology/forecast/flood/v1.0.10/api/Warning/Municipality/3305/2/2023-08-08/2023-08-08. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0)."
+   "Norwegian Water Resources and Energy Directorate (NVE), via varsom.no: NVE flood warnings (2023-08-08 to 2023-08-08). Retrieved 2026-10-29 20:17 UTC from https://api01.nve.no/hydrology/forecast/flood/v1.0.10/api/Warning/Municipality/3305/2/2023-08-08/2023-08-08. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0)."
   ]
  },
  "w04": {
   "answer": 2,
-  "built_at": "2026-10-28T20:14:42+00:00",
+  "built_at": "2026-10-29T20:17:47+00:00",
   "citations": [
-   "Norwegian Water Resources and Energy Directorate (NVE), via varsom.no: NVE avalanche forecast (2026-03-10 to 2026-03-10). Retrieved 2026-10-28 20:14 UTC from https://api01.nve.no/hydrology/forecast/avalanche/v6.3.2/api/AvalancheWarningByRegion/Detail/3011/2/2026-03-10/2026-03-10. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0)."
+   "Norwegian Water Resources and Energy Directorate (NVE), via varsom.no: NVE avalanche forecast (2026-03-10 to 2026-03-10). Retrieved 2026-10-29 20:17 UTC from https://api01.nve.no/hydrology/forecast/avalanche/v6.3.2/api/AvalancheWarningByRegion/Detail/3011/2/2026-03-10/2026-03-10. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0)."
   ]
  },
  "w05": {
   "answer": 400.0,
-  "built_at": "2026-10-28T20:14:42+00:00",
+  "built_at": "2026-10-29T20:17:47+00:00",
   "citations": [
-   "Norwegian Water Resources and Energy Directorate (NVE): HydAPI stations. Retrieved 2026-10-28 20:14 UTC from https://hydapi.nve.no/api/v1/Stations?Active=0&StationId=62.5.0. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0)."
+   "Norwegian Water Resources and Energy Directorate (NVE): HydAPI stations. Retrieved 2026-10-29 20:17 UTC from https://hydapi.nve.no/api/v1/Stations?Active=0&StationId=62.5.0. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0)."
   ]
  },
  "w06": {
   "answer": 175.4,
-  "built_at": "2026-10-28T20:14:42+00:00",
+  "built_at": "2026-10-29T20:17:47+00:00",
   "citations": [
-   "Norwegian Mapping Authority, Hydrographic Service (Kartverket): Kartverket water level, Bergen. Retrieved 2026-10-28 20:14 UTC from https://vannstand.kartverket.no/tideapi.php?fromtime=2026-10-27T00%3A00&totime=2026-10-27T01%3A00&datatype=all&refcode=cd&interval=60&lang=en&tzone=1&dst=1&tide_request=stationdata&stationcode=BGO. Licence: Creative Commons Attribution 4.0 International (credit: Kartverket, Hydrographic Service) (https://creativecommons.org/licenses/by/4.0/)."
+   "Norwegian Mapping Authority, Hydrographic Service (Kartverket): Kartverket water level, Bergen. Retrieved 2026-10-29 20:17 UTC from https://vannstand.kartverket.no/tideapi.php?fromtime=2026-10-27T00%3A00&totime=2026-10-27T01%3A00&datatype=all&refcode=cd&interval=60&lang=en&tzone=1&dst=1&tide_request=stationdata&stationcode=BGO. Licence: Creative Commons Attribution 4.0 International (credit: Kartverket, Hydrographic Service) (https://creativecommons.org/licenses/by/4.0/)."
   ]
  },
  "w07": {
   "answer": 47.62,
-  "built_at": "2026-10-28T20:14:44+00:00",
+  "built_at": "2026-10-29T20:17:50+00:00",
   "citations": [
-   "Norwegian Water Resources and Energy Directorate (NVE): NVE reservoir statistics, 20-year min, median and max. Retrieved 2026-10-28 20:14 UTC from https://biapi.nve.no/magasinstatistikk/api/Magasinstatistikk/HentOffentligDataMinMaxMedian. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0).",
-   "Norwegian Water Resources and Energy Directorate (NVE): NVE reservoir statistics. Retrieved 2026-10-28 20:14 UTC from https://biapi.nve.no/magasinstatistikk/api/Magasinstatistikk/HentOffentligData. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0)."
+   "Norwegian Water Resources and Energy Directorate (NVE): NVE reservoir statistics, 20-year min, median and max. Retrieved 2026-10-29 20:17 UTC from https://biapi.nve.no/magasinstatistikk/api/Magasinstatistikk/HentOffentligDataMinMaxMedian. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0).",
+   "Norwegian Water Resources and Energy Directorate (NVE): NVE reservoir statistics. Retrieved 2026-10-29 20:17 UTC from https://biapi.nve.no/magasinstatistikk/api/Magasinstatistikk/HentOffentligData. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0)."
   ]
  },
  "m01": {
   "answer": 2468.25,
-  "built_at": "2026-10-28T20:14:44+00:00",
+  "built_at": "2026-10-29T20:17:50+00:00",
   "citations": [
    "Norwegian Mapping Authority (Kartverket): Kartverket elevation. Retrieved 2026-10-28 20:14 UTC from https://ws.geonorge.no/hoydedata/v1/punkt?koordsys=4258&punkter=%5B%5B8.31248%2C61.63644%5D%5D. Licence: Creative Commons Attribution 4.0 International (credit: © Kartverket) (https://creativecommons.org/licenses/by/4.0/)."
   ]
  },
  "m02": {
   "answer": "0026",
-  "built_at": "2026-10-28T20:14:44+00:00",
+  "built_at": "2026-10-29T20:17:50+00:00",
   "citations": [
-   "Norwegian Mapping Authority (Kartverket): Kartverket address search. Retrieved 2026-10-28 20:14 UTC from https://ws.geonorge.no/adresser/v1/sok?utkoordsys=4258&treffPerSide=10&sok=Karl+Johans+gate+22+Oslo. Licence: Creative Commons Attribution 4.0 International (credit: © Kartverket) (https://creativecommons.org/licenses/by/4.0/)."
+   "Norwegian Mapping Authority (Kartverket): Kartverket address search. Retrieved 2026-10-29 20:17 UTC from https://ws.geonorge.no/adresser/v1/sok?utkoordsys=4258&treffPerSide=10&sok=Karl+Johans+gate+22+Oslo. Licence: Creative Commons Attribution 4.0 International (credit: © Kartverket) (https://creativecommons.org/licenses/by/4.0/)."
   ]
  },
  "m03": {
   "answer": "Guovdageaidnu",
-  "built_at": "2026-10-28T20:14:44+00:00",
+  "built_at": "2026-10-29T20:17:50+00:00",
   "citations": [
-   "Norwegian Mapping Authority (Kartverket): Kartverket place names (SSR). Retrieved 2026-10-28 20:14 UTC from https://api.kartverket.no/stedsnavn/v1/sted?utkoordsys=4258&sok=Kautokeino&treffPerSide=3. Licence: Creative Commons Attribution 4.0 International (credit: © Kartverket) (https://creativecommons.org/licenses/by/4.0/)."
+   "Norwegian Mapping Authority (Kartverket): Kartverket place names (SSR). Retrieved 2026-10-29 20:17 UTC from https://api.kartverket.no/stedsnavn/v1/sted?utkoordsys=4258&sok=Kautokeino&treffPerSide=3. Licence: Creative Commons Attribution 4.0 International (credit: © Kartverket) (https://creativecommons.org/licenses/by/4.0/)."
   ]
  },
  "f01": {
   "answer": 11.7456,
-  "built_at": "2026-10-28T20:14:44+00:00",
+  "built_at": "2026-10-29T20:17:50+00:00",
   "citations": [
-   "Norges Bank: Norges Bank exchange rates (monthly). Retrieved 2026-10-28 20:14 UTC from https://data.norges-bank.no/api/data/EXR/M.EUR.NOK.SP?format=sdmx-json&locale=en&startPeriod=2025-01-01&endPeriod=2025-01-31. Licence: No licence stated by the publisher (https://www.norges-bank.no/en/topics/Statistics/open-data/)."
+   "Norges Bank: Norges Bank exchange rates (monthly). Retrieved 2026-10-29 20:17 UTC from https://data.norges-bank.no/api/data/EXR/M.EUR.NOK.SP?format=sdmx-json&locale=en&startPeriod=2025-01-01&endPeriod=2025-01-31. Licence: No licence stated by the publisher (https://www.norges-bank.no/en/topics/Statistics/open-data/)."
   ]
  },
  "f02": {
   "answer": 2.75,
-  "built_at": "2026-10-28T20:14:44+00:00",
+  "built_at": "2026-10-29T20:17:50+00:00",
   "citations": [
-   "Norges Bank: Norges Bank key policy rate. Retrieved 2026-10-28 20:14 UTC from https://data.norges-bank.no/api/data/IR/B.KPRA.SD.R?format=sdmx-json&locale=en&startPeriod=2022-01-01. Licence: No licence stated by the publisher (https://www.norges-bank.no/en/topics/Statistics/open-data/)."
+   "Norges Bank: Norges Bank key policy rate. Retrieved 2026-10-29 20:17 UTC from https://data.norges-bank.no/api/data/IR/B.KPRA.SD.R?format=sdmx-json&locale=en&startPeriod=2022-01-01. Licence: No licence stated by the publisher (https://www.norges-bank.no/en/topics/Statistics/open-data/)."
   ]
  },
  "f03": {
   "answer": 0.059036,
-  "built_at": "2026-10-28T20:14:44+00:00",
+  "built_at": "2026-10-29T20:17:50+00:00",
   "citations": [
-   "Norges Bank: Norges Bank exchange rates (daily). Retrieved 2026-10-28 20:14 UTC from https://data.norges-bank.no/api/data/EXR/B.JPY.NOK.SP?format=sdmx-json&locale=en&startPeriod=2026-10-27&endPeriod=2026-10-27. Licence: No licence stated by the publisher (https://www.norges-bank.no/en/topics/Statistics/open-data/)."
+   "Norges Bank: Norges Bank exchange rates (daily). Retrieved 2026-10-29 20:17 UTC from https://data.norges-bank.no/api/data/EXR/B.JPY.NOK.SP?format=sdmx-json&locale=en&startPeriod=2026-10-27&endPeriod=2026-10-27. Licence: No licence stated by the publisher (https://www.norges-bank.no/en/topics/Statistics/open-data/)."
   ]
  },
  "p01": {
   "answer": 68,
-  "built_at": "2026-10-28T20:14:46+00:00",
+  "built_at": "2026-10-29T20:17:51+00:00",
   "citations": [
-   "Stortinget (the Norwegian parliament): Stortinget case 200084. Retrieved 2026-10-28 20:14 UTC from https://data.stortinget.no/eksport/sak?sakid=200084&format=json. Licence: Norwegian Licence for Open Government Data 2.0 (credit: Stortinget) (https://data.norge.no/nlod/en/2.0).",
-   "Stortinget (the Norwegian parliament): Stortinget vote 28502, by representative. Retrieved 2026-10-28 20:14 UTC from https://data.stortinget.no/eksport/voteringsresultat?voteringid=28502&format=json. Licence: Norwegian Licence for Open Government Data 2.0 (credit: Stortinget) (https://data.norge.no/nlod/en/2.0).",
-   "Stortinget (the Norwegian parliament): Stortinget vote 28503, by representative. Retrieved 2026-10-28 20:14 UTC from https://data.stortinget.no/eksport/voteringsresultat?voteringid=28503&format=json. Licence: Norwegian Licence for Open Government Data 2.0 (credit: Stortinget) (https://data.norge.no/nlod/en/2.0)."
+   "Stortinget (the Norwegian parliament): Stortinget case 200084. Retrieved 2026-10-29 20:17 UTC from https://data.stortinget.no/eksport/sak?sakid=200084&format=json. Licence: Norwegian Licence for Open Government Data 2.0 (credit: Stortinget) (https://data.norge.no/nlod/en/2.0).",
+   "Stortinget (the Norwegian parliament): Stortinget vote 28502, by representative. Retrieved 2026-10-29 20:17 UTC from https://data.stortinget.no/eksport/voteringsresultat?voteringid=28502&format=json. Licence: Norwegian Licence for Open Government Data 2.0 (credit: Stortinget) (https://data.norge.no/nlod/en/2.0).",
+   "Stortinget (the Norwegian parliament): Stortinget vote 28503, by representative. Retrieved 2026-10-29 20:17 UTC from https://data.stortinget.no/eksport/voteringsresultat?voteringid=28503&format=json. Licence: Norwegian Licence for Open Government Data 2.0 (credit: Stortinget) (https://data.norge.no/nlod/en/2.0)."
   ]
  },
  "p02": {
   "answer": 13,
-  "built_at": "2026-10-28T20:14:46+00:00",
+  "built_at": "2026-10-29T20:17:51+00:00",
   "citations": [
-   "Stortinget (the Norwegian parliament): Stortinget members. Retrieved 2026-10-28 20:14 UTC from https://data.stortinget.no/eksport/representanter?stortingsperiodeid=2021-2025&format=json. Licence: Norwegian Licence for Open Government Data 2.0 (credit: Stortinget) (https://data.norge.no/nlod/en/2.0)."
+   "Stortinget (the Norwegian parliament): Stortinget members. Retrieved 2026-10-29 20:17 UTC from https://data.stortinget.no/eksport/representanter?stortingsperiodeid=2021-2025&format=json. Licence: Norwegian Licence for Open Government Data 2.0 (credit: Stortinget) (https://data.norge.no/nlod/en/2.0)."
   ]
  },
  "e01": {
   "answer": 351,
-  "built_at": "2026-10-28T20:14:46+00:00",
+  "built_at": "2026-10-29T20:17:52+00:00",
   "citations": [
-   "Norwegian Directorate for Education and Training (Udir): National School Register, 874738352. Retrieved 2026-10-28 20:14 UTC from https://data-nsr.udir.no/v4/enhet/874738352. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0)."
+   "Norwegian Directorate for Education and Training (Udir): National School Register, 874738352. Retrieved 2026-10-29 20:17 UTC from https://data-nsr.udir.no/v4/enhet/874738352. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0)."
   ]
  },
  "t01": {
   "answer": 5493,
-  "built_at": "2026-10-28T20:14:46+00:00",
+  "built_at": "2026-10-29T20:17:52+00:00",
   "citations": [
-   "Norwegian Public Roads Administration (Statens vegvesen): Traffic volumes, 09194V804833. Retrieved 2026-10-28 20:14 UTC from https://trafikkdata-api.atlas.vegvesen.no/. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0)."
+   "Norwegian Public Roads Administration (Statens vegvesen): Traffic volumes, 09194V804833. Retrieved 2026-10-29 20:17 UTC from https://trafikkdata-api.atlas.vegvesen.no/. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0)."
   ]
  },
  "t02": {
   "answer": 5233,
-  "built_at": "2026-10-28T20:14:46+00:00",
+  "built_at": "2026-10-29T20:17:52+00:00",
   "citations": [
-   "Norwegian Public Roads Administration (Statens vegvesen): Annual average daily traffic, 09194V804833. Retrieved 2026-10-28 20:14 UTC from https://trafikkdata-api.atlas.vegvesen.no/. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0)."
+   "Norwegian Public Roads Administration (Statens vegvesen): Annual average daily traffic, 09194V804833. Retrieved 2026-10-29 20:17 UTC from https://trafikkdata-api.atlas.vegvesen.no/. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0)."
   ]
  },
  "x01": {
   "answer": 235,
-  "built_at": "2026-10-28T20:14:46+00:00",
+  "built_at": "2026-10-29T20:17:53+00:00",
   "citations": [
-   "Brønnøysund Register Centre (Brønnøysundregistrene): Enhetsregisteret search. Retrieved 2026-10-28 20:14 UTC from https://data.brreg.no/enhetsregisteret/api/enheter?size=5&page=0&kommunenummer=4601&konkurs=false&sort=antallAnsatte%2CDESC. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0).",
-   "Norwegian Directorate for Education and Training (Udir): National School Register search. Retrieved 2026-10-28 15:02 UTC from https://data-nsr.udir.no/v4/enheter/sok. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0).",
-   "Norwegian Meteorological Institute (MET Norway): MetAlerts, current warnings. Retrieved 2026-10-28 20:14 UTC from https://api.met.no/weatherapi/metalerts/2.0/current.json?lang=en&county=46. Licence: Creative Commons Attribution 4.0 International (also offered under NLOD 2.0) (https://creativecommons.org/licenses/by/4.0/)."
+   "Brønnøysund Register Centre (Brønnøysundregistrene): Enhetsregisteret search. Retrieved 2026-10-29 20:17 UTC from https://data.brreg.no/enhetsregisteret/api/enheter?size=5&page=0&kommunenummer=4601&konkurs=false&sort=antallAnsatte%2CDESC. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0).",
+   "Brønnøysund Register Centre (Brønnøysundregistrene): Regnskapsregisteret, annual accounts for 983974724. Retrieved 2026-10-29 20:17 UTC from https://data.brreg.no/regnskapsregisteret/regnskap/983974724?regnskapstype=SELSKAP. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0).",
+   "Elhub AS: Elhub: electricity consumption in Bergen on 2026-10-22. Retrieved 2026-10-29 16:05 UTC from https://api.elhub.no/energy-data/v0/municipalities/4601?dataset=CONSUMPTION_PER_GROUP_MUNICIPALITY_HOUR&startDate=2026-10-22T00%3A00%3A00%2B02%3A00&endDate=2026-10-22T23%3A59%3A59%2B02%3A00. Licence: Creative Commons Attribution 4.0 International (credit: Elhub) (https://creativecommons.org/licenses/by/4.0/)."
   ]
  },
  "x02": {
   "answer": "Bergen",
-  "built_at": "2026-10-28T20:14:49+00:00",
+  "built_at": "2026-10-29T20:17:55+00:00",
   "citations": [
-   "Brønnøysund Register Centre (Brønnøysundregistrene): Enhetsregisteret search. Retrieved 2026-10-28 20:14 UTC from https://data.brreg.no/enhetsregisteret/api/enheter?size=5&page=0&kommunenummer=1103&konkurs=false&sort=antallAnsatte%2CDESC. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0).",
-   "Brønnøysund Register Centre (Brønnøysundregistrene): Enhetsregisteret search. Retrieved 2026-10-28 20:14 UTC from https://data.brreg.no/enhetsregisteret/api/enheter?size=5&page=0&kommunenummer=4601&konkurs=false&sort=antallAnsatte%2CDESC. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0).",
-   "Brønnøysund Register Centre (Brønnøysundregistrene): Enhetsregisteret search. Retrieved 2026-10-28 20:14 UTC from https://data.brreg.no/enhetsregisteret/api/enheter?size=5&page=0&kommunenummer=5001&konkurs=false&sort=antallAnsatte%2CDESC. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0)."
+   "Brønnøysund Register Centre (Brønnøysundregistrene): Enhetsregisteret search. Retrieved 2026-10-29 20:17 UTC from https://data.brreg.no/enhetsregisteret/api/enheter?size=5&page=0&kommunenummer=1103&konkurs=false&sort=antallAnsatte%2CDESC. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0).",
+   "Brønnøysund Register Centre (Brønnøysundregistrene): Enhetsregisteret search. Retrieved 2026-10-29 20:17 UTC from https://data.brreg.no/enhetsregisteret/api/enheter?size=5&page=0&kommunenummer=4601&konkurs=false&sort=antallAnsatte%2CDESC. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0).",
+   "Brønnøysund Register Centre (Brønnøysundregistrene): Enhetsregisteret search. Retrieved 2026-10-29 20:17 UTC from https://data.brreg.no/enhetsregisteret/api/enheter?size=5&page=0&kommunenummer=5001&konkurs=false&sort=antallAnsatte%2CDESC. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0)."
   ]
  },
  "x03": {
   "answer": "Olav Kyrres gate",
-  "built_at": "2026-10-28T20:14:50+00:00",
+  "built_at": "2026-10-29T20:17:55+00:00",
   "citations": [
-   "Entur AS: Entur stop place search. Retrieved 2026-10-28 20:14 UTC from https://api.entur.io/geocoder/v3/reverse?layers=stopPlace&limit=1&lat=60.3913&lon=5.3221&radius=0.5. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0)."
+   "Entur AS: Entur stop place search. Retrieved 2026-10-29 20:17 UTC from https://api.entur.io/geocoder/v3/reverse?layers=stopPlace&limit=1&lat=60.3913&lon=5.3221&radius=0.5. Licence: Norwegian Licence for Open Government Data 2.0 (https://data.norge.no/nlod/en/2.0)."
   ]
  }
 }
