@@ -60,6 +60,9 @@ class FloodLandslideInput(_Period):
         le=4,
         description="1 green, 2 yellow, 3 orange, 4 red. The default leaves out green days.",
     )
+    language: Literal["en", "nb"] = Field(
+        default="en", description="'nb' for NVE's Norwegian texts."
+    )
 
     @model_validator(mode="after")
     def _one_area(self) -> FloodLandslideInput:
@@ -109,6 +112,9 @@ class AvalancheInput(_Period):
     )
     lat: float | None = Field(default=None, ge=57, le=82)
     lon: float | None = Field(default=None, ge=-11, le=35)
+    language: Literal["en", "nb"] = Field(
+        default="en", description="'nb' for NVE's Norwegian texts."
+    )
 
     @model_validator(mode="after")
     def _one_place(self) -> AvalancheInput:

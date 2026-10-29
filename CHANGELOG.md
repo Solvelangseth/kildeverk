@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- The warnings feed comes in Norwegian with `?lang=nb`, with MET's and NVE's Norwegian texts, and
+  the website now gives out the Norwegian feed. `weather_warnings`, `hazards_flood_landslide` and
+  `hazards_avalanche` take `language: "nb"`.
 - The MCP tool list is about 21,000 tokens instead of 109,000: tools no longer declare output
   schemas (each repeated the whole result envelope) or the titles Pydantic derives from argument
   names. Results still carry structured content, and the OpenAPI document keeps full schemas.

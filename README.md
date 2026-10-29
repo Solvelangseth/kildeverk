@@ -1217,6 +1217,10 @@ municipality's county, the flood and landslide warnings for the municipality, an
 forecasts at moderate or above for every forecasting region that covers part of it, for any feed
 reader. It takes a code (old or current) or a name, and is built from the same tools, so it shares
 their budgets and cache. On a quiet day it holds one entry saying there are no warnings.
+`?lang=nb` gives it in Norwegian: the feed's own text, and MET's and NVE's Norwegian warning
+texts. The language stays in the feed's self link, so a reader keeps it; the website hands out
+the Norwegian feed. `weather_warnings`, `hazards_flood_landslide` and `hazards_avalanche` take
+`language: "nb"` for the same texts.
 
 ## What it is not
 

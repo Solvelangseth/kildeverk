@@ -456,6 +456,18 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
             },
         ),
     ],
+    # The warning tools in Norwegian, on fixed past dates.
+    "warnings_nb": [
+        ("weather_warnings", {"month": "2023-08", "county": "03", "language": "nb", "limit": 3}),
+        (
+            "hazards_flood_landslide",
+            {"county": "03", "start": "2023-08-08", "end": "2023-08-09", "language": "nb"},
+        ),
+        (
+            "hazards_avalanche",
+            {"region": 3011, "start": "2026-03-10", "end": "2026-03-10", "language": "nb"},
+        ),
+    ],
     "met_nowcast": [
         ("weather_nowcast", {"lat": 60.3913, "lon": 5.3221}),
         ("weather_nowcast", {"lat": 78.22, "lon": 15.65}),
@@ -586,6 +598,7 @@ SCRUB = {
     "stortinget": {"epost", "foedselsdato", "doedsdato", "respons_dato_tid", "versjon"},
     "stortinget_questions": {"epost", "foedselsdato", "doedsdato", "respons_dato_tid", "versjon"},
     "met_metalerts": {"geometry", "resources"},
+    "warnings_nb": {"geometry", "resources"},
     # Pictures carry photographers' names; observer ids are not needed.
     "nve_regobs": {"Attachments", "AttachmentSummaries", "ObserverID", "ObserverGUID"},
 }
@@ -659,6 +672,9 @@ TRIM = {
 
 # Sources whose tools also call other sources: only their own host is recorded, since the
 # other sources' recordings already hold the rest.
+# Requests another cassette already holds, left out to keep fixtures small.
+ALREADY_RECORDED = {"warnings_nb": ("/avalanche/v6.3.2/api/Region",)}
+
 OWN_HOSTS = {"elhub": "api.elhub.no"}
 
 
@@ -709,6 +725,11 @@ async def record(source_id: str) -> None:
             if trim:
                 body = trim(exchange["url"].split("?")[0], body)
             exchange["response"] = json.dumps(body, ensure_ascii=False)
+
+    if skipped := ALREADY_RECORDED.get(source_id):
+        transport.exchanges = [
+            e for e in transport.exchanges if not any(e["url"].endswith(s) for s in skipped)
+        ]
 
     if host := OWN_HOSTS.get(source_id):
         transport.exchanges = [e for e in transport.exchanges if f"//{host}/" in e["url"]]

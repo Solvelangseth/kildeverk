@@ -28,7 +28,8 @@ from kildeverk.sources.nve_varsom.spec import AVALANCHE_URL, FLOOD_URL, LANDSLID
 from kildeverk.sources.ssb_klass.names import with_region_names
 
 OSLO = ZoneInfo("Europe/Oslo")
-ENGLISH = 2
+# Varsom's language keys.
+LANGUAGES = {"nb": 1, "en": 2}
 ASPECTS = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
 BASES = {"flood": FLOOD_URL, "landslide": LANDSLIDE_URL}
 
@@ -86,7 +87,7 @@ def _warning(kind: str, item: dict[str, Any]) -> Warning:
 async def flood_landslide(ctx: Context, args: FloodLandslideInput) -> Result[FloodLandslideOutput]:
     up = ctx.upstream(SPEC.id)
     start, end = _period(args.start, args.end)
-    dates = f"{ENGLISH}/{start.isoformat()}/{end.isoformat()}"
+    dates = f"{LANGUAGES[args.language]}/{start.isoformat()}/{end.isoformat()}"
     if args.municipality:
         path = f"Warning/Municipality/{args.municipality}/{dates}"
     elif args.county:
@@ -222,7 +223,7 @@ def _forecast(item: dict[str, Any]) -> AvalancheForecast:
 async def avalanche(ctx: Context, args: AvalancheInput) -> Result[AvalancheOutput]:
     up = ctx.upstream(SPEC.id)
     start, end = _period(args.start, args.end)
-    dates = f"{ENGLISH}/{start.isoformat()}/{end.isoformat()}"
+    dates = f"{LANGUAGES[args.language]}/{start.isoformat()}/{end.isoformat()}"
     if args.region is not None:
         regions = await _regions(ctx)
         if args.region not in regions:
@@ -252,7 +253,7 @@ async def avalanche(ctx: Context, args: AvalancheInput) -> Result[AvalancheOutpu
         notes.append("That point is in no avalanche forecasting region.")
     elif forecasts and all(f.level == 0 for f in forecasts):
         notes.append("No rating: avalanche forecasts are published from about December to June.")
-    if any(f.danger_assessment for f in forecasts):
+    if args.language == "en" and any(f.danger_assessment for f in forecasts):
         notes.append("The danger assessment text may be in Norwegian; the summary is English.")
     notes.append("Forecasts from varsom.no. Check varsom.no before going into avalanche terrain.")
     return Result(

@@ -143,3 +143,68 @@ async def test_avalanche_regions_cover_a_municipality(ctx, monkeypatch):
     found = await feeds._avalanche(ctx, "5501")
     assert [(f["region_id"], f["date"]) for f in found] == [(3011, "2026-03-10")]
     assert await feeds._avalanche(ctx, "0301") == []
+
+
+# --- in Norwegian ------------------------------------------------------------------
+
+
+def test_a_norwegian_feed_says_everything_in_norwegian():
+    weather = {"data": {"warnings": [{**WEATHER["data"]["warnings"][0], "event": "Kuling"}]}}
+    root = _parse(
+        build_feed(
+            "https://k.test",
+            "4601",
+            "Bergen",
+            weather,
+            HAZARDS,
+            [],
+            NOW,
+            avalanche=AVALANCHE,
+            lang="nb",
+        )
+    )
+    assert root.findtext("a:title", namespaces=NS) == "Farevarsler for Bergen (4601)"
+    assert root.get("{http://www.w3.org/XML/1998/namespace}lang") == "nb"
+    titles = [e.findtext("a:title", namespaces=NS) for e in root.findall("a:entry", NS)]
+    assert titles == [
+        "Gult farevarsel: Kuling (Stoett - Andenes)",
+        "Oransje farevarsel for flom: Flood warning orange level",
+        "Snøskredfare 2 (moderat): Tromsø",
+    ]
+    # The self link keeps the language, so a feed reader stays on the Norwegian feed.
+    self_link = root.find("a:link[@rel='self']", NS).get("href")
+    assert self_link == "https://k.test/v1/feeds/warnings/4601.atom?lang=nb"
+    assert root.findtext("a:id", namespaces=NS) == self_link
+
+
+def test_a_quiet_day_in_norwegian():
+    root = _parse(build_feed("https://k.test", "4601", "Bergen", None, None, [], NOW, lang="nb"))
+    [entry] = root.findall("a:entry", NS)
+    assert entry.findtext("a:title", namespaces=NS) == "Ingen farevarsler for Bergen i dag"
+    assert entry.findtext("a:summary", namespaces=NS).startswith("Ingen farevarsler for vær")
+
+
+def test_the_route_asks_the_sources_for_norwegian(ctx, monkeypatch):
+    asked = {}
+
+    async def fake_part(ctx, tool, arguments):
+        asked[tool] = arguments
+        return {
+            "weather_warnings": WEATHER,
+            "hazards_flood_landslide": HAZARDS,
+            "regions_resolve": {"data": {"matches": [{"name": "Bergen"}]}},
+            "hazards_avalanche": {"data": {"forecasts": []}},
+        }[tool]
+
+    async def fake_region(ctx, value):
+        return "4601", "municipality", None
+
+    monkeypatch.setattr(composite, "_part", fake_part)
+    monkeypatch.setattr(composite, "_region_for_series", fake_region)
+    with TestClient(create_app(Settings(_env_file=None), context=ctx)) as http:
+        response = http.get("/v1/feeds/warnings/Bergen.atom?lang=nb")
+        refused = http.get("/v1/feeds/warnings/Bergen.atom?lang=sv")
+    assert response.status_code == 200 and refused.status_code == 400
+    assert asked["weather_warnings"]["language"] == "nb"
+    assert asked["hazards_flood_landslide"]["language"] == "nb"
+    assert _parse(response.content).findtext("a:title", namespaces=NS).startswith("Farevarsler")

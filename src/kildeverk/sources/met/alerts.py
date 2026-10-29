@@ -45,6 +45,9 @@ class WarningsInput(BaseModel):
         "warning reached.",
     )
     limit: int = Field(default=20, ge=1, le=200)
+    language: Literal["en", "nb"] = Field(
+        default="en", description="'nb' for MET's Norwegian (bokmål) texts."
+    )
 
     @model_validator(mode="after")
     def _rules(self) -> WarningsInput:
@@ -129,7 +132,8 @@ def _warning(feature: dict[str, Any]) -> WeatherWarning:
 
 async def warnings(ctx: Context, args: WarningsInput) -> Result[WarningsOutput]:
     up = ctx.upstream(METALERTS.id)
-    params: dict[str, Any] = {"lang": "en"}
+    # MetAlerts calls Norwegian 'no'.
+    params: dict[str, Any] = {"lang": "no" if args.language == "nb" else "en"}
     if args.lat is not None and args.lon is not None:
         params["lat"], params["lon"] = round(args.lat, 3), round(args.lon, 3)
     if args.county:

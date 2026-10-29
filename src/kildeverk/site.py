@@ -870,7 +870,8 @@ footer nav { display: flex; gap: 16px; flex-wrap: wrap; }
     var result = document.getElementById("feed-result");
     if (!name) return;
     var button = feedForm.querySelector("button"); button.disabled = true;
-    var url = "/v1/feeds/warnings/" + encodeURIComponent(name) + ".atom";
+    // The Norwegian feed, to match the page; its own self link keeps ?lang=nb for the reader.
+    var url = "/v1/feeds/warnings/" + encodeURIComponent(name) + ".atom?lang=nb";
     fetch(url).then(function (r) {
       result.hidden = false; result.className = "small";
       if (r.ok) return r.text().then(function (xml) {
