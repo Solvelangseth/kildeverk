@@ -31,7 +31,7 @@ publishers whose data it reads.
 | [MET Norway Frost](#met_frost): needs a free client id | ✅ available | `weather_find_stations`, `weather_station_elements`, `weather_observations`, `weather_normals` |
 | [NVE HydAPI](#nve_hydapi): needs a free key | ✅ available | `water_find_stations`, `water_observations` |
 | [Entur Geocoder](#entur_geocoder): stop places | ✅ available | `transit_find_stops` |
-| [Entur Journey Planner](#entur_journeyplanner): departures | ✅ available | `transit_departures` |
+| [Entur Journey Planner](#entur_journeyplanner): departures and journeys | ✅ available | `transit_departures`, `transit_journeys` |
 | [Avinor](#avinor): flight departures and arrivals | ✅ available | `flights_airport` |
 | [Kartverket](#kartverket): addresses, place names, elevation, municipality at a point | ✅ available | `addresses_search`, `places_search`, `terrain_elevation`, `regions_at_point` |
 | [Kartverket water level and tides](#kartverket_sea_level) | ✅ available | `sea_level`, `sea_level_extremes` |
@@ -618,6 +618,11 @@ trains, buses, trams, metro, ferries and flights.
 **Identification:** Entur requires every client to send an `ET-Client-Name` header in the form
 `<company>-<application>`. Kildeverk sends `kildeverk-local` or `kildeverk-public`. Set
 `KILDEVERK_ENTUR_CLIENT_NAME` to use your own. No key is needed.
+- `transit_journeys` plans a journey from A to B, each end given as a stop id, a stop name
+  (looked up with the geocoder, and the result says what it was read as) or coordinates: the next
+  journeys, or those arriving by a time, each with departure, arrival, duration, changes and
+  walking distance, and every leg's mode, line, direction, stops, platforms, real-time times,
+  cancellations and notices. Cached for a minute.
 
 **Licence:** [NLOD](https://data.norge.no/nlod/en/2.0), as for the geocoder.
 
@@ -635,7 +640,6 @@ identical questions costs one upstream call; the result says when it came from t
 - The query is GraphQL, and provenance records the full request body.
 
 **Known gaps:**
-- Journey planning from A to B is not exposed yet.
 - Groups of stop places (all of "Oslo", say) are not searched; use a stop place or a quay.
 
 <a id="avinor"></a>

@@ -356,6 +356,30 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
             {"kind": "question_time", "session": "2025-2026", "query": "barnehage"},
         ),
     ],
+    # Recorded apart from the Entur sources, so their recordings stay as they are.
+    "entur_journeys": [
+        ("transit_journeys", {"origin": "Oslo S", "destination": "Bergen stasjon", "limit": 2}),
+        (
+            "transit_journeys",
+            {
+                "origin_lat": 59.9139,
+                "origin_lon": 10.7522,
+                "destination_lat": 59.95,
+                "destination_lon": 10.73,
+            },
+        ),
+        (
+            "transit_journeys",
+            {
+                "origin": "Tromsø lufthavn",
+                "destination": "Prostneset",
+                "time": "2026-11-02T09:00",
+                "arrive_by": True,
+                "limit": 1,
+            },
+        ),
+        ("transit_journeys", {"origin": "Xyzzyville", "destination": "Oslo S"}),
+    ],
     "worldbank_wdi": [
         ("world_indicators", {"indicator": "gdp_per_capita"}),
         (

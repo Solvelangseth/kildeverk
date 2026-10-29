@@ -57,15 +57,18 @@ JOURNEY_PLANNER = SourceSpec(
         "headers; clients must identify with ET-Client-Name",
     ),
     # Real-time departures change by the minute; a short cache still absorbs bursts.
-    cache_ttls_s={"departures": 30},
+    cache_ttls_s={"departures": 30, "journeys": 60},
     covers=[
         (
             "Departures from any stop place or quay in Norway, for every operator: scheduled and "
             "real-time times, platform, line, destination, cancellations and disruption notices"
         ),
+        (
+            "Journeys from A to B by stop, name or coordinates: every leg with line, platforms, "
+            "real-time times, walking and changes"
+        ),
     ],
     known_gaps=[
-        "Journey planning from A to B is not exposed yet",
         "Real-time coverage depends on the operator; rows say whether a time is real-time",
         "Departures are cached for 30 seconds",
     ],

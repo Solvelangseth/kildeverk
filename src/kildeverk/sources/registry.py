@@ -72,6 +72,7 @@ def operations():
     from kildeverk.sources.brreg.ops import OPERATIONS as BRREG_OPS
     from kildeverk.sources.datanorge.ops import OPERATIONS as DATANORGE_OPS
     from kildeverk.sources.elhub.ops import OPERATIONS as ELHUB_OPS
+    from kildeverk.sources.entur.journeys import OPERATIONS as ENTUR_JOURNEY_OPS
     from kildeverk.sources.entur.ops import OPERATIONS as ENTUR_OPS
     from kildeverk.sources.kartverket.ops import OPERATIONS as KARTVERKET_OPS
     from kildeverk.sources.kartverket_sea.levels import OPERATIONS as SEA_LEVEL_EXTREME_OPS
@@ -106,6 +107,7 @@ def operations():
         *MET_PRODUCT_OPS,
         *NVE_OPS,
         *ENTUR_OPS,
+        *ENTUR_JOURNEY_OPS,
         *KARTVERKET_OPS,
         *NORGES_BANK_OPS,
         *NVE_VARSOM_OPS,
