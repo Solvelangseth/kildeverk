@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `transit_journeys`: plan a public transport journey from A to B with Entur, by stop, name or
+  coordinates, with every leg, change, platform and real-time time.
 - `parliament_questions`: questions members of Stortinget put to ministers (written questions,
   question time, interpellations), searchable by words, minister, party and answer status.
 - `sea_level_extremes`: storm-surge return levels, record sea levels and tidal levels at a place on

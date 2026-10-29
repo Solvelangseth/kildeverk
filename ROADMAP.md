@@ -89,7 +89,7 @@ or a credential and cannot be done from the code alone.
 
 ## More from the same publishers
 
-- [ ] Entur journey planning from A to B.
+- [x] Entur journey planning from A to B (`transit_journeys`).
 - [x] Kartverket return levels for storm surge (`sea_level_extremes`).
 - [x] Stortinget questions to ministers (`parliament_questions`).
 - [x] MET ocean forecast (waves and sea temperature).

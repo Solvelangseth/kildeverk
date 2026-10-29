@@ -280,9 +280,12 @@ SOURCES: dict[str, SourceText] = {
                 "Avganger fra alle stoppesteder og plattformer i Norge, for alle operatører: "
                 "rutetid og sanntid, plattform, linje, endestasjon, innstillinger og avviksmeldinger"
             ),
+            (
+                "Reiser fra A til B, fra holdeplass, navn eller koordinater: hvert ledd med linje, "
+                "plattform, sanntid, gange og bytter"
+            ),
         ],
         [
-            "Reiseplanlegging fra A til B er ikke tatt med ennå",
             "Sanntidsdekningen avhenger av operatøren; hver rad sier om tiden er sanntid",
             "Avganger mellomlagres i 30 sekunder",
         ],
@@ -762,6 +765,10 @@ TOOLS: dict[str, ToolText] = {
         "Neste buss, tog, trikk, T-bane eller ferje fra en holdeplass, med sanntid, forsinkelser "
         "og avvik.",
     ),
+    "transit_journeys": ToolText(
+        "Reise fra A til B",
+        "De neste reisene med kollektivtransport, med hvert ledd, bytter, gange og sanntid.",
+    ),
     "flights_airport": ToolText(
         "Fly på en flyplass",
         "Avganger og ankomster med tider, forsinkelser, gate og bagasjebånd, fra Avinor.",
@@ -919,6 +926,7 @@ THEMES: list[tuple[str, str, list[str]]] = [
         [
             "transit_find_stops",
             "transit_departures",
+            "transit_journeys",
             "flights_airport",
             "traffic_find_points",
             "traffic_volumes",
