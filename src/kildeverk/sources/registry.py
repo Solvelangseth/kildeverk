@@ -22,6 +22,7 @@ from kildeverk.sources.nve_hydapi.spec import SPEC as NVE_HYDAPI
 from kildeverk.sources.nve_regobs.spec import SPEC as NVE_REGOBS
 from kildeverk.sources.nve_reservoirs.spec import SPEC as NVE_RESERVOIRS
 from kildeverk.sources.nve_varsom.spec import SPEC as NVE_VARSOM
+from kildeverk.sources.ordbokene.spec import SPEC as ORDBOKENE
 from kildeverk.sources.ssb_klass.spec import SPEC as SSB_KLASS
 from kildeverk.sources.ssb_statbank.spec import SPEC as SSB_STATBANK
 from kildeverk.sources.stortinget.spec import SPEC as STORTINGET
@@ -55,6 +56,7 @@ SOURCES: tuple[SourceSpec, ...] = (
     VEGVESEN_TRAFFIC,
     UDIR_NSR,
     USGS_EARTHQUAKES,
+    ORDBOKENE,
 )
 
 
@@ -77,6 +79,7 @@ def operations():
     from kildeverk.sources.nve_regobs.ops import OPERATIONS as NVE_REGOBS_OPS
     from kildeverk.sources.nve_reservoirs.ops import OPERATIONS as NVE_RESERVOIRS_OPS
     from kildeverk.sources.nve_varsom.ops import OPERATIONS as NVE_VARSOM_OPS
+    from kildeverk.sources.ordbokene.ops import OPERATIONS as ORDBOKENE_OPS
     from kildeverk.sources.ssb_klass.ops import OPERATIONS as SSB_KLASS_OPS
     from kildeverk.sources.ssb_statbank.ops import OPERATIONS as SSB_STATBANK_OPS
     from kildeverk.sources.stortinget.ops import OPERATIONS as STORTINGET_OPS
@@ -107,6 +110,7 @@ def operations():
         *VEGVESEN_TRAFFIC_OPS,
         *UDIR_NSR_OPS,
         *USGS_OPS,
+        *ORDBOKENE_OPS,
         *composite.OPERATIONS,
         *cite.OPERATIONS,
         *meta.OPERATIONS,

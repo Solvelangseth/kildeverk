@@ -319,6 +319,12 @@ SCENARIOS: dict[str, list[tuple[str, dict]]] = {
             },
         ),
     ],
+    "ordbokene": [
+        ("dictionary_lookup", {"word": "fjord"}),
+        ("dictionary_lookup", {"word": "springe", "dictionary": "nn", "limit": 1}),
+        ("dictionary_lookup", {"word": "fjrod"}),
+        ("dictionary_lookup", {"word": "spring*", "dictionary": "bm", "limit": 2}),
+    ],
     "usgs_earthquakes": [
         (
             "hazards_earthquakes",

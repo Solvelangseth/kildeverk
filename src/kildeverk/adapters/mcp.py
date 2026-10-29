@@ -48,6 +48,7 @@ GUIDE = """# Choosing a Kildeverk tool
 - **Money:** `currency_exchange_rates`, `rates_policy_rate`.
 - **Parliament:** `parliament_cases`, then `parliament_case` for votes; `parliament_members`.
 - **Schools:** `schools_search`, then `schools_get`.
+- **Norwegian words:** `dictionary_lookup` for spelling, inflection and meaning.
 - **Anything else:** `catalog_search` finds which public body publishes it.
 
 Quote each result's `provenance[].citation` when you use its data, and read its `notes`.

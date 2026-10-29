@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- A new source, Ordbøkene: `dictionary_lookup` looks a word up in Bokmålsordboka and
+  Nynorskordboka, with meanings, examples, inflection, word class and origin.
 - A new source, Regobs: `hazards_field_observations` gives field observations of avalanches,
   landslides, floods and ice near a point, crediting each observer by username as Regobs requires.
 - A first source from outside Norway: `hazards_earthquakes`, earthquakes near a point from the

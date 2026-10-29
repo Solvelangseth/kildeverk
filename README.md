@@ -1,7 +1,7 @@
 # Kildeverk
 
 Live Norwegian public data for AI agents and people. Kildeverk is an MCP server
-and a read-only JSON API over 25 official data services from 13 publishers, 12 of them Norwegian:
+and a read-only JSON API over 26 official data services from 14 publishers, 13 of them Norwegian:
 statistics, companies, weather, water, warnings, transport, maps, the sea, money,
 energy, parliament, roads and schools. Every result says exactly where it came from.
 
@@ -43,6 +43,7 @@ publishers whose data it reads.
 | [Stortinget](#stortinget): cases, votes and members | ✅ available | `parliament_cases`, `parliament_case`, `parliament_members` |
 | [Statens vegvesen traffic data](#vegvesen_traffic) | ✅ available | `traffic_find_points`, `traffic_volumes` |
 | [National School Register](#udir_nsr) | ✅ available | `schools_search`, `schools_get` |
+| [Ordbøkene](#ordbokene): Bokmålsordboka and Nynorskordboka | ✅ available | `dictionary_lookup` |
 | [USGS Earthquake Catalog](#usgs_earthquakes) | ✅ available | `hazards_earthquakes` |
 
 Three tools combine sources. `place_overview` takes a coordinate and returns its municipality and
@@ -1019,6 +1020,30 @@ private, and Norwegian schools abroad.
 - Pupil numbers are the register's latest figure, not a time series.
 
 <a id="deploy-your-own"></a>
+
+<a id="ordbokene"></a>
+### Ordbøkene: Bokmålsordboka and Nynorskordboka
+
+**What it covers:** the official Norwegian dictionaries from the University of Bergen and the
+Language Council of Norway. `dictionary_lookup` gives, for a word in Bokmål, Nynorsk or both, each
+article's headwords, word class and gender, every standard inflected form, the meanings with
+examples, and the word's origin, with a link to ordbøkene.no. `*` matches any letters. A word that
+is not a headword gets similar words instead.
+
+**Licence:** [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.no), for the content and
+for data fetched through the API, commercial use included
+([UiB's terms](https://www.uib.no/en/node/182212)). UiB asks for this credit wherever the content
+is shown, and every result carries it: "Bokmålsordboka/Nynorskordboka, Universitetet i Bergen og
+Språkrådet, ordbøkene.no, CC-BY 4.0".
+
+**Rate limits:** none published. Kildeverk spends at most 120 calls a minute; a lookup is one
+search, one call per article and, once a week, the list of abbreviations.
+
+**Behaviour worth knowing:** the dictionaries store texts with placeholders and abbreviations
+(`norr.`, `besl`); Kildeverk fills them in from the dictionaries' own list, so results read as
+plain Norwegian ("norrønt fjǫrdr; beslektet med fare").
+
+**Known gaps:** explanations are in Norwegian, and compounds that are not headwords are not split.
 
 <a id="usgs_earthquakes"></a>
 ### USGS Earthquake Catalog

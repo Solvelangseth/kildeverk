@@ -169,7 +169,7 @@ must be read in full before building.
       for commercial or non-commercial purposes" (Decision 2011/833/EU). Site text is CC BY 4.0
       and metadata is CC0 (https://ted.europa.eu/en/legal-notice). Search needs no key
       (https://docs.ted.europa.eu/api/latest/search.html). **M** (expert query syntax), low risk.
-- [ ] **Ordbøkene** (`ordbokene`): Bokmål and Nynorsk dictionary lookups (spelling, inflection,
+- [x] **Ordbøkene** (`ordbokene`, built 2026-10-29): Bokmål and Nynorsk dictionary lookups (spelling, inflection,
       meaning). CC BY 4.0 for the content and API data, with the required credit
       "Bokmålsordboka/Nynorskordboka, Universitetet i Bergen og Språkrådet, ordbøkene.no, CC-BY
       4.0" (https://www.uib.no/en/node/182212). No key. **S**, low risk. Only a modest fit, but very

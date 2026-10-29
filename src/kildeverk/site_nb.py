@@ -514,6 +514,21 @@ SOURCES: dict[str, SourceText] = {
             "Resultater, lærertetthet og annen skolestatistikk er ikke med",
         ],
     ),
+    "ordbokene": SourceText(
+        "Ordbøkene",
+        "Universitetet i Bergen og Språkrådet",
+        [
+            (
+                "Bokmålsordboka og Nynorskordboka: et ords betydninger med eksempler, ordklasse og "
+                "kjønn, alle bøyningsformer og opphav"
+            ),
+            "Lignende ord når et ord ikke finnes",
+        ],
+        [
+            "Forklaringene er på norsk",
+            "Sammensatte ord som ikke er oppslagsord, deles ikke opp",
+        ],
+    ),
     "usgs_earthquakes": SourceText(
         "USGS jordskjelvkatalog",
         "U.S. Geological Survey (USGS)",
@@ -742,6 +757,10 @@ TOOLS: dict[str, ToolText] = {
         "Stortingsrepresentantene",
         "Representantene i dag eller i en periode, med parti, valgkrets og komiteer.",
     ),
+    "dictionary_lookup": ToolText(
+        "Slå opp et ord",
+        "Betydning, bøyning, ordklasse og opphav fra Bokmålsordboka og Nynorskordboka.",
+    ),
     "catalog_search": ToolText(
         "Søk i datakatalogen",
         "Finn datasett og API-er som offentlige virksomheter har beskrevet på data.norge.no.",
@@ -851,6 +870,11 @@ THEMES: list[tuple[str, str, list[str]]] = [
         ["parliament_cases", "parliament_case", "parliament_members"],
     ),
     (
+        "Språk",
+        "De offisielle ordbøkene for bokmål og nynorsk.",
+        ["dictionary_lookup"],
+    ),
+    (
         "Datakatalog og tjenesten",
         "Finn andre datasett, lag kildehenvisninger og se status.",
         ["catalog_search", "cite_sources", "sources_list", "service_status"],
@@ -876,6 +900,7 @@ PUBLISHERS: dict[str, str] = {
     "Norwegian Directorate for Education and Training (Udir)": "Udir",
     "Elhub AS": "Elhub",
     "U.S. Geological Survey (USGS)": "USGS",
+    "University of Bergen and the Language Council of Norway (Språkrådet)": "UiB og Språkrådet",
 }
 
 LICENCES: dict[str, str] = {"not-stated": "ingen lisens oppgitt"}
