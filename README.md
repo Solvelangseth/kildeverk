@@ -5,6 +5,8 @@ and a read-only JSON API over 18 official data services from 11 Norwegian publis
 statistics, companies, weather, water, warnings, transport, maps, the sea, money,
 energy, parliament, roads and schools. Every result says exactly where it came from.
 
+**Try it:** [kildeverk.fly.dev](https://kildeverk.fly.dev) · MCP at `https://kildeverk.fly.dev/mcp`
+
 - **One set of tools, two front doors.** The same handlers serve MCP (streamable HTTP or stdio) and REST.
 - **Provenance on every result:** the source, its licence, the exact upstream URL, when it was retrieved, and a citation line you can paste.
 - **Errors an agent can act on.** Each error has a code, a plain explanation, whether retrying helps, how long to wait, and often a ready-made next call.
@@ -88,8 +90,25 @@ Kildeverk reads live data. It does not mirror or archive anything beyond a short
 
 ### The hosted service
 
-The hosted service is not live yet. Everything needed to run it is in this repository (see
-[Deploy your own](#deploy-your-own)), and this section will give its address once it is up.
+The hosted service runs at **https://kildeverk.fly.dev**, on one machine in Stockholm. No sign-up
+and no key: point an MCP client at the URL below, or call the JSON API directly.
+
+```json
+{
+  "mcpServers": {
+    "kildeverk": { "type": "http", "url": "https://kildeverk.fly.dev/mcp" }
+  }
+}
+```
+
+```sh
+claude mcp add --transport http kildeverk https://kildeverk.fly.dev/mcp
+curl "https://kildeverk.fly.dev/v1/weather/forecast?lat=59.91&lon=10.75"
+```
+
+The website at the same address has a "Try it" button for every tool, and the API's interactive
+documentation is at [/docs](https://kildeverk.fly.dev/docs). It is a personal project with no
+uptime promise; for heavy use, run your own (see [Deploy your own](#deploy-your-own)).
 
 A public deployment differs from a local one in three ways:
 - **Each client address gets its own budget:** 60 calls a minute with bursts of 20, across the

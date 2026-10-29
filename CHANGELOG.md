@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- The hosted service is live at https://kildeverk.fly.dev (MCP at `/mcp`).
+- The container starts as root only to take ownership of the mounted cache volume, then runs the
+  service as an unprivileged user.
+
 ## 0.2.0 — 2026-10-28
 
 Tools that answer a question from several sources at once, and more ways to use the answers.

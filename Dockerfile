@@ -19,11 +19,12 @@ COPY src ./src
 RUN uv sync --frozen --no-dev && kildeverk site --out /app/site
 
 RUN useradd --create-home --uid 1000 kildeverk && mkdir -p /data && chown kildeverk /data
-USER kildeverk
 
 ENV KILDEVERK_DEPLOYMENT=public \
     KILDEVERK_SITE_DIR=/app/site \
     KILDEVERK_CACHE_PATH=/data/responses.sqlite
 
 EXPOSE 8080
-CMD ["kildeverk", "serve", "--http", "--host", "0.0.0.0", "--port", "8080"]
+# A mounted volume arrives owned by root, so the container starts as root, hands /data to the
+# service's user and runs the service as that user.
+CMD ["sh", "-c", "chown kildeverk /data && exec setpriv --reuid=kildeverk --regid=kildeverk --init-groups kildeverk serve --http --host 0.0.0.0 --port 8080"]

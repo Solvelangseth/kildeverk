@@ -5,11 +5,11 @@ or a credential and cannot be done from the code alone.
 
 ## Launch
 
-- [ ] Create the public GitHub repository and push `main` **(needs owner)**. The first CI run
+- [x] Create the public GitHub repository and push `main` **(needs owner)**. The first CI run
       also builds the Docker image for the first time.
-- [ ] Deploy to Fly.io: volume, secrets (`KILDEVERK_CONTACT`, Frost and HydAPI keys), `fly deploy`
+- [x] Deploy to Fly.io: volume, secrets (`KILDEVERK_CONTACT`, Frost and HydAPI keys), `fly deploy`
       **(needs owner)**.
-- [ ] Put the hosted URL in the README and on the website; add the hosted MCP URL to the
+- [x] Put the hosted URL in the README and on the website; add the hosted MCP URL to the
       "Connect" panel.
 - [ ] Check the website by eye at desktop and phone width, light and dark.
 
