@@ -463,6 +463,7 @@ nav.top .wrap { display: flex; align-items: center; gap: 22px; height: 60px; }
 .stats { display: flex; gap: 34px; flex-wrap: wrap; margin: 0; padding: 0; list-style: none; }
 .stats li { color: var(--muted); font-size: .92rem; }
 .stats b { display: block; font-size: 1.75rem; color: var(--ink); font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
+.growing { margin: 14px 0 0; color: var(--muted); font-size: .9rem; }
 .ridges { position: absolute; left: 0; right: 0; bottom: -1px; width: 100%; height: 150px; z-index: 0; }
 
 /* The illustration in the hero */
@@ -646,6 +647,7 @@ footer nav { display: flex; gap: 16px; flex-wrap: wrap; }
         <li><b>@@N_PUBLISHERS@@</b>utgivere</li>
         <li><b>@@N_TOOLS@@</b>verktøy</li>
       </ul>
+      <p class="growing">Flere kilder legges til fortløpende.</p>
     </div>
     @@DEMO@@
   </div>
@@ -696,7 +698,8 @@ footer nav { display: flex; gap: 16px; flex-wrap: wrap; }
     <p class="eyebrow">Kilder</p>
     <h2>@@N_SOURCES@@ kilder fra @@N_PUBLISHERS@@ utgivere</h2>
     <p class="lead-s">Hver kilde oppgir lisensen slik utgiveren skriver den, og hvert svar gjentar den.
-    To av kildene krever en gratis nøkkel; den offentlige tjenesten har begge.</p>
+    To av kildene krever en gratis nøkkel; den offentlige tjenesten har begge. Vi legger stadig til
+    flere kilder; se <a href="@@REPO@@/blob/main/CHANGELOG.md">endringsloggen</a> for det siste.</p>
     <div class="grid cards">@@CARDS@@
     </div>
   </section>
