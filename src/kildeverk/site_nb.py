@@ -652,8 +652,8 @@ TOOLS: dict[str, ToolText] = {
     ),
     "compare_municipalities": ToolText(
         "Sammenlign kommuner",
-        "To til fem kommuner side om side, med foretak per 1 000 innbyggere og strøm per "
-        "innbygger.",
+        "To til fem kommuner side om side, med registrerte enheter per 1 000 innbyggere og strøm "
+        "per innbygger.",
     ),
     "statistics_search_tables": ToolText(
         "Søk i SSBs tabeller",

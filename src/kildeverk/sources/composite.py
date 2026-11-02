@@ -1354,7 +1354,7 @@ OPERATIONS = (
         title="Compare municipalities",
         description=(
             "Two to five Norwegian municipalities side by side: population and its change, "
-            "registered companies (also per 1,000 inhabitants), schools, traffic counting points, "
+            "registered units in the business register (also per 1,000 inhabitants), schools, traffic counting points, "
             "electricity use per inhabitant and warnings in force. Accepts codes, old or current, "
             "and names. Built on "
             "municipality_profile, which gives each one in full."

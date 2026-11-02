@@ -1,5 +1,5 @@
 {
- "built_at": "2026-10-29T15:17+00:00",
+ "built_at": "2026-11-02T22:02+00:00",
  "recipes": [
   {
    "question": "What is it like at this spot in central Bergen right now?",
@@ -9,8 +9,8 @@
     "lat": 60.3913,
     "lon": 5.3221
    },
-   "answer": "The point is in Bergen (Vestland), 4 m above sea level. It is 13 °C with wind of 1 m/s, and no rain is expected in the next six hours. No warnings are in force. The nearest stop is Olav Kyrres gate, 144 m away.",
-   "answer_nb": "Punktet ligger i Bergen (Vestland), 4 meter over havet. Det er 13 °C og 1 m/s vind, og det ventes ikke nedbør de neste seks timene. Ingen farevarsler gjelder. Nærmeste holdeplass er Olav Kyrres gate, 144 meter unna.",
+   "answer": "The point is in Bergen (Vestland), 4 m above sea level. It is 6 °C with wind of 2 m/s, and no rain is expected in the next six hours. No warnings are in force. The nearest stop is Olav Kyrres gate, 144 m away.",
+   "answer_nb": "Punktet ligger i Bergen (Vestland), 4 meter over havet. Det er 6 °C og 2 m/s vind, og det ventes ikke nedbør de neste seks timene. Ingen farevarsler gjelder. Nærmeste holdeplass er Olav Kyrres gate, 144 meter unna.",
    "sources": [
     {
      "publisher": "Entur AS",
@@ -29,7 +29,7 @@
      "licence": "Norwegian Licence for Open Government Data 2.0"
     }
    ],
-   "upstream_calls": 8
+   "upstream_calls": 9
   },
   {
    "question": "Which municipalities have grown fastest since 2015?",
@@ -54,18 +54,18 @@
     "rows": [
      {
       "name": "Lørenskog",
-      "change_pct": 47.0
+      "change_pct": 46.59
      },
      {
       "name": "Nannestad",
-      "change_pct": 40.0
+      "change_pct": 40.23
      },
      {
       "name": "Ullensaker",
-      "change_pct": 38.0
+      "change_pct": 38.04
      }
     ],
-    "country_pct": 8.9,
+    "country_pct": 8.94,
     "compare_to": "2015",
     "period": "2026"
    }
@@ -96,8 +96,8 @@
    "arguments": {
     "case_id": 200084
    },
-   "answer": "Representantforslag om tiltak for å dempe økte energipriser og levekostnader: the vote ended 68–29, adopted. Parties mostly voting against: FrP.",
-   "answer_nb": "Representantforslag om tiltak for å dempe økte energipriser og levekostnader: voteringen endte 68–29, og forslaget ble vedtatt. Partier som for det meste stemte imot: FrP.",
+   "answer": "Representantforslag om tiltak for å dempe økte energipriser og levekostnader: rejected. Against the committee's recommendation the proposal got 29 votes to 68; only FrP voted for it. 72 members were absent.",
+   "answer_nb": "Representantforslag om tiltak for å dempe økte energipriser og levekostnader: forkastet. Mot komiteens innstilling fikk forslaget 29 stemmer mot 68; bare FrP stemte for. 72 representanter var ikke til stede.",
    "sources": [
     {
      "publisher": "Stortinget (the Norwegian parliament)",
@@ -117,12 +117,16 @@
      "Stavanger"
     ]
    },
-   "answer": "Bergen: 294 860 people (+6.3% since 2016), 198 companies per 1 000. Trondheim - Tråante: 218 460 people (+12.9% since 2016), 192 companies per 1 000. Stavanger: 151 669 people (+7.8% since 2016), 192 companies per 1 000.",
-   "answer_nb": "Bergen: 294 860 innbyggere (+6,3 % siden 2016), 198 foretak per 1 000. Trondheim - Tråante: 218 460 innbyggere (+12,9 % siden 2016), 192 foretak per 1 000. Stavanger: 151 669 innbyggere (+7,8 % siden 2016), 192 foretak per 1 000.",
+   "answer": "Bergen: 294 860 people (+6.3% since 2016), 198 registered units per 1 000 people. Trondheim - Tråante: 218 460 people (+12.9% since 2016), 192 registered units per 1 000 people. Stavanger: 151 669 people (+7.8% since 2016), 192 registered units per 1 000 people.",
+   "answer_nb": "Bergen: 294 860 innbyggere (+6,3 % siden 2016), 198 registrerte enheter per 1 000 innbyggere. Trondheim - Tråante: 218 460 innbyggere (+12,9 % siden 2016), 192 registrerte enheter per 1 000 innbyggere. Stavanger: 151 669 innbyggere (+7,8 % siden 2016), 192 registrerte enheter per 1 000 innbyggere.",
    "sources": [
     {
      "publisher": "Brønnøysund Register Centre (Brønnøysundregistrene)",
      "licence": "Norwegian Licence for Open Government Data 2.0"
+    },
+    {
+     "publisher": "Elhub AS",
+     "licence": "Creative Commons Attribution 4.0 International (credit: Elhub)"
     },
     {
      "publisher": "Norwegian Directorate for Education and Training (Udir)",
@@ -145,7 +149,7 @@
      "licence": "Creative Commons Attribution 4.0 International"
     }
    ],
-   "upstream_calls": 33
+   "upstream_calls": 57
   }
  ]
 }

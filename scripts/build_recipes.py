@@ -92,14 +92,30 @@ def series(r: dict) -> str:
     )
 
 
+def _alternative_vote(d: dict) -> tuple[dict, dict, list[str]]:
+    """The committee's recommendation against a proposal, as Stortinget records the pair.
+
+    An alternative vote is stored as two records with the same topic: the recommendation's tally
+    and the proposal's. Reading only the first one says "adopted" about the recommendation, not
+    the proposal; this pairs them so the answer says which is which.
+    """
+
+    recorded = [v for v in d["votes"] if v["recorded_by_name"]]
+    assert recorded and recorded[0]["topic"].startswith("Alternativ votering mellom innstillingen")
+    recommendation, proposal = recorded[0], recorded[1]
+    assert recommendation["adopted"] and not proposal["adopted"], "not a rejected proposal"
+    assert "ikke vedtatt" in d["decision"]
+    backers = [p["party"] for p in proposal["parties"] if p["for_votes"] > p["against_votes"]]
+    return recommendation, proposal, backers
+
+
 def vote(r: dict) -> str:
     d = r["data"]
-    v = next(v for v in d["votes"] if v["recorded_by_name"])
-    against = [p["party"] for p in v["parties"] if p["against_votes"] > p["for_votes"]]
+    rec, prop, backers = _alternative_vote(d)
     return (
-        f"{d['short_title']}: the vote ended {v['for_count']}–{v['against_count']}, "
-        f"{'adopted' if v['adopted'] else 'rejected'}. Parties mostly voting against: "
-        f"{', '.join(against) or 'none'}."
+        f"{d['short_title']}: rejected. Against the committee's recommendation the proposal got "
+        f"{prop['for_count']} votes to {rec['for_count']}; only {', '.join(backers)} voted for it. "
+        f"{prop['absent_count']} members were absent."
     )
 
 
@@ -107,7 +123,7 @@ def compare(r: dict) -> str:
     rows = r["data"]["rows"]
     return " ".join(
         f"{x['name']}: {_fmt(x['population'])} people ({x['population_change_since_pct']:+.1f}% since "
-        f"{x['population_change_since']}), {x['companies_per_1000']:.0f} companies per 1 000."
+        f"{x['population_change_since']}), {x['companies_per_1000']:.0f} registered units per 1 000 people."
         for x in rows
     )
 
@@ -173,12 +189,11 @@ def series_nb(r: dict) -> str:
 
 def vote_nb(r: dict) -> str:
     d = r["data"]
-    v = next(v for v in d["votes"] if v["recorded_by_name"])
-    against = [p["party"] for p in v["parties"] if p["against_votes"] > p["for_votes"]]
+    rec, prop, backers = _alternative_vote(d)
     return (
-        f"{d['short_title']}: voteringen endte {v['for_count']}–{v['against_count']}, og forslaget "
-        f"ble {'vedtatt' if v['adopted'] else 'forkastet'}. Partier som for det meste stemte imot: "
-        f"{', '.join(against) or 'ingen'}."
+        f"{d['short_title']}: forkastet. Mot komiteens innstilling fikk forslaget "
+        f"{prop['for_count']} stemmer mot {rec['for_count']}; bare {', '.join(backers)} stemte "
+        f"for. {prop['absent_count']} representanter var ikke til stede."
     )
 
 
@@ -188,7 +203,7 @@ def compare_nb(r: dict) -> str:
         f"{x['name']}: {_fmt(x['population'])} innbyggere "
         f"({'+' if x['population_change_since_pct'] >= 0 else ''}"
         f"{_pct(x['population_change_since_pct'])} % siden {x['population_change_since']}), "
-        f"{x['companies_per_1000']:.0f} foretak per 1 000."
+        f"{x['companies_per_1000']:.0f} registrerte enheter per 1 000 innbyggere."
         for x in rows
     )
 
