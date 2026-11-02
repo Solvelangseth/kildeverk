@@ -39,6 +39,7 @@ TEXT = {
             "No weather, flood or landslide warning at yellow or above, and no avalanche danger "
             "at moderate or above, is in force."
         ),
+        "none_summary_some": "None of the chosen kinds of warning is in force.",
         "levels": {"yellow": "Yellow", "orange": "Orange", "red": "Red", "green": "Green"},
         "avalanche_levels": {},
         "unavailable": "{part} unavailable: {message}",
@@ -61,6 +62,7 @@ TEXT = {
             "Ingen farevarsler for vær, flom eller jordskred på gult nivå eller høyere, og ingen "
             "snøskredfare på moderat eller høyere, gjelder nå."
         ),
+        "none_summary_some": "Ingen av de valgte varseltypene gjelder nå.",
         "levels": {"yellow": "Gult", "orange": "Oransje", "red": "Rødt", "green": "Grønt"},
         "avalanche_levels": {
             1: "liten",
@@ -87,10 +89,34 @@ def _entry(
         ET.SubElement(entry, "link", href=link)
 
 
-def feed_url(base_url: str, code: str, lang: str) -> str:
-    """The feed's own address; the language is part of it, so a subscription keeps it."""
+# The kinds of warning a feed can carry, in the order a feed's address lists them.
+KINDS = ("weather", "flood", "landslide", "avalanche")
 
-    return f"{base_url}/v1/feeds/warnings/{code}.atom" + ("?lang=nb" if lang == "nb" else "")
+
+def parse_kinds(value: str | None) -> frozenset[str]:
+    """`?kinds=flood,landslide` -> those kinds; no value means every kind."""
+
+    if not value:
+        return frozenset(KINDS)
+    kinds = frozenset(k.strip() for k in value.split(",") if k.strip())
+    unknown = sorted(kinds - set(KINDS))
+    if unknown or not kinds:
+        raise ToolError(
+            ErrorCode.INVALID_ARGUMENT,
+            f"kinds is a comma-separated list of {', '.join(KINDS)}; got {value!r}.",
+        )
+    return kinds
+
+
+def feed_url(base_url: str, code: str, lang: str, kinds: frozenset[str] = frozenset(KINDS)) -> str:
+    """The feed's own address; the language and kinds are part of it, so a subscription keeps them."""
+
+    query = []
+    if lang == "nb":
+        query.append("lang=nb")
+    if kinds != set(KINDS):
+        query.append("kinds=" + ",".join(k for k in KINDS if k in kinds))
+    return f"{base_url}/v1/feeds/warnings/{code}.atom" + ("?" + "&".join(query) if query else "")
 
 
 def build_feed(
@@ -103,12 +129,13 @@ def build_feed(
     now: dt.datetime,
     avalanche: list[dict[str, Any]] | None = None,
     lang: str = "en",
+    kinds: frozenset[str] = frozenset(KINDS),
 ) -> bytes:
     text = TEXT[lang]
     feed = ET.Element("feed", xmlns=ATOM)
     if lang == "nb":
         feed.set("xml:lang", "nb")
-    self_url = feed_url(base_url, code, lang)
+    self_url = feed_url(base_url, code, lang, kinds)
     ET.SubElement(feed, "id").text = self_url
     ET.SubElement(feed, "title").text = text["title"].format(name=name, code=code)
     ET.SubElement(feed, "subtitle").text = text["subtitle"]
@@ -117,6 +144,10 @@ def build_feed(
     updated = ET.SubElement(feed, "updated")
     stamps: list[str] = []
 
+    if "weather" not in kinds:
+        weather = None
+    if "avalanche" not in kinds:
+        avalanche = None
     for w in (weather or {}).get("data", {}).get("warnings", []):
         stamp = w.get("valid_from") or now.isoformat()
         stamps.append(stamp)
@@ -138,6 +169,8 @@ def build_feed(
             link=w.get("web"),
         )
     for w in (hazards or {}).get("data", {}).get("warnings", []):
+        if w["kind"] not in kinds:
+            continue
         stamp = w.get("published") or w.get("valid_from") or now.isoformat()
         stamps.append(stamp)
         _entry(
@@ -173,7 +206,9 @@ def build_feed(
             id_=f"{self_url}#none-{now:%Y%m%d}",
             title=text["none_title"].format(name=name),
             updated=now.isoformat(timespec="seconds"),
-            summary=" ".join([text["none_summary"], *notes]),
+            summary=" ".join(
+                [text["none_summary"] if kinds == set(KINDS) else text["none_summary_some"], *notes]
+            ),
             link=None,
         )
     updated.text = max(stamps) if stamps else now.isoformat(timespec="seconds")
@@ -212,9 +247,12 @@ async def _avalanche(ctx: Any, municipality: str, lang: str = "en") -> list[dict
 
 def install(app: FastAPI) -> None:
     @app.get("/v1/feeds/warnings/{municipality}.atom", include_in_schema=False)
-    async def warnings_feed(request: Request, municipality: str, lang: str = "en") -> Response:
+    async def warnings_feed(
+        request: Request, municipality: str, lang: str = "en", kinds: str | None = None
+    ) -> Response:
         if lang not in TEXT:
             raise ToolError(ErrorCode.INVALID_ARGUMENT, "lang is 'en' or 'nb'.")
+        wanted = parse_kinds(kinds)
         from kildeverk.sources import composite
 
         ctx = request.app.state.ctx
@@ -224,15 +262,23 @@ def install(app: FastAPI) -> None:
                 ErrorCode.INVALID_ARGUMENT,
                 f"'{municipality}' is not a municipality; feeds are per municipality.",
             )
+
+        async def nothing() -> None:
+            return None
+
         weather, hazards, region, avalanche = await asyncio.gather(
-            composite._part(ctx, "weather_warnings", {"county": code[:2], "language": lang}),
+            composite._part(ctx, "weather_warnings", {"county": code[:2], "language": lang})
+            if "weather" in wanted
+            else nothing(),
             composite._part(
                 ctx, "hazards_flood_landslide", {"municipality": code, "language": lang}
-            ),
+            )
+            if wanted & {"flood", "landslide"}
+            else nothing(),
             composite._part(
                 ctx, "regions_resolve", {"query": code, "level": "municipality", "limit": 1}
             ),
-            _avalanche(ctx, code, lang),
+            _avalanche(ctx, code, lang) if "avalanche" in wanted else nothing(),
         )
         text = TEXT[lang]
         notes = [
@@ -255,6 +301,7 @@ def install(app: FastAPI) -> None:
             dt.datetime.now(dt.UTC),
             avalanche=avalanche,
             lang=lang,
+            kinds=wanted,
         )
         return Response(
             body,

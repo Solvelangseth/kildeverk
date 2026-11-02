@@ -208,3 +208,52 @@ def test_the_route_asks_the_sources_for_norwegian(ctx, monkeypatch):
     assert asked["weather_warnings"]["language"] == "nb"
     assert asked["hazards_flood_landslide"]["language"] == "nb"
     assert _parse(response.content).findtext("a:title", namespaces=NS).startswith("Farevarsler")
+
+
+# --- chosen kinds ------------------------------------------------------------------
+
+
+def test_a_feed_can_carry_only_some_kinds():
+    root = _parse(
+        build_feed(
+            "https://k.test",
+            "4601",
+            "Bergen",
+            WEATHER,
+            HAZARDS,
+            [],
+            NOW,
+            avalanche=AVALANCHE,
+            lang="nb",
+            kinds=frozenset({"flood", "landslide"}),
+        )
+    )
+    titles = [e.findtext("a:title", namespaces=NS) for e in root.findall("a:entry", NS)]
+    assert titles == ["Oransje farevarsel for flom: Flood warning orange level"]
+    # The kinds are part of the address, so a subscription keeps them.
+    self_link = root.find("a:link[@rel='self']", NS).get("href")
+    assert self_link == "https://k.test/v1/feeds/warnings/4601.atom?lang=nb&kinds=flood,landslide"
+
+
+def test_the_route_asks_only_for_the_chosen_kinds(ctx, monkeypatch):
+    asked = []
+
+    async def fake_part(ctx, tool, arguments):
+        asked.append(tool)
+        return {
+            "weather_warnings": WEATHER,
+            "hazards_flood_landslide": HAZARDS,
+            "regions_resolve": {"data": {"matches": [{"name": "Bergen"}]}},
+        }[tool]
+
+    async def fake_region(ctx, value):
+        return "4601", "municipality", None
+
+    monkeypatch.setattr(composite, "_part", fake_part)
+    monkeypatch.setattr(composite, "_region_for_series", fake_region)
+    with TestClient(create_app(Settings(_env_file=None), context=ctx)) as http:
+        response = http.get("/v1/feeds/warnings/Bergen.atom?kinds=weather")
+        refused = http.get("/v1/feeds/warnings/Bergen.atom?kinds=weather,tsunami")
+    assert response.status_code == 200 and refused.status_code == 400
+    assert sorted(asked) == ["regions_resolve", "weather_warnings"]
+    assert len(_parse(response.content).findall("a:entry", NS)) == 1

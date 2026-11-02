@@ -85,7 +85,7 @@ def test_site_lists_every_source_and_tool(tmp_path: Path):
     assert 'data-tool="place_overview"' in html
     assert html.count('class="ghost cite" hidden') == len(operations())
     assert 'id="feed-form"' in html
-    assert html.count('class="card recipe"') >= 3 and 'id="eksempler"' in html
+    assert html.count('class="recipe"') >= 3 and 'id="eksempler"' in html
     assert '<html lang="nb">' in html and "@@" not in html
 
 

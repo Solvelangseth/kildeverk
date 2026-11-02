@@ -69,6 +69,18 @@ def rank(r: dict) -> str:
     )
 
 
+def rank_figure(r: dict) -> dict:
+    """The numbers behind the website's front-page chart: the top three and the country."""
+
+    d = r["data"]
+    return {
+        "rows": [{"name": x["name"], "change_pct": x["change_pct"]} for x in d["rows"][:3]],
+        "country_pct": d["country"]["change_pct"] if d["country"] else None,
+        "compare_to": d["compare_to"],
+        "period": d["period"],
+    }
+
+
 def series(r: dict) -> str:
     d = r["data"]
     first, last = d["points"][0], d["points"][-1]
@@ -197,6 +209,7 @@ RECIPES: list[dict[str, Any]] = [
         "arguments": {"table_id": "07459", "compare_to": "2015", "min_value": 10000, "limit": 5},
         "answer": rank,
         "answer_nb": rank_nb,
+        "figure": rank_figure,
     },
     {
         "question": "How has Tromsø's population changed since 2010, across the reforms?",
@@ -244,6 +257,8 @@ async def main() -> None:
                 "upstream_calls": len(result["provenance"]),
             }
         )
+        if "figure" in recipe:
+            out[-1]["figure"] = recipe["figure"](result)
         print(f"{recipe['tool']}: {out[-1]['answer'][:100]}")
     await ctx.aclose()
     OUT.write_text(

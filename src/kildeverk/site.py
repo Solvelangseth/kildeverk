@@ -19,6 +19,34 @@ from kildeverk.settings import REPO_URL
 
 HOSTED_URL = "https://kildeverk.fly.dev"
 
+# A short code and a short name per publisher, keyed by the catalogue's publisher up to the
+# first comma. The codes label the source tiles and the chips on examples and tools; the
+# short names run along the strip under the hero, in this order.
+PUBLISHER_CODES: dict[str, tuple[str, str]] = {
+    "Statistics Norway (SSB)": ("SSB", "SSB"),
+    "Norwegian Meteorological Institute (MET Norway)": ("MET", "MET"),
+    "Norwegian Water Resources and Energy Directorate (NVE)": ("NVE", "NVE"),
+    "Norwegian Mapping Authority (Kartverket)": ("KV", "Kartverket"),
+    "Norwegian Mapping Authority": ("KV", "Kartverket"),
+    "Entur AS": ("ENTUR", "Entur"),
+    "Brønnøysund Register Centre (Brønnøysundregistrene)": ("BRREG", "Brønnøysundregistrene"),
+    "Norges Bank": ("NB", "Norges Bank"),
+    "Stortinget (the Norwegian parliament)": ("STORT", "Stortinget"),
+    "Norwegian Public Roads Administration (Statens vegvesen)": ("SVV", "Statens vegvesen"),
+    "Norwegian Directorate for Education and Training (Udir)": ("UDIR", "Udir"),
+    "Norwegian Digitalisation Agency (Digdir)": ("DIGDIR", "Digdir"),
+    "Elhub AS": ("ELHUB", "Elhub"),
+    "U.S. Geological Survey (USGS)": ("USGS", "USGS"),
+    "University of Bergen and the Language Council of Norway (Språkrådet)": (
+        "UIB",
+        "UiB og Språkrådet",
+    ),
+    "Avinor AS": ("AVINOR", "Avinor"),
+    "The World Bank": ("WB", "Verdensbanken"),
+    "Eurostat (European Commission)": ("ESTAT", "Eurostat"),
+}
+STRIP_LENGTH = 10
+
 
 def _e(value: Any) -> str:
     return escape(str(value), quote=True)
@@ -36,20 +64,14 @@ def _origin() -> str:
     return f'<span class="origin">{HOSTED_URL}</span>'
 
 
-ICONS = {
-    "provenance": '<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="m10 14.5 2 2 4-4"/>',
-    "errors": '<path d="M12 3v18"/><path d="M5 6h11l3 3-3 3H5z"/>',
-    "regions": '<path d="m3 6 6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/>',
-    "polite": '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
-    "feed": '<path d="M5 11a8 8 0 0 1 8 8M5 5a14 14 0 0 1 14 14"/><circle cx="6" cy="18" r="1.5"/>',
-}
+def _publisher(english: str) -> tuple[str, str]:
+    """(code, short name) for a publisher as the catalogue and the provenance write it."""
 
-
-def _icon(name: str) -> str:
-    return (
-        '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" '
-        f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{ICONS[name]}</svg>'
-    )
+    base = english.split(",")[0].strip()
+    if base in PUBLISHER_CODES:
+        return PUBLISHER_CODES[base]
+    initials = "".join(w[0] for w in base.split() if w[:1].isalpha()).upper()
+    return initials or base.upper(), base
 
 
 def _source_text(source: dict[str, Any]) -> site_nb.SourceText:
@@ -70,6 +92,10 @@ def _licence_badge(licence: dict[str, Any]) -> str:
     return f'<a class="badge" href="{_e(licence["url"])}" title="{_e(licence["name"])}">{_e(label)}</a>'
 
 
+def _chips(codes: list[str]) -> str:
+    return "".join(f'<span class="chip">{_e(c)}</span>' for c in dict.fromkeys(codes))
+
+
 def _source_card(source: dict[str, Any]) -> str:
     nb = _source_text(source)
     key = (
@@ -81,29 +107,56 @@ def _source_card(source: dict[str, Any]) -> str:
     covers = "".join(f"<li>{_e(c)}</li>" for c in nb.covers)
     gaps = "".join(f"<li>{_e(g)}</li>" for g in nb.gaps)
     tools = " ".join(
-        f'<a class="chip tool-link" href="#tool-{_e(t)}"><code>{_e(t)}</code></a>'
-        for t in source["tools"]
+        f'<a class="chip tool-link" href="#tool-{_e(t)}">{_e(t)}</a>' for t in source["tools"]
     )
     return f"""
-      <article class="card source" id="source-{_e(source["id"])}">
-        <header>
-          <h3>{_e(nb.name)}</h3>
-          <p class="muted">{_e(nb.publisher)}</p>
-        </header>
-        <p class="badges">{_licence_badge(source["licence"])}{key}</p>
-        <ul class="covers">{covers}</ul>
-        <p class="chips">{tools}</p>
-        <details class="more">
-          <summary>Begrensninger</summary>
-          <ul>{gaps}</ul>
-          <p class="muted small">Tjenesten bruker høyst {_e(source["this_service_max_per_minute"])} kall i minuttet mot denne kilden.</p>
-        </details>
-        <p class="links small">
-          <a href="{_e(source["homepage"])}">Utgiver</a>
-          <a href="{_e(source["docs_url"])}">API-dokumentasjon</a>
-          <a href="{_e(source["terms_url"])}">Vilkår</a>
-        </p>
-      </article>"""
+        <article class="source" id="source-{_e(source["id"])}">
+          <h4>{_e(nb.name)}</h4>
+          <p class="badges">{_licence_badge(source["licence"])}{key}</p>
+          <ul class="covers">{covers}</ul>
+          <p class="chips">{tools}</p>
+          <details class="more">
+            <summary>Begrensninger</summary>
+            <ul>{gaps}</ul>
+            <p class="muted small">Tjenesten bruker høyst {_e(source["this_service_max_per_minute"])} kall i minuttet mot denne kilden.</p>
+          </details>
+          <p class="links small">
+            <a href="{_e(source["homepage"])}">Utgiver</a>
+            <a href="{_e(source["docs_url"])}">API-dokumentasjon</a>
+            <a href="{_e(source["terms_url"])}">Vilkår</a>
+          </p>
+        </article>"""
+
+
+def _sources(sources: list[dict[str, Any]]) -> str:
+    """A tile per publisher; a tile opens the cards of that publisher's sources below the grid."""
+
+    groups: dict[str, list[dict[str, Any]]] = {}
+    for source in sources:
+        groups.setdefault(_publisher(source["publisher"])[0], []).append(source)
+    tiles = "".join(
+        f"""
+      <button type="button" class="pub" data-pub="{_e(code)}" aria-expanded="false" aria-controls="pub-detail">
+        <span class="pub-code">{_e(code)}</span>
+        <span class="pub-name">{_e(_source_text(group[0]).publisher)}</span>
+        <span class="pub-count">{len(group)} {"kilde" if len(group) == 1 else "kilder"}</span>
+      </button>"""
+        for code, group in groups.items()
+    )
+    details = "".join(
+        f"""
+      <div class="pub-group" data-pub="{_e(code)}" hidden>
+        <p class="pub-title"><b>{_e(_source_text(group[0]).publisher)}</b><button type="button" class="pub-close">Lukk ×</button></p>
+        <div class="source-grid">{"".join(_source_card(s) for s in group)}
+        </div>
+      </div>"""
+        for code, group in groups.items()
+    )
+    return f"""
+    <div class="pubs">{tiles}
+    </div>
+    <div class="pub-detail" id="pub-detail">{details}
+    </div>"""
 
 
 def _type(schema: dict[str, Any]) -> str:
@@ -116,7 +169,7 @@ def _type(schema: dict[str, Any]) -> str:
     return schema.get("type") or schema.get("$ref", "object").rsplit("/", 1)[-1]
 
 
-def _tool_block(tool: dict[str, Any], source_names: dict[str, str], theme: str = "") -> str:
+def _tool_block(tool: dict[str, Any], source_codes: dict[str, str], theme: str = "") -> str:
     nb = _tool_text(tool)
     example = tool["examples"][0] if tool["examples"] else {}
     method, path = tool["http"]["method"], tool["http"]["path"]
@@ -126,58 +179,69 @@ def _tool_block(tool: dict[str, Any], source_names: dict[str, str], theme: str =
         f"<td>{_e(schema.get('description', ''))}</td></tr>"
         for name, schema in params.items()
     )
-    sources = ", ".join(source_names.get(s, s) for s in tool["sources"]) or "Kildeverk selv"
-    search = " ".join([tool["name"], nb.title, nb.summary, tool["title"], sources, theme]).lower()
+    codes = list(dict.fromkeys(source_codes.get(s, s) for s in tool["sources"]))
+    source = " · ".join(codes) if codes else "Kildeverk"
+    search = " ".join([tool["name"], nb.title, nb.summary, tool["title"], source, theme]).lower()
     return f"""
-      <details class="tool" id="tool-{_e(tool["name"])}" data-search="{_e(search)}">
-        <summary>
-          <span class="tool-title">{_e(nb.title)}</span>
-          <code class="tool-name">{_e(tool["name"])}</code>
-          <span class="tool-sum">{_e(nb.summary)}</span>
-        </summary>
-        <div class="tool-body">
-          <p class="endpoint small"><span class="method">{_e(method)}</span> <code>{_e(path)}</code> <span class="muted">· Kilde: {_e(sources)}</span></p>
-          <div class="try">
-            <label class="small muted" for="args-{_e(tool["name"])}">Argumenter (JSON). Endre dem og trykk «Kjør».</label>
-            <textarea id="args-{_e(tool["name"])}" spellcheck="false" data-tool="{_e(tool["name"])}" data-method="{_e(method)}" data-path="{_e(path)}">{_e(json.dumps(example, ensure_ascii=False, indent=2))}</textarea>
-            <div class="actions">
-              <button type="button" class="run">Kjør</button>
-              <button type="button" class="ghost copy-curl">Kopier som curl</button>
-              <button type="button" class="ghost copy-mcp">Kopier som MCP-kall</button>
-              <button type="button" class="ghost cite" hidden>Lag kildehenvisning</button>
+        <details class="tool" id="tool-{_e(tool["name"])}" data-search="{_e(search)}">
+          <summary>
+            <span class="tool-head"><code class="tool-name">{_e(tool["name"])}</code><span class="chip">kilde: {_e(source)}</span></span>
+            <span class="tool-title">{_e(nb.title)}</span>
+            <span class="tool-sum">{_e(nb.summary)}</span>
+          </summary>
+          <div class="tool-body">
+            <p class="endpoint"><span class="method">{_e(method)}</span> {_e(path)}</p>
+            <div class="try">
+              <label class="label" for="args-{_e(tool["name"])}">Argumenter (JSON)</label>
+              <textarea id="args-{_e(tool["name"])}" spellcheck="false" data-tool="{_e(tool["name"])}" data-method="{_e(method)}" data-path="{_e(path)}">{_e(json.dumps(example, ensure_ascii=False, indent=2))}</textarea>
+              <div class="actions">
+                <button type="button" class="run">▶ Kjør</button>
+                <button type="button" class="ghost copy-curl">Kopier som curl</button>
+                <button type="button" class="ghost copy-mcp">Kopier som MCP-kall</button>
+                <button type="button" class="ghost cite" hidden>Lag kildehenvisning</button>
+              </div>
+              <div class="result" hidden>
+                <div class="code"><div class="code-head"><span class="status"></span><button type="button" class="copy">Kopier</button></div><pre class="out"></pre></div>
+                <button type="button" class="ghost expand" hidden></button>
+              </div>
+              <div class="bib" hidden>
+                <div class="code"><div class="code-head"><span>BibTeX</span><button type="button" class="copy">Kopier</button></div><pre class="bib-out"></pre></div>
+              </div>
             </div>
-            <div class="result" hidden>
-              <div class="code"><div class="code-head"><span class="status"></span><button type="button" class="copy">Kopier</button></div><pre class="out"></pre></div>
-              <button type="button" class="ghost expand" hidden></button>
-            </div>
-            <div class="bib" hidden>
-              <div class="code"><div class="code-head"><span>BibTeX</span><button type="button" class="copy">Kopier</button></div><pre class="bib-out"></pre></div>
-            </div>
+            <details class="more spec">
+              <summary>Teknisk beskrivelse (på engelsk, slik KI-assistenten leser den)</summary>
+              <p class="small">{_e(tool["description"])}</p>
+              <table><tbody>{rows or '<tr><td colspan="3">Ingen argumenter.</td></tr>'}</tbody></table>
+            </details>
           </div>
-          <details class="more spec">
-            <summary>Teknisk beskrivelse (på engelsk, slik KI-assistenten leser den)</summary>
-            <p class="small">{_e(tool["description"])}</p>
-            <table><tbody>{rows or '<tr><td colspan="3">Ingen argumenter.</td></tr>'}</tbody></table>
-          </details>
-        </div>
-      </details>"""
+        </details>"""
 
 
-def _tool_sections(tools: list[dict[str, Any]], source_names: dict[str, str]) -> str:
-    by_name = {t["name"]: t for t in tools}
+def _themes(tools: list[dict[str, Any]]) -> list[tuple[str, str, list[str]]]:
     themed = [name for _, _, names in site_nb.THEMES for name in names]
     themes = list(site_nb.THEMES)
     rest = [t["name"] for t in tools if t["name"] not in themed]
     if rest:
         themes.append(("Andre verktøy", "", rest))
+    return themes
+
+
+def _tool_nav(tools: list[dict[str, Any]]) -> str:
+    return "".join(
+        f'<button type="button" class="cat" data-theme="tema-{i}"><span>{_e(title)}</span><span class="cat-arrow" aria-hidden="true">→</span></button>'
+        for i, (title, _, _) in enumerate(_themes(tools), 1)
+    )
+
+
+def _tool_sections(tools: list[dict[str, Any]], source_codes: dict[str, str]) -> str:
+    by_name = {t["name"]: t for t in tools}
     return "".join(
         f"""
-    <section class="theme">
-      <h3>{_e(title)}</h3>
-      <p class="muted">{_e(blurb)}</p>
-      <div class="tool-list">{"".join(_tool_block(by_name[n], source_names, f"{title} {blurb}") for n in names if n in by_name)}</div>
-    </section>"""
-        for title, blurb, names in themes
+      <section class="theme" id="tema-{i}">
+        <header class="theme-head"><h3>{_e(title)}</h3><p>{_e(blurb)}</p></header>
+        <div class="tool-list">{"".join(_tool_block(by_name[n], source_codes, f"{title} {blurb}") for n in names if n in by_name)}</div>
+      </section>"""
+        for i, (title, blurb, names) in enumerate(_themes(tools), 1)
     )
 
 
@@ -190,36 +254,49 @@ def _stored_recipes() -> dict[str, Any]:
     return json.loads(RECIPES.read_text(encoding="utf-8"))
 
 
-def _publishers(recipe: dict[str, Any]) -> list[str]:
-    names = [site_nb.PUBLISHERS.get(s["publisher"], s["publisher"]) for s in recipe["sources"]]
-    return list(dict.fromkeys(names))
+def _day(stored: dict[str, Any]) -> str:
+    built = stored["built_at"][:10]
+    return f"{built[8:10]}.{built[5:7]}.{built[:4]}" if built else ""
 
 
-def _demo(stored: dict[str, Any]) -> str:
-    """The hero's illustration: a question to an assistant, and the answer Kildeverk gave it."""
+def _recipe_codes(recipe: dict[str, Any]) -> list[str]:
+    return [_publisher(s["publisher"])[0] for s in recipe["sources"]]
 
-    slides = "".join(
+
+def _pct(value: float, digits: int = 0) -> str:
+    return f"{value:+.{digits}f}".replace(".", ",").replace("-", "−") + " %"
+
+
+def _slip(stored: dict[str, Any], names: dict[str, str]) -> str:
+    """The hero's answer slip: a stored example with its figures as bars and its source as a note."""
+
+    recipe = next((r for r in stored["recipes"] if r.get("figure")), None)
+    if recipe is None:
+        return ""
+    figure = recipe["figure"]
+    top = max(row["change_pct"] for row in figure["rows"])
+    bars = "".join(
         f"""
-        <div class="slide{" active" if i == 0 else ""}" data-slide="{i}">
-          <p class="msg user">{_e(r.get("question_nb", r["question"]))}</p>
-          <p class="msg call"><span class="spark"></span><span>{_e(r["upstream_calls"])} oppslag hos kildene med <code>{_e(r["tool"])}</code></span></p>
-          <div class="msg bot"><p>{_e(r.get("answer_nb", r["answer"]))}</p>
-            <p class="chips">{"".join(f'<span class="chip">{_e(p)}</span>' for p in _publishers(r))}</p>
-          </div>
-        </div>"""
-        for i, r in enumerate(stored["recipes"])
+          <div class="bar"><p><b>{_e(row["name"])}</b><span>{_pct(row["change_pct"])}</span></p>
+            <div class="track"><div style="width: {94 * row["change_pct"] / top:.1f}%"></div></div></div>"""
+        for row in figure["rows"]
     )
-    dots = "".join(
-        f'<button type="button" class="dot{" active" if i == 0 else ""}" data-go="{i}" aria-label="Eksempel {i + 1}"></button>'
-        for i in range(len(stored["recipes"]))
-    )
+    if figure.get("country_pct") is not None:
+        bars += f"""
+          <div class="bar whole"><p><span>Hele Norge</span><span>{_pct(figure["country_pct"], 1)}</span></p>
+            <div class="track"><div style="width: {94 * figure["country_pct"] / top:.1f}%"></div></div></div>"""
+    publisher = recipe["sources"][0]["publisher"]
+    name = names.get(publisher, _publisher(publisher)[1])
+    least = recipe["arguments"].get("min_value")
+    who = f"Kommuner med minst {least:,} innbyggere".replace(",", " ") if least else "Kommuner"
     return f"""
-      <div class="demo" aria-label="Eksempler på spørsmål og svar">
-        <div class="demo-bar"><span></span><span></span><span></span><b>KI-assistent med Kildeverk</b></div>
-        <div class="slides">{slides}
-        </div>
-        <div class="dots">{dots}</div>
-      </div>"""
+    <figure class="slip">
+      <div class="slip-head"><span>{_e(recipe["tool"])} · {_e(recipe["upstream_calls"])} oppslag</span><span>kjørt {_e(_day(stored))}</span></div>
+      <div class="slip-q"><p class="label">Spørsmål</p><p class="q">{_e(recipe.get("question_nb", recipe["question"]))}</p></div>
+      <div class="bars">{bars}
+      </div>
+      <figcaption id="fotnote"><span class="fn">1</span><span><b>{_e(name)}.</b> {_e(who)}, endring {_e(figure["compare_to"])}–{_e(figure["period"])}.</span></figcaption>
+    </figure>"""
 
 
 def _recipes(stored: dict[str, Any]) -> str:
@@ -227,38 +304,28 @@ def _recipes(stored: dict[str, Any]) -> str:
 
     if not stored["recipes"]:
         return ""
-    cards = "".join(
+    rows = "".join(
         f"""
-      <article class="card recipe">
-        <h3>{_e(r.get("question_nb", r["question"]))}</h3>
-        <p>{_e(r.get("answer_nb", r["answer"]))}</p>
-        {_code(f"{r['tool']} {json.dumps(r['arguments'], ensure_ascii=False)}", "Kallet")}
-        <p class="chips">{"".join(f'<span class="chip">{_e(p)}</span>' for p in _publishers(r))}</p>
-        <p class="recipe-foot small"><span class="muted">Ett kall, {_e(r["upstream_calls"])} oppslag hos kildene</span>
-        <a href="#tool-{_e(r["tool"])}" class="use-recipe" data-tool="{_e(r["tool"])}" data-args="{_e(json.dumps(r["arguments"], ensure_ascii=False))}">Prøv dette kallet →</a></p>
-      </article>"""
-        for r in stored["recipes"]
+      <li><details class="recipe" id="eksempel-{i}">
+        <summary class="row"><span class="n">{i:02d}</span><span class="q">{_e(r.get("question_nb", r["question"]))}</span><span class="chips">{_chips(_recipe_codes(r))}</span><span class="arrow" aria-hidden="true">→</span></summary>
+        <div class="recipe-body">
+          <p class="answer">{_e(r.get("answer_nb", r["answer"]))}</p>
+          <pre class="snippet">{_e(r["tool"])} {_e(json.dumps(r["arguments"], ensure_ascii=False))}</pre>
+          <p class="recipe-foot"><span>Ett kall, {_e(r["upstream_calls"])} oppslag hos kildene</span>
+          <a href="#tool-{_e(r["tool"])}" class="use-recipe" data-tool="{_e(r["tool"])}" data-args="{_e(json.dumps(r["arguments"], ensure_ascii=False))}">Prøv dette kallet →</a></p>
+        </div>
+      </details></li>"""
+        for i, r in enumerate(stored["recipes"], 1)
     )
-    built = stored["built_at"][:10]
-    day = f"{built[8:10]}.{built[5:7]}.{built[:4]}" if built else ""
     return f"""
-  <section id="eksempler" class="wrap">
-    <p class="eyebrow">Eksempler</p>
-    <h2>Ekte spørsmål, besvart med ett kall</h2>
-    <p class="lead-s">Kjørt {_e(day)}. Tallene er slik kildene hadde dem da; trykk «Prøv dette kallet» for å hente dem på nytt.</p>
-    <div class="grid recipes">{cards}
+  <section id="eksempler" class="wrap block">
+    <div class="block-head">
+      <div><p class="sec">§ 02</p><h2>Spør som du ville spurt en person</h2></div>
+      <p class="mono-note">Ekte svar, kjørt {_e(_day(stored))}</p>
     </div>
+    <ul class="recipes">{rows}
+    </ul>
   </section>"""
-
-
-EXAMPLE_QUESTIONS = [
-    "Hvordan blir været i Tromsø i morgen?",
-    "Hvilke kommuner har vokst mest siden 2015?",
-    "Er det flom- eller jordskredvarsel i Bergen nå?",
-    "Når går de neste togene fra Oslo S?",
-    "Hvor fulle er vannmagasinene sammenlignet med normalt?",
-    "Hva er styringsrenten, og når ble den sist endret?",
-]
 
 
 def _connect() -> str:
@@ -276,74 +343,64 @@ def _connect() -> str:
         (
             "claude-code",
             "Claude Code",
-            "<p>Kjør dette i terminalen, så har Claude Code alle verktøyene:</p>"
-            + _code(
-                f"claude mcp add --transport http kildeverk {origin}/mcp", "Terminal", html=True
-            ),
+            "Kjør dette i terminalen:",
+            f"claude mcp add --transport http kildeverk {origin}/mcp",
         ),
         (
             "apps",
             "Claude, ChatGPT og andre",
-            "<p>I assistenter som støtter eksterne MCP-servere: legg til en egendefinert "
-            "konnektor (ofte under <em>Innstillinger → Konnektorer</em>) og lim inn adressen:</p>"
-            + _code(f"{origin}/mcp", "Adresse", html=True),
+            "Legg til en egendefinert konnektor med denne adressen:",
+            f"{origin}/mcp",
         ),
         (
             "config",
             "Cursor, VS Code m.fl.",
-            "<p>Klienter som leser en konfigurasjonsfil, tar denne:</p>"
-            + _code(_e(mcp_json).replace(_e(origin), origin), "JSON", html=True),
+            "Legg til i MCP-konfigurasjonen:",
+            _e(mcp_json).replace(_e(origin), origin),
         ),
         (
             "api",
             "JSON-API",
-            '<p>Hvert verktøy er også en vanlig nettadresse. Se <a href="/docs">API-dokumentasjonen</a>.</p>'
-            + _code(
-                f'curl "{origin}/v1/weather/forecast?lat=59.91&amp;lon=10.75&amp;hours=3"',
-                "Terminal",
-                html=True,
-            ),
+            "Hvert verktøy er også en vanlig nettadresse; alle står i API-dokumentasjonen:",
+            f'curl "{origin}/v1/weather/forecast?lat=59.91&amp;lon=10.75&amp;hours=3"',
         ),
         (
             "local",
             "Kjør selv",
-            "<p>Med egen kvote og eget mellomlager, over stdio. Krever "
-            '<a href="https://docs.astral.sh/uv/">uv</a>.</p>' + _code(local_json, "JSON"),
+            "Med egen kvote og eget mellomlager, over stdio. Krever uv:",
+            _e(local_json),
         ),
     ]
     buttons = "".join(
         f'<button type="button" role="tab" id="tab-{key}" aria-controls="panel-{key}" '
         f'aria-selected="{"true" if i == 0 else "false"}">{_e(label)}</button>'
-        for i, (key, label, _) in enumerate(tabs)
+        for i, (key, label, _, _) in enumerate(tabs)
     )
     panels = "".join(
         f'<div role="tabpanel" id="panel-{key}" aria-labelledby="tab-{key}" class="tabpanel"'
-        f"{'' if i == 0 else ' hidden'}>{body}</div>"
-        for i, (key, _, body) in enumerate(tabs)
-    )
-    questions = "".join(
-        f'<li><button type="button" class="ask" data-text="{_e(q)}">{_e(q)}</button></li>'
-        for q in EXAMPLE_QUESTIONS
+        f'{"" if i == 0 else " hidden"}><p>{_e(lead)}</p><pre class="snippet">{code}</pre></div>'
+        for i, (key, _, lead, code) in enumerate(tabs)
     )
     return f"""
-  <section id="kom-i-gang" class="wrap">
-    <p class="eyebrow">Kom i gang</p>
-    <h2>Koble til på ett minutt</h2>
-    <p class="lead-s">Kildeverk bruker MCP (Model Context Protocol), den åpne standarden som lar
-    KI-assistenter bruke verktøy. Du trenger ingen konto og ingen nøkkel.</p>
-    <div class="steps">
-      <div class="card step">
-        <p class="step-n"><span>1</span>Legg til serveren</p>
-        <div class="tabs" role="tablist" aria-label="Velg klient">{buttons}</div>
-        {panels}
+  <section id="kom-i-gang" class="wrap block">
+    <div class="connect">
+      <div class="connect-text">
+        <p class="sec">§ 01</p>
+        <h2>Kom i gang</h2>
+        <p class="lead-s">To steg. Ingen nøkkel, ingen konto, ingen installasjon.</p>
+        <ol class="steps">
+          <li><span>1</span><div><p class="step-t">Legg til serveren</p><p>Velg klienten din og lim inn.</p></div></li>
+          <li><span>2</span><div><p class="step-t">Spør i vei</p><p>Assistenten henter tallene og oppgir kilden. Du kan spørre på norsk.</p></div></li>
+        </ol>
       </div>
-      <div class="card step">
-        <p class="step-n"><span>2</span>Spør i vei</p>
-        <p>Assistenten velger selv verktøyene og forteller hvor tallene kommer fra. Trykk på et
-        spørsmål for å kopiere det.</p>
-        <ul class="asks">{questions}</ul>
-        <p class="muted small">Verktøyene svarer på engelsk, slik assistentene leser dem best,
-        men du kan spørre på norsk.</p>
+      <div class="panel connect-panel">
+        <div class="tabs" role="tablist" aria-label="Velg klient">{buttons}</div>
+        <div class="panel-body">{panels}
+          <div class="panel-foot">
+            <p class="mono-note">MCP-endepunkt: {origin}/mcp</p>
+            <button type="button" class="ghost copy-snippet">Kopier</button>
+          </div>
+        </div>
       </div>
     </div>
   </section>"""
@@ -352,27 +409,35 @@ def _connect() -> str:
 def render(catalogue: dict[str, Any]) -> str:
     sources = catalogue["sources"]
     tools = catalogue["tools"]
-    source_names = {s["id"]: _source_text(s).name for s in sources}
+    source_codes = {s["id"]: _publisher(s["publisher"])[0] for s in sources}
     # "Kartverket" and "Kartverket, Hydrographic Service" are one publisher.
-    publishers = len({s["publisher"].split(",")[0].split("(")[0].strip() for s in sources})
+    publishers = list(dict.fromkeys(_publisher(s["publisher"]) for s in sources))
+    order = list(dict.fromkeys(code for code, _ in PUBLISHER_CODES.values()))
+    strip = sorted(publishers, key=lambda p: order.index(p[0]) if p[0] in order else len(order))
+    more = len(strip) - STRIP_LENGTH
+    keyed = [_source_text(s).name for s in sources if s["requires_env"]]
     stored = _stored_recipes()
     parts = {
         "VERSION": _e(catalogue["version"]),
         "N_SOURCES": str(len(sources)),
         "N_TOOLS": str(len(tools)),
-        "N_PUBLISHERS": str(publishers),
-        "DEMO": _demo(stored),
+        "N_PUBLISHERS": str(len(publishers)),
+        "SLIP": _slip(stored, {s["publisher"]: _source_text(s).publisher for s in sources}),
+        "STRIP": "".join(f"<span>{_e(name)}</span>" for _, name in strip[:STRIP_LENGTH])
+        + (f'<span class="more">+ {more} til</span>' if more > 0 else ""),
+        "KEYED": (
+            f"Bare {_e(' og '.join(keyed))} krever en gratis API-nøkkel; "
+            "den offentlige tjenesten har dem."
+            if keyed
+            else "Ingen av kildene krever nøkkel."
+        ),
         "CONNECT": _connect(),
         "RECIPES": _recipes(stored),
-        "CARDS": "".join(_source_card(s) for s in sources),
-        "TOOLS": _tool_sections(tools, source_names),
+        "SOURCES": _sources(sources),
+        "TOOL_NAV": _tool_nav(tools),
+        "TOOLS": _tool_sections(tools, source_codes),
         "REPO": REPO_URL,
         "HOSTED": HOSTED_URL,
-        "ICON_PROVENANCE": _icon("provenance"),
-        "ICON_ERRORS": _icon("errors"),
-        "ICON_REGIONS": _icon("regions"),
-        "ICON_POLITE": _icon("polite"),
-        "ICON_FEED": _icon("feed"),
     }
     page = PAGE
     for key, value in parts.items():
@@ -397,339 +462,404 @@ PAGE = """<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kildeverk</title>
 <meta name="description" content="Ferske norske offentlige data for KI-assistenter og folk: en MCP-server og et JSON-API over @@N_SOURCES@@ offisielle kilder, med kilde på hvert svar.">
-<meta name="color-scheme" content="light dark">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230e4d78'/><path d='M9 7v18M9 16l10-9M12 13l9 12' stroke='white' stroke-width='3' fill='none' stroke-linecap='round'/></svg>">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='1.5' y='1.5' width='29' height='29' fill='%23F5F5F1' stroke='%2310161F' stroke-width='3'/><text x='16' y='21.5' font-family='monospace' font-weight='700' font-size='14' text-anchor='middle' fill='%2310161F'>[1]</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500;1,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
+/* A printed reference work: off-white paper, black ink, one red for marks and footnotes,
+   and a monospace for everything a machine reads. */
 :root {
-  --bg: #f5f3ee; --panel: #ffffff; --ink: #16202b; --muted: #5a6472; --line: #e3ded3;
-  --accent: #0e4d78; --accent-strong: #0a3a5c; --accent-soft: #e4eef6; --accent-ink: #ffffff;
-  --red: #b8202f; --warn: #7d5200; --warn-bg: #fff0cf; --ok: #1e6b3a; --err: #a12c2c;
-  --code-bg: #f3f0e9; --code-head: #ebe7de; --chip: #eef2f5;
-  --ridge-1: #d3e1ec; --ridge-2: #b2c9db; --ridge-3: #8eaec7;
-  --shadow: 0 1px 2px rgba(22, 32, 43, .05), 0 10px 30px rgba(22, 32, 43, .07);
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0d1318; --panel: #141d25; --ink: #e7ecf1; --muted: #9ba7b5; --line: #24313b;
-    --accent: #7cc0f0; --accent-strong: #a9d6f7; --accent-soft: #11263a; --accent-ink: #0b1117;
-    --red: #ff7683; --warn: #f2c46d; --warn-bg: #352a12; --ok: #7bd39a; --err: #ff9c9c;
-    --code-bg: #0f171e; --code-head: #17222c; --chip: #1a2630;
-    --ridge-1: #13273a; --ridge-2: #17314a; --ridge-3: #1d3d5b;
-    --shadow: 0 1px 2px rgba(0, 0, 0, .3);
-  }
+  --bg: #F5F5F1; --white: #FFFFFF; --ink: #10161F; --ink-2: #3E4652; --muted: #5A6370; --faint: #8A929C;
+  --line: #D9DBD4; --line-2: #C9CCC5; --track: #EDEDE8; --hover: #ECECE6; --note: #FAFAF7;
+  --red: #C8341C; --navy: #1D3B5C; --navy-line: #4F6A88; --navy-ink: #C9D4E0; --code-ink: #E9ECEF;
+  --ok: #1E6B3A; --err: #A12C2C; --warn: #7D5200; --warn-bg: #F6E7C1;
+  --sans: "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html { scroll-behavior: smooth; scroll-padding-top: 76px; }
+html { scroll-behavior: smooth; scroll-padding-top: 24px; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { margin: 0; background: var(--bg); color: var(--ink);
-  font: 16.5px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  -webkit-font-smoothing: antialiased; }
-a { color: var(--accent); text-underline-offset: 2px; }
-code, pre, textarea { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .86em; }
-:not(pre) > code { background: var(--chip); padding: .08em .38em; border-radius: 5px; overflow-wrap: anywhere; }
-h1, h2, h3 { letter-spacing: -0.02em; line-height: 1.2; }
-.wrap { max-width: 1120px; margin: 0 auto; padding-left: 16px; padding-right: 16px; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
+a { color: var(--ink); text-underline-offset: 3px; }
+a:hover { color: var(--red); }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+code, pre, textarea { font-family: var(--mono); }
+h1, h2, h3, h4 { margin: 0; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: 32px; padding-right: 32px; }
 .muted { color: var(--muted); }
 .small { font-size: .88rem; }
-.icon { width: 22px; height: 22px; flex: none; }
+.label { margin: 0; font: 500 12px/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.mono-note { margin: 0; font: 13px/1.5 var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+.sec { margin: 0 0 14px; font: 13px var(--mono); color: var(--red); }
+h2 { font-size: 48px; line-height: 1; letter-spacing: -0.03em; font-weight: 800; }
+.lead-s { margin: 18px 0 32px; font-size: 18px; line-height: 1.55; color: var(--ink-2); max-width: 34ch; }
+button { font: 600 15px var(--sans); cursor: pointer; border-radius: 0; }
+.btn { display: inline-flex; align-items: center; padding: 14px 24px; font-weight: 600; text-decoration: none; border: 1.5px solid var(--ink); transition: transform .12s ease; }
+.btn:hover { transform: translateY(-1px); }
+.btn.dark { background: var(--ink); color: var(--bg); }
+.btn.dark:hover { color: var(--bg); }
+.chip { display: inline-block; font: 12px/1.3 var(--mono); padding: 5px 9px; border: 1px solid var(--line-2); color: var(--ink-2); background: var(--white); text-decoration: none; white-space: nowrap; }
+a.chip:hover { border-color: var(--ink); color: var(--ink); }
 
 /* Navigation */
-nav.top { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
-  backdrop-filter: saturate(1.4) blur(10px); -webkit-backdrop-filter: saturate(1.4) blur(10px);
-  border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
-nav.top .wrap { display: flex; align-items: center; gap: 22px; height: 60px; }
-.brand { display: flex; align-items: center; gap: 9px; font-weight: 800; font-size: 1.08rem; color: var(--ink); text-decoration: none; flex: none; }
-.brand svg { width: 26px; height: 26px; }
-.navlinks { display: flex; gap: 20px; overflow-x: auto; scrollbar-width: none; margin-left: auto; }
-.navlinks::-webkit-scrollbar { display: none; }
-.navlinks a { color: var(--muted); text-decoration: none; font-weight: 550; font-size: .95rem; white-space: nowrap; }
-.navlinks a:hover { color: var(--ink); }
+header.top { border-bottom: 1px solid var(--line); }
+header.top .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding-top: 14px; padding-bottom: 14px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
+.brand .mark { display: inline-flex; width: 30px; height: 30px; border: 2px solid var(--ink); align-items: center; justify-content: center; font: 600 15px var(--mono); }
+.brand b { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
+.brand:hover { color: var(--ink); }
+nav.menu { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 22px; }
+nav.menu a { text-decoration: none; color: var(--ink-2); font-size: 15px; font-weight: 500; padding: 10px 4px; }
+nav.menu a:hover { color: var(--ink); }
+nav.menu a.gh { border: 1.5px solid var(--ink); padding: 9px 16px; color: var(--ink); font-weight: 600; }
 
 /* Hero */
-.hero { position: relative; background: linear-gradient(180deg, var(--accent-soft), var(--bg) 92%); overflow: hidden; }
-.hero .wrap { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 48px; align-items: center; padding-top: 64px; padding-bottom: 120px; position: relative; z-index: 1; }
-.kicker { display: inline-flex; align-items: center; gap: 8px; font-size: .85rem; font-weight: 650; color: var(--accent);
-  background: var(--panel); border: 1px solid var(--line); border-radius: 99px; padding: 4px 12px 4px 8px; margin: 0 0 18px; }
-.kicker i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 25%, transparent); }
-.hero h1 { font-size: clamp(2.3rem, 5.4vw, 3.7rem); font-weight: 820; letter-spacing: -0.035em; line-height: 1.04; margin: 0 0 18px; }
-.hero h1 em { font-style: normal; color: var(--accent); }
-.hero .lead { font-size: 1.16rem; color: var(--muted); margin: 0 0 26px; max-width: 34rem; }
-.cta { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 30px; }
-.button { display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: 10px; font-weight: 650; text-decoration: none; }
-.button.primary { background: var(--accent); color: var(--accent-ink); }
-.button.primary:hover { background: var(--accent-strong); }
-.button.secondary { background: var(--panel); color: var(--ink); border: 1px solid var(--line); }
-.stats { display: flex; gap: 34px; flex-wrap: wrap; margin: 0; padding: 0; list-style: none; }
-.stats li { color: var(--muted); font-size: .92rem; }
-.stats b { display: block; font-size: 1.75rem; color: var(--ink); font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
-.growing { margin: 14px 0 0; color: var(--muted); font-size: .9rem; }
-.ridges { position: absolute; left: 0; right: 0; bottom: -1px; width: 100%; height: 150px; z-index: 0; }
+.hero { display: flex; flex-wrap: wrap; gap: 56px; align-items: flex-start; padding-top: 72px; padding-bottom: 56px; }
+.hero-text { flex: 1 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 28px; }
+.kicker { margin: 0; font: 13px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-size: clamp(44px, 6.4vw, 88px); line-height: .98; letter-spacing: -0.035em; font-weight: 800; }
+h1 em { font-weight: 700; color: var(--red); }
+h1 sup { font: 500 .28em var(--mono); margin-left: 4px; }
+h1 sup a { color: var(--red); text-decoration: none; }
+.lead { margin: 0; font-size: 20px; line-height: 1.5; color: var(--ink-2); max-width: 34ch; }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; }
+.stats { margin: 12px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); border-top: 1px solid var(--ink); }
+.stats div { padding: 16px 16px 0; border-right: 1px solid var(--line); }
+.stats div:first-child { padding-left: 0; }
+.stats div:last-child { border-right: 0; }
+.stats dt { font-size: 13px; color: var(--muted); }
+.stats dd { margin: 4px 0 0; font-size: 40px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
 
-/* The illustration in the hero */
-.demo { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
-.demo-bar { display: flex; align-items: center; gap: 6px; padding: 11px 14px; border-bottom: 1px solid var(--line); font-size: .82rem; color: var(--muted); }
-.demo-bar span { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
-.demo-bar b { font-weight: 600; margin-left: 8px; }
-.slides { display: grid; padding: 18px; }
-.slide { grid-area: 1 / 1; opacity: 0; visibility: hidden; transition: opacity .45s ease, visibility .45s; }
-.slide.active { opacity: 1; visibility: visible; }
-.msg { margin: 0 0 12px; border-radius: 14px; padding: 11px 14px; font-size: .95rem; }
-.msg.user { background: var(--accent); color: var(--accent-ink); margin-left: 18%; border-bottom-right-radius: 4px; font-weight: 550; }
-.msg.call { background: transparent; color: var(--muted); padding: 0 2px; font-size: .84rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.spark { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none; }
-.msg.bot { background: var(--code-bg); border-bottom-left-radius: 4px; margin-right: 6%; }
-.msg.bot p { margin: 0; }
-.msg.bot .chips { margin-top: 10px; }
-.dots { display: flex; justify-content: center; gap: 8px; padding: 0 0 14px; }
-.dot { width: 9px; height: 9px; padding: 0; border-radius: 50%; border: 0; background: var(--line); cursor: pointer; }
-.dot.active { background: var(--accent); width: 22px; border-radius: 99px; }
+/* The answer slip */
+.slip { flex: 1 1 420px; min-width: 0; margin: 0; background: var(--white); border: 1px solid var(--ink); box-shadow: 8px 8px 0 var(--ink); }
+.slip-head { display: flex; justify-content: space-between; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--line); font: 12px var(--mono); color: var(--muted); }
+.slip-q { padding: 24px 24px 8px; }
+.slip-q .label { margin-bottom: 6px; }
+.slip-q .q { margin: 0; font-size: 22px; font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; }
+.bars { padding: 20px 24px 8px; display: flex; flex-direction: column; gap: 14px; }
+.bar p { display: flex; justify-content: space-between; margin: 0 0 6px; font-size: 15px; }
+.bar p span:last-child { font: 600 15px var(--mono); }
+.track { height: 12px; background: var(--track); }
+.track div { height: 12px; background: var(--ink); }
+.bar.whole { padding-top: 6px; border-top: 1px dashed var(--line); color: var(--muted); }
+.bar.whole p span:last-child { font-weight: 400; }
+.bar.whole .track div { background: var(--faint); }
+.slip figcaption { margin-top: 16px; padding: 14px 24px 18px; border-top: 1px solid var(--line); background: var(--note); display: flex; gap: 10px; font-size: 13px; line-height: 1.5; color: var(--ink-2); }
+.slip figcaption b { color: var(--ink); }
+.fn { font: 600 13px var(--mono); color: var(--red); }
+
+/* Publisher strip */
+.strip { background: var(--ink); color: var(--bg); }
+.strip .wrap { display: flex; flex-wrap: wrap; gap: 8px 28px; align-items: center; padding-top: 16px; padding-bottom: 16px; font-size: 14px; }
+.strip .label { color: #A9B0B9; }
+.strip .more { color: #A9B0B9; }
 
 /* Sections */
-main > section, main > .band { padding-top: 64px; padding-bottom: 8px; }
-.eyebrow { margin: 0 0 6px; font-size: .8rem; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; color: var(--red); }
-h2 { font-size: clamp(1.6rem, 3.2vw, 2.2rem); font-weight: 780; margin: 0 0 10px; }
-.lead-s { color: var(--muted); max-width: 44rem; margin: 0 0 26px; font-size: 1.04rem; }
-.grid { display: grid; gap: 18px; }
-.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px; min-width: 0; box-shadow: var(--shadow); }
-.card h3 { margin: 0 0 8px; font-size: 1.1rem; }
+.block { padding-top: 104px; padding-bottom: 40px; }
+.block-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px 64px; margin-bottom: 36px; }
+.block-head > div { flex: 1 1 420px; min-width: 0; }
+.block-head > p { flex: 1 1 360px; margin: 0; font-size: 17px; line-height: 1.55; color: var(--ink-2); }
+.block-head > p.mono-note { flex: 0 1 auto; font-size: 13px; color: var(--muted); }
+.panel { border: 1px solid var(--ink); background: var(--white); }
+pre.snippet { margin: 0; background: var(--ink); color: var(--code-ink); padding: 22px 24px; font-size: 14px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
 
-/* Getting started */
-.steps { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 18px; align-items: start; }
-.step-n { display: flex; align-items: center; gap: 10px; font-weight: 750; font-size: 1.08rem; margin: 0 0 14px; }
-.step-n span { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-size: .9rem; }
-.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
-.tabs button { background: transparent; color: var(--muted); border: 1px solid var(--line); font-weight: 600; padding: 6px 12px; border-radius: 99px; font-size: .88rem; }
-.tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-.tabpanel > p { margin: 0 0 10px; }
-.asks { list-style: none; padding: 0; margin: 12px 0; display: grid; gap: 8px; }
-.ask { width: 100%; text-align: left; background: var(--code-bg); color: var(--ink); border: 1px solid var(--line); font-weight: 500; padding: 9px 13px; border-radius: 10px; }
-.ask:hover { border-color: var(--accent); }
-.ask.copied { border-color: var(--ok); color: var(--ok); }
+/* § 01 Getting started */
+.connect { display: flex; flex-wrap: wrap; gap: 40px 64px; }
+.connect-text { flex: 1 1 300px; min-width: 0; }
+.steps { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.steps li { display: flex; gap: 18px; padding: 18px 0; border-bottom: 1px solid var(--line); }
+.steps li > span { font: 600 16px var(--mono); color: var(--red); }
+.steps p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.5; }
+.steps p.step-t { margin: 0 0 4px; color: var(--ink); font-weight: 700; font-size: 18px; }
+.connect-panel { flex: 2 1 560px; min-width: 0; }
+.tabs { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--ink); }
+.tabs button { padding: 16px 17px; min-height: 52px; border: 0; border-right: 1px solid var(--line); background: var(--white); color: var(--ink-2); font-size: 14px; }
+.tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+.panel-body { padding: 28px; }
+.tabpanel > p { margin: 0 0 14px; font-size: 15px; color: var(--ink-2); }
+.panel-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-top: 16px; }
+button.ghost { background: var(--white); color: var(--ink); border: 1.5px solid var(--ink); padding: 11px 18px; min-height: 44px; transition: transform .12s ease; }
+button.ghost:hover { transform: translateY(-1px); }
+.panel-foot button.ghost { background: var(--bg); }
 
-/* Code boxes: they wrap and grow, so nothing is hidden behind a scrollbar. */
-.code { border: 1px solid var(--line); border-radius: 10px; background: var(--code-bg); overflow: hidden; margin: 10px 0 0; }
-.code-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 5px 6px 5px 12px; background: var(--code-head); font-size: .78rem; color: var(--muted); font-weight: 600; }
-.code-head .copy { padding: 3px 10px; font-size: .78rem; background: transparent; color: var(--accent); border: 1px solid var(--line); }
-.code pre { margin: 0; padding: 12px 14px; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.55; color: var(--ink); }
-.code pre code { background: none; padding: 0; font-size: 1em; }
+/* § 02 Examples */
+.recipes { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--ink); }
+.recipes > li { border-bottom: 1px solid var(--line); }
+.recipe > summary { list-style: none; cursor: pointer; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; padding: 26px 8px; transition: background .12s ease; }
+.recipe > summary::-webkit-details-marker { display: none; }
+.recipe > summary:hover { background: var(--hover); }
+.recipe .n { font: 14px var(--mono); color: var(--faint); width: 28px; }
+.recipe .q { flex: 1 1 420px; min-width: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.015em; line-height: 1.3; }
+.recipe .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.recipe .arrow { font-size: 22px; transition: transform .2s ease; }
+.recipe[open] .arrow { transform: rotate(90deg); color: var(--red); }
+.recipe-body { padding: 0 8px 28px 64px; display: flex; flex-direction: column; gap: 14px; max-width: 900px; }
+.recipe-body .answer { margin: 0; font-size: 17px; line-height: 1.6; color: var(--ink-2); }
+.recipe-body pre.snippet { padding: 14px 18px; font-size: 13px; }
+.recipe-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin: 0; font-size: 14px; color: var(--muted); }
+.recipe-foot a { font-weight: 600; color: var(--red); text-decoration: none; }
+
+/* § 03 Warnings */
+.band { margin-top: 96px; background: var(--navy); color: var(--bg); }
+.band .wrap { display: flex; flex-wrap: wrap; gap: 48px; align-items: center; padding-top: 88px; padding-bottom: 88px; }
+.band-text { flex: 1 1 440px; min-width: 0; }
+.band .sec { color: #FF9E8A; }
+.band-text p.body { margin: 18px 0 0; font-size: 18px; line-height: 1.55; color: var(--navy-ink); max-width: 40ch; }
+#feed-form { flex: 1 1 400px; min-width: 0; border: 1px solid var(--navy-line); padding: 28px; display: flex; flex-direction: column; gap: 14px; }
+#feed-form .label { color: var(--navy-ink); }
+#feed-form input { font: 16px var(--sans); padding: 13px 14px; border: 1.5px solid var(--navy-line); background: transparent; color: var(--bg); min-height: 48px; }
+#feed-form input::placeholder { color: #8FA3BA; }
+#feed-form input:focus { outline: 2px solid #FF9E8A; outline-offset: 1px; }
+.kinds { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 6px; }
+.kind { padding: 11px 16px; min-height: 44px; background: transparent; color: var(--bg); border: 1.5px solid #6C86A3; }
+.kind[aria-pressed="true"] { background: var(--bg); color: var(--navy); border-color: var(--bg); }
+.kind::before { content: "+ "; }
+.kind[aria-pressed="true"]::before { content: "✓ "; }
+#feed-form button[type="submit"] { align-self: flex-start; background: var(--bg); color: var(--navy); border: 0; padding: 15px 24px; font-weight: 700; font-size: 16px; min-height: 48px; }
+#feed-form button:disabled { opacity: .6; cursor: progress; }
+#feed-result { font-size: 15px; color: var(--navy-ink); }
+#feed-result p { margin: 0 0 10px; }
+#feed-result a { color: var(--bg); }
+#feed-result.err { color: #FFB4A6; }
+#feed-result .code { border-color: var(--navy-line); }
+
+/* § 04 Sources */
+.pubs { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); border-top: 1px solid var(--ink); border-left: 1px solid var(--line); }
+.pub { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-height: 120px; padding: 18px 20px; border: 0; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: transparent; color: var(--ink); text-align: left; font-weight: 400; }
+.pub:hover { background: var(--white); }
+.pub[aria-expanded="true"] { background: var(--ink); color: var(--bg); }
+.pub[aria-expanded="true"] .pub-name, .pub[aria-expanded="true"] .pub-count { color: #C9CED6; }
+.pub-code { font: 600 22px var(--mono); letter-spacing: -0.01em; margin-bottom: auto; }
+.pub-name { font-size: 14px; line-height: 1.35; color: var(--ink-2); padding-top: 12px; }
+.pub-count { font: 12px var(--mono); color: var(--faint); }
+.pub-group { margin-top: 24px; border: 1px solid var(--ink); background: var(--white); padding: 24px 28px 28px; }
+.pub-title { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 0 0 18px; font-size: 20px; }
+.pub-close { background: none; border: 0; font: 500 14px var(--mono); color: var(--muted); padding: 6px 0; }
+.pub-close:hover { color: var(--red); }
+.source-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 28px 36px; }
+.source { border-top: 1px solid var(--ink); padding-top: 14px; min-width: 0; font-size: 15px; }
+.source h4 { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+.badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.badge { font: 500 12px var(--mono); padding: 3px 8px; border: 1px solid var(--line-2); text-decoration: none; color: var(--ink-2); }
+.badge.warn { background: var(--warn-bg); color: var(--warn); border-color: transparent; }
+.covers { padding-left: 18px; margin: 10px 0; color: var(--ink-2); }
+.covers li { margin: 4px 0; }
+.covers li::marker { color: var(--red); }
+.source .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+details.more > summary { cursor: pointer; font-size: 14px; font-weight: 600; }
+details.more ul { font-size: 14px; padding-left: 18px; color: var(--ink-2); }
+.links { display: flex; flex-wrap: wrap; gap: 14px; margin: 12px 0 0; }
+
+/* § 05 Tools */
+#verktoy { padding-bottom: 112px; }
+.workbench { display: flex; flex-wrap: wrap; gap: 32px 48px; align-items: flex-start; }
+.cats { flex: 1 1 240px; min-width: 0; border-top: 1px solid var(--ink); position: sticky; top: 16px; }
+#tool-search { width: 100%; font: 15px var(--sans); padding: 14px 4px; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--ink); }
+#tool-search:focus { outline: none; border-bottom-color: var(--red); }
+.cat { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 12px; text-align: left; padding: 14px 4px; min-height: 50px; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--ink); font-size: 16px; }
+.cat:hover { color: var(--red); }
+.cat .cat-arrow { visibility: hidden; }
+.cat[aria-current="true"] { color: var(--red); }
+.cat[aria-current="true"] .cat-arrow { visibility: visible; }
+.cats p { margin: 18px 0 0; font-size: 14px; color: var(--muted); }
+.bench { flex: 3 1 560px; min-width: 0; }
+.theme { border: 1px solid var(--ink); background: var(--white); }
+.theme + .theme { margin-top: 24px; }
+.theme-head { padding: 22px 28px 18px; border-bottom: 1px solid var(--ink); }
+.theme-head h3 { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
+.theme-head p { margin: 6px 0 0; color: var(--muted); font-size: 15px; }
+.theme-head p:empty { display: none; }
+.tool + .tool { border-top: 1px solid var(--line); }
+.tool > summary { list-style: none; cursor: pointer; padding: 20px 28px; display: flex; flex-direction: column; gap: 6px; transition: background .12s ease; }
+.tool > summary::-webkit-details-marker { display: none; }
+.tool > summary:hover { background: var(--note); }
+.tool-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 12px; }
+.tool-name { font: 600 19px var(--mono); overflow-wrap: anywhere; }
+.tool-head .chip { white-space: normal; }
+.tool[open] .tool-name { color: var(--red); }
+.tool-title { font-weight: 700; font-size: 16px; }
+.tool-sum { font-size: 15px; line-height: 1.55; color: var(--ink-2); max-width: 62ch; }
+.tool-body { padding: 4px 28px 26px; display: flex; flex-direction: column; gap: 12px; }
+.endpoint { margin: 0; font: 13px var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+.method { font-weight: 600; color: var(--red); margin-right: 4px; }
+.try { display: flex; flex-direction: column; gap: 10px; }
+.try textarea { width: 100%; min-height: 3.4em; resize: vertical; overflow: hidden; background: var(--ink); color: var(--code-ink); border: 0; padding: 18px 20px; font-size: 14px; line-height: 1.7; }
+.try textarea:focus { outline: 2px solid var(--red); outline-offset: 2px; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+button.run { background: var(--red); color: #FFFFFF; border: 0; padding: 13px 22px; font-weight: 700; min-height: 44px; transition: transform .12s ease; }
+button.run:hover { transform: translateY(-1px); }
+button:disabled { opacity: .6; cursor: progress; }
+.code { border: 1px solid var(--line-2); background: var(--note); margin: 4px 0 0; }
+.code-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 6px 6px 14px; border-bottom: 1px solid var(--line); font: 12px var(--mono); color: var(--muted); }
+.code-head .copy { padding: 4px 10px; font: 500 12px var(--mono); background: var(--white); color: var(--ink); border: 1px solid var(--line-2); }
+.code pre { margin: 0; padding: 14px 16px; font-size: 13px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--ink); }
+.band .code { background: transparent; }
+.band .code-head { color: var(--navy-ink); border-color: var(--navy-line); }
+.band .code pre { color: var(--bg); }
 .status.ok { color: var(--ok); }
 .status.err { color: var(--err); }
-
-/* Promises */
-.promises { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.promise .icon { color: var(--accent); width: 26px; height: 26px; margin-bottom: 10px; }
-.promise p { margin: 0; color: var(--muted); font-size: .95rem; }
-
-/* Recipes */
-.recipes { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
-.recipe { display: flex; flex-direction: column; }
-.recipe > p { margin: 0 0 6px; }
-.recipe .chips { margin: 12px 0 0; }
-.recipe-foot { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: auto 0 0 !important; padding-top: 14px; }
-.recipe-foot a { font-weight: 650; text-decoration: none; }
-
-/* Feed */
-.feed { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; align-items: center; }
-.feed h2 { display: flex; align-items: center; gap: 10px; }
-.feed h2 .icon { color: var(--red); width: 28px; height: 28px; }
-.feed form { display: flex; gap: 8px; }
-.feed input { flex: 1; min-width: 0; font: inherit; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
-#feed-result { margin: 12px 0 0; }
-#feed-result.err { color: var(--err); }
-
-/* Sources */
-.cards { grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); }
-.source header p { margin: 0; font-size: .92rem; }
-.badges { margin: 12px 0 6px; display: flex; gap: 6px; flex-wrap: wrap; }
-.badge { font-size: .76rem; font-weight: 650; padding: 2px 9px; border-radius: 99px; border: 1px solid var(--line); text-decoration: none; color: var(--ink); }
-.badge.warn { background: var(--warn-bg); color: var(--warn); border-color: transparent; }
-.covers { padding-left: 18px; margin: 10px 0; font-size: .93rem; }
-.covers li { margin: 4px 0; }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
-.chip { font-size: .78rem; background: var(--chip); color: var(--ink); padding: 3px 9px; border-radius: 99px; text-decoration: none; }
-.chip code { background: none; padding: 0; }
-a.chip:hover { background: var(--accent-soft); color: var(--accent); }
-details.more > summary { cursor: pointer; color: var(--accent); font-size: .9rem; font-weight: 600; }
-details.more ul { font-size: .9rem; padding-left: 18px; }
-.links { display: flex; gap: 14px; flex-wrap: wrap; margin: 12px 0 0; }
-
-/* Tools */
-.finder { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; }
-.finder input { flex: 1; min-width: 0; font: inherit; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); box-shadow: var(--shadow); }
-#no-match { margin: 18px 0; }
-.theme { margin-top: 30px; }
-.theme > h3 { margin: 0 0 2px; font-size: 1.2rem; }
-.theme > p { margin: 0 0 12px; font-size: .95rem; }
-.tool-list { display: grid; gap: 10px; }
-.tool { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
-.tool[open] { box-shadow: var(--shadow); }
-.tool > summary { list-style: none; cursor: pointer; padding: 14px 44px 14px 18px; position: relative; display: grid; grid-template-columns: auto 1fr; column-gap: 12px; row-gap: 2px; align-items: baseline; }
-.tool > summary::-webkit-details-marker { display: none; }
-.tool > summary::after { content: ""; position: absolute; right: 18px; top: 21px; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform .2s; }
-.tool[open] > summary::after { transform: rotate(-135deg); top: 25px; }
-.tool-title { font-weight: 700; }
-.tool-name { justify-self: start; font-size: .78rem; color: var(--muted); }
-.tool-sum { grid-column: 1 / -1; color: var(--muted); font-size: .93rem; }
-.tool-body { padding: 0 18px 18px; border-top: 1px solid var(--line); }
-.endpoint { margin: 14px 0 12px; }
-.method { font-weight: 800; font-size: .72rem; color: var(--accent); background: var(--accent-soft); padding: 2px 7px; border-radius: 5px; }
-.try label { display: block; margin-bottom: 6px; }
-.try textarea { display: block; width: 100%; min-height: 3.2em; resize: vertical; overflow: hidden; background: var(--code-bg); color: var(--ink);
-  border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; line-height: 1.55; }
-.try textarea:focus, .finder input:focus, .feed input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-button { font: inherit; border: 0; border-radius: 9px; padding: 8px 15px; cursor: pointer; background: var(--accent); color: var(--accent-ink); font-weight: 650; }
-button:hover { filter: brightness(1.06); }
-button:disabled { opacity: .6; cursor: progress; }
-button.ghost { background: transparent; color: var(--accent); border: 1px solid var(--line); }
-.result .code { margin-top: 14px; }
 .result.collapsed pre { max-height: 30em; overflow: hidden; -webkit-mask-image: linear-gradient(180deg, #000 75%, transparent); mask-image: linear-gradient(180deg, #000 75%, transparent); }
-.expand { margin-top: 8px; }
-.bib .code { margin-top: 10px; }
-.spec { margin-top: 16px; }
-.spec p { margin: 10px 0 0; }
-table { border-collapse: collapse; width: 100%; font-size: .85rem; margin-top: 10px; }
+.expand { align-self: flex-start; }
+.spec summary { cursor: pointer; font-size: 14px; color: var(--muted); }
+.spec p { margin: 10px 0 0; color: var(--ink-2); }
+table { border-collapse: collapse; width: 100%; font-size: 13px; margin-top: 10px; }
 td { border-top: 1px solid var(--line); padding: 7px 10px 7px 0; vertical-align: top; overflow-wrap: anywhere; }
 td:first-child { white-space: nowrap; }
+#no-match { margin: 0; padding: 28px; border: 1px solid var(--ink); background: var(--white); }
 
-footer { border-top: 1px solid var(--line); margin-top: 72px; padding: 28px 0 48px; color: var(--muted); font-size: .9rem; }
-footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
-footer p { margin: 0; max-width: 40rem; }
-footer nav { display: flex; gap: 16px; flex-wrap: wrap; }
+/* Footer */
+footer { background: var(--ink); color: #C9CED6; }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 32px; padding-top: 56px; padding-bottom: 40px; }
+footer .about { display: flex; flex-direction: column; gap: 10px; max-width: 380px; }
+footer .about b { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; color: var(--bg); }
+footer .about p { margin: 0; font-size: 15px; line-height: 1.55; }
+footer nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 48px; font-size: 15px; align-content: start; }
+footer nav a { color: var(--bg); }
+footer nav a:hover { color: #FF9E8A; }
+footer .fine { display: block; padding-top: 18px; padding-bottom: 28px; border-top: 1px solid #2A333F; font: 12px var(--mono); color: var(--faint); }
 
-@media (max-width: 900px) {
-  .hero .wrap { grid-template-columns: minmax(0, 1fr); gap: 36px; padding-top: 40px; padding-bottom: 100px; }
-  .steps, .feed { grid-template-columns: minmax(0, 1fr); }
-  .promises { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (max-width: 600px) {
-  nav.top .wrap { gap: 14px; }
-  .navlinks { gap: 14px; padding-right: 18px; -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
-  .stats { gap: 22px; }
-  .card { padding: 18px; }
-  .recipes, .cards, .promises { grid-template-columns: minmax(0, 1fr); }
-  .msg.user { margin-left: 8%; }
-  .feed form { flex-direction: column; }
+@media (max-width: 720px) {
+  .wrap { padding-left: 16px; padding-right: 16px; }
+  nav.menu { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; width: 100%; gap: 18px; -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); padding-right: 24px; }
+  nav.menu::-webkit-scrollbar { display: none; }
+  nav.menu a { white-space: nowrap; }
+  .hero { padding-top: 40px; gap: 40px; }
+  .hero-text, .slip, .connect-panel, .bench, .cats, .band-text, #feed-form { flex-basis: 100%; }
+  .lead { font-size: 18px; }
+  .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .stats div { padding: 14px 10px 0; }
+  .stats dd { font-size: 28px; }
+  .slip { box-shadow: 6px 6px 0 var(--ink); }
+  h2 { font-size: 36px; }
+  .block { padding-top: 72px; }
+  .band { margin-top: 72px; }
+  .band .wrap { padding-top: 64px; padding-bottom: 64px; }
+  .panel-body, .pub-group { padding: 20px; }
+  .recipe .q { font-size: 20px; flex-basis: calc(100% - 60px); }
+  .recipe-body { padding-left: 8px; }
+  .pubs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pub { min-height: 104px; padding: 14px; }
+  .cats { position: static; }
+  .tool > summary, .theme-head { padding-left: 18px; padding-right: 18px; }
+  .tool-body { padding: 4px 18px 22px; }
 }
 </style>
 </head>
 <body>
-<nav class="top">
+<header class="top">
   <div class="wrap">
-    <a class="brand" href="#"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="var(--accent)"/><path d="M9 7v18M9 16l10-9M12 13l9 12" stroke="var(--accent-ink)" stroke-width="3" fill="none" stroke-linecap="round"/></svg>Kildeverk</a>
-    <div class="navlinks">
+    <a class="brand" href="#top"><span class="mark" aria-hidden="true">[1]</span><b>kildeverk</b></a>
+    <nav class="menu" aria-label="Hovedmeny">
       <a href="#kom-i-gang">Kom i gang</a>
       <a href="#eksempler">Eksempler</a>
       <a href="#varsler">Varsler</a>
       <a href="#kilder">Kilder</a>
       <a href="#verktoy">Verktøy</a>
       <a href="/docs">API</a>
-      <a href="@@REPO@@">GitHub</a>
-    </div>
+      <a class="gh" href="@@REPO@@">GitHub ↗</a>
+    </nav>
   </div>
-</nav>
-
-<header class="hero">
-  <div class="wrap">
-    <div>
-      <p class="kicker"><i></i>Åpent, gratis og uten konto</p>
-      <h1>Norske offentlige data, <em>rett fra kilden.</em></h1>
-      <p class="lead">Kildeverk gir KI-assistenter og utviklere ferske tall fra SSB,
-      Meteorologisk institutt, NVE, Kartverket, Entur, Brønnøysundregistrene og flere.
-      Hvert svar sier nøyaktig hvor det kommer fra.</p>
-      <div class="cta">
-        <a class="button primary" href="#kom-i-gang">Kom i gang</a>
-        <a class="button secondary" href="#verktoy">Prøv verktøyene</a>
-      </div>
-      <ul class="stats">
-        <li><b>@@N_SOURCES@@</b>kilder</li>
-        <li><b>@@N_PUBLISHERS@@</b>utgivere</li>
-        <li><b>@@N_TOOLS@@</b>verktøy</li>
-      </ul>
-      <p class="growing">Flere kilder legges til fortløpende.</p>
-    </div>
-    @@DEMO@@
-  </div>
-  <svg class="ridges" viewBox="0 0 1440 150" preserveAspectRatio="none" aria-hidden="true">
-    <path style="fill: var(--ridge-1)" d="M0 92 120 52l100 30 120-58 130 56 120-40 130 52 130-68 130 56 130-34 130 44 100-30 100 22V150H0Z"/>
-    <path style="fill: var(--ridge-2)" d="M0 118 160 80l140 30 120-38 140 46 140-40 160 48 140-36 150 40 140-34 150 28V150H0Z"/>
-    <path style="fill: var(--ridge-3); opacity: .55" d="M0 134 200 112l180 26 160-22 220 28 200-24 220 26 260-18V150H0Z"/>
-    <path style="fill: var(--bg)" d="M0 150V140l240-8 260 12 280-10 300 12 360-8V150Z"/>
-  </svg>
 </header>
 
 <main>
-@@CONNECT@@
-
-  <section class="wrap">
-    <p class="eyebrow">Hvorfor Kildeverk</p>
-    <h2>Svar du kan stole på og sitere</h2>
-    <p class="lead-s">Kildeverk henter alt direkte fra utgiverne, i det øyeblikket du spør. Ingenting er kopiert eller gjettet.</p>
-    <div class="grid promises">
-      <div class="card promise">@@ICON_PROVENANCE@@<h3>Kilden står på hvert svar</h3><p>Utgiver, lisens, nøyaktig adresse til dataene, når de ble hentet, og en ferdig kildehenvisning.</p></div>
-      <div class="card promise">@@ICON_ERRORS@@<h3>Feil som forklarer seg</h3><p>Hver feil har en kode, en forklaring, om det hjelper å prøve igjen, og ofte det neste kallet å gjøre.</p></div>
-      <div class="card promise">@@ICON_REGIONS@@<h3>Kommuner som henger sammen</h3><p>Kommune- og fylkesnumre følges gjennom reformene i 2020 og 2024, så gamle og nye tall kan sammenlignes.</p></div>
-      <div class="card promise">@@ICON_POLITE@@<h3>Høflig mot kildene</h3><p>En kvote under hver kildes grense, mellomlagring og felles kall, så tjenestene ikke belastes.</p></div>
+  <section id="top" class="wrap hero">
+    <div class="hero-text">
+      <p class="kicker">MCP-server · JSON-API · Gratis, ingen konto</p>
+      <h1>Norske offentlige data, <em>rett fra kilden.</em><sup><a href="#fotnote" aria-label="Fotnote 1">1</a></sup></h1>
+      <p class="lead">Ferske tall fra @@N_SOURCES@@ offentlige kilder, for KI-assistenter og utviklere. Hvert svar sier nøyaktig hvor det kommer fra.</p>
+      <div class="cta">
+        <a class="btn dark" href="#kom-i-gang">Kom i gang →</a>
+        <a class="btn" href="#verktoy">Prøv verktøyene</a>
+      </div>
+      <dl class="stats">
+        <div><dt>kilder</dt><dd>@@N_SOURCES@@</dd></div>
+        <div><dt>utgivere</dt><dd>@@N_PUBLISHERS@@</dd></div>
+        <div><dt>verktøy</dt><dd>@@N_TOOLS@@</dd></div>
+        <div><dt>kontoer</dt><dd>0</dd></div>
+      </dl>
     </div>
+    @@SLIP@@
   </section>
+
+  <div class="strip">
+    <div class="wrap"><span class="label">Data fra</span>@@STRIP@@</div>
+  </div>
+
+@@CONNECT@@
 
 @@RECIPES@@
 
-  <section id="varsler" class="wrap">
-    <div class="card feed">
-      <div>
-        <p class="eyebrow">Farevarsler</p>
-        <h2>@@ICON_FEED@@Varsler for din kommune</h2>
-        <p class="muted">Farevarsler for vær, flom, jordskred og snøskred samlet i én Atom-feed, som du kan
-        følge i en hvilken som helst feedleser. Sjekk alltid varsom.no og yr.no før du handler.</p>
+  <section id="varsler" class="band">
+    <div class="wrap">
+      <div class="band-text">
+        <p class="sec">§ 03</p>
+        <h2>Alle farevarsler i én feed</h2>
+        <p class="body">Vær, flom, jordskred og snøskred fra MET og NVE, samlet i én Atom-feed. Velg
+        det du vil følge, og abonner i en hvilken som helst feedleser. Sjekk alltid varsom.no og
+        yr.no før du handler.</p>
       </div>
-      <div>
-        <form id="feed-form">
-          <input id="feed-name" type="text" placeholder="Kommune, f.eks. Tromsø eller 4601" aria-label="Kommunenavn eller kommunenummer" autocomplete="off">
-          <button type="submit">Lag feed</button>
-        </form>
-        <div id="feed-result" class="small" hidden></div>
-      </div>
+      <form id="feed-form">
+        <label class="label" for="feed-name">Kommune</label>
+        <input id="feed-name" type="text" placeholder="F.eks. Tromsø eller 4601" autocomplete="off">
+        <p class="label">Ta med</p>
+        <div class="kinds">
+          <button type="button" class="kind" data-kind="weather" aria-pressed="true">Vær</button>
+          <button type="button" class="kind" data-kind="flood" aria-pressed="true">Flom</button>
+          <button type="button" class="kind" data-kind="landslide" aria-pressed="true">Jordskred</button>
+          <button type="button" class="kind" data-kind="avalanche" aria-pressed="true">Snøskred</button>
+        </div>
+        <button type="submit">Lag feed →</button>
+        <div id="feed-result" hidden></div>
+      </form>
     </div>
   </section>
 
-  <section id="kilder" class="wrap">
-    <p class="eyebrow">Kilder</p>
-    <h2>@@N_SOURCES@@ kilder fra @@N_PUBLISHERS@@ utgivere</h2>
-    <p class="lead-s">Hver kilde oppgir lisensen slik utgiveren skriver den, og hvert svar gjentar den.
-    To av kildene krever en gratis nøkkel; den offentlige tjenesten har begge. Vi legger stadig til
-    flere kilder; se <a href="@@REPO@@/blob/main/CHANGELOG.md">endringsloggen</a> for det siste.</p>
-    <div class="grid cards">@@CARDS@@
+  <section id="kilder" class="wrap block">
+    <div class="block-head">
+      <div><p class="sec">§ 04</p><h2>@@N_SOURCES@@ kilder, @@N_PUBLISHERS@@ utgivere</h2></div>
+      <p>Hver kilde oppgir lisensen slik utgiveren skriver den, og hvert svar gjentar den. @@KEYED@@
+      Flere kilder legges til fortløpende.</p>
     </div>
+    @@SOURCES@@
   </section>
 
-  <section id="verktoy" class="wrap">
-    <p class="eyebrow">Verktøy</p>
-    <h2>Prøv verktøyene her</h2>
-    <p class="lead-s">De samme @@N_TOOLS@@ verktøyene finnes over MCP og som nettadresser. Åpne et
-    verktøy, endre eksempelet om du vil, og trykk «Kjør» for å hente ferske data.</p>
-    <div class="finder">
-      <input id="tool-search" type="search" placeholder="Søk blant @@N_TOOLS@@ verktøy, f.eks. «vær», «skole» eller «tog»" aria-label="Søk blant verktøyene">
+  <section id="verktoy" class="wrap block">
+    <p class="sec">§ 05</p>
+    <h2 style="margin-bottom: 36px">@@N_TOOLS@@ verktøy. Prøv dem her.</h2>
+    <div class="workbench">
+      <nav class="cats" aria-label="Verktøykategorier">
+        <input id="tool-search" type="search" placeholder="Søk, f.eks. «skole» eller «tog»" aria-label="Søk blant verktøyene">
+        @@TOOL_NAV@@
+        <p>Hvert verktøy kan kjøres her i nettleseren, eller kopieres som curl- eller MCP-kall.</p>
+      </nav>
+      <div class="bench">
+        <p id="no-match" hidden>Ingen verktøy passer søket.</p>
+        @@TOOLS@@
+      </div>
     </div>
-    <p id="no-match" class="muted" hidden>Ingen verktøy passer søket.</p>
-    @@TOOLS@@
   </section>
 </main>
 
 <footer>
   <div class="wrap">
-    <p>Kildeverk @@VERSION@@ er et personlig, ikke-kommersielt prosjekt med åpen kildekode (MIT).
-    Det er ikke tilknyttet noen av utgiverne. Dataene tilhører dem og kommer under deres lisenser,
-    som hvert svar oppgir.</p>
-    <nav>
-      <a href="@@REPO@@">GitHub</a>
+    <div class="about">
+      <b>kildeverk</b>
+      <p>Norske offentlige data for KI-assistenter og utviklere. Gratis, uten konto, og alltid med
+      kilde. Versjon @@VERSION@@, åpen kildekode (MIT), ikke tilknyttet utgiverne.</p>
+    </div>
+    <nav aria-label="Bunnmeny">
       <a href="/docs">API-dokumentasjon</a>
+      <a href="@@REPO@@">GitHub</a>
+      <a href="@@REPO@@/blob/main/CHANGELOG.md">Endringslogg</a>
+      <a href="#kom-i-gang">MCP-endepunkt</a>
       <a href="/openapi.json">OpenAPI</a>
       <a href="catalogue.json">Katalog (JSON)</a>
-      <a href="@@REPO@@/blob/main/CHANGELOG.md">Endringslogg</a>
     </nav>
   </div>
+  <div class="wrap fine">Data © de respektive utgiverne. Lisens oppgis per kilde og i hvert svar.</div>
 </footer>
 
 <script>
@@ -739,7 +869,7 @@ footer nav { display: flex; gap: 16px; flex-wrap: wrap; }
   document.querySelectorAll(".origin").forEach(function (el) { el.textContent = origin; });
 
   function copyText(text, button, done) {
-    navigator.clipboard.writeText(text).then(function () { flash(button, done || "Kopiert"); });
+    navigator.clipboard.writeText(text).then(function () { flash(button, done || "Kopiert ✓"); });
   }
   function flash(button, text) {
     var label = button.dataset.label || button.textContent;
@@ -751,7 +881,7 @@ footer nav { display: flex; gap: 16px; flex-wrap: wrap; }
     if (b) copyText(b.closest(".code").querySelector("pre").textContent, b);
   });
 
-  // Tabs in "Kom i gang".
+  // Tabs in "Kom i gang"; the copy button takes the snippet of the open tab.
   var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
   tabs.forEach(function (tab, i) {
     tab.addEventListener("click", function () { select(i); });
@@ -770,32 +900,11 @@ footer nav { display: flex; gap: 16px; flex-wrap: wrap; }
     });
   }
   if (tabs.length) select(0);
-
-  document.querySelectorAll(".ask").forEach(function (b) {
-    b.addEventListener("click", function () {
-      navigator.clipboard.writeText(b.dataset.text).then(function () {
-        b.classList.add("copied"); var t = b.textContent; b.textContent = "Kopiert: " + t;
-        setTimeout(function () { b.classList.remove("copied"); b.textContent = t; }, 1600);
-      });
-    });
+  var copySnippet = document.querySelector(".copy-snippet");
+  if (copySnippet) copySnippet.addEventListener("click", function () {
+    var open = document.querySelector('.tabpanel:not([hidden]) pre');
+    if (open) copyText(open.textContent, copySnippet);
   });
-
-  // The hero's examples take turns, unless the reader prefers less motion or is reading one.
-  var slides = document.querySelectorAll(".slide"), dots = document.querySelectorAll(".dot"), current = 0, paused = false;
-  function show(i) {
-    current = i;
-    slides.forEach(function (s, j) { s.classList.toggle("active", i === j); });
-    dots.forEach(function (d, j) { d.classList.toggle("active", i === j); });
-  }
-  dots.forEach(function (d) { d.addEventListener("click", function () { show(Number(d.dataset.go)); paused = true; }); });
-  var demo = document.querySelector(".demo");
-  if (demo) {
-    demo.addEventListener("mouseenter", function () { paused = true; });
-    demo.addEventListener("mouseleave", function () { paused = false; });
-  }
-  if (slides.length > 1 && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    setInterval(function () { if (!paused && !document.hidden) show((current + 1) % slides.length); }, 7000);
-  }
 
   // A textarea grows to show all of its arguments.
   function fit(area) { area.style.height = "auto"; area.style.height = area.scrollHeight + 2 + "px"; }
@@ -806,11 +915,83 @@ footer nav { display: flex; gap: 16px; flex-wrap: wrap; }
     d.addEventListener("toggle", function () { if (d.open) fit(d.querySelector("textarea")); });
   });
 
-  // A link to a tool opens it.
+  // The workbench shows one theme at a time; a search shows every theme with a match.
+  var cats = Array.prototype.slice.call(document.querySelectorAll(".cat"));
+  var themes = Array.prototype.slice.call(document.querySelectorAll(".theme"));
+  var search = document.getElementById("tool-search"), noMatch = document.getElementById("no-match");
+  var currentTheme = themes.length ? themes[0].id : null;
+  function showTheme(id, openFirst) {
+    currentTheme = id;
+    if (search) search.value = "";
+    noMatch.hidden = true;
+    themes.forEach(function (t) {
+      t.hidden = t.id !== id;
+      t.querySelectorAll("details.tool").forEach(function (tool) { tool.hidden = false; });
+    });
+    cats.forEach(function (c) { c.setAttribute("aria-current", String(c.dataset.theme === id)); });
+    var theme = document.getElementById(id);
+    if (openFirst && theme && !theme.querySelector("details.tool[open]")) {
+      var first = theme.querySelector("details.tool");
+      if (first) first.open = true;
+    }
+  }
+  cats.forEach(function (c) {
+    c.addEventListener("click", function () {
+      showTheme(c.dataset.theme, true);
+      if (innerWidth <= 720) document.getElementById(c.dataset.theme).scrollIntoView({ block: "start" });
+    });
+  });
+  if (currentTheme) showTheme(currentTheme, true);
+  if (search) search.addEventListener("input", function () {
+    var words = search.value.toLowerCase().trim().split(/\\s+/).filter(Boolean), any = false;
+    if (!words.length) { var keep = currentTheme; showTheme(keep, false); return; }
+    cats.forEach(function (c) { c.setAttribute("aria-current", "false"); });
+    themes.forEach(function (theme) {
+      var shown = 0;
+      theme.querySelectorAll("details.tool").forEach(function (tool) {
+        var hit = words.every(function (w) { return tool.dataset.search.indexOf(w) !== -1; });
+        tool.hidden = !hit; if (hit) shown++;
+      });
+      theme.hidden = shown === 0; if (shown) any = true;
+    });
+    noMatch.hidden = any;
+  });
+
+  // Publisher tiles open the cards of that publisher's sources.
+  var pubs = Array.prototype.slice.call(document.querySelectorAll(".pub"));
+  function showPub(code) {
+    pubs.forEach(function (p) { p.setAttribute("aria-expanded", String(p.dataset.pub === code)); });
+    document.querySelectorAll(".pub-group").forEach(function (g) { g.hidden = g.dataset.pub !== code; });
+  }
+  pubs.forEach(function (p) {
+    p.addEventListener("click", function () {
+      var open = p.getAttribute("aria-expanded") === "true";
+      showPub(open ? null : p.dataset.pub);
+      if (!open) document.querySelector('.pub-group[data-pub="' + p.dataset.pub + '"]').scrollIntoView({ block: "nearest" });
+    });
+  });
+  document.querySelectorAll(".pub-close").forEach(function (b) {
+    b.addEventListener("click", function () { showPub(null); });
+  });
+
+  // A link to a tool, a theme, a source or an example opens it, wherever it is hidden.
   function openFromHash() {
     var id = decodeURIComponent(location.hash.slice(1));
     var el = id && document.getElementById(id);
-    if (el && el.matches("details.tool")) { el.open = true; fit(el.querySelector("textarea")); }
+    if (!el) return;
+    if (el.matches("details.tool")) {
+      showTheme(el.closest(".theme").id, false);
+      el.open = true; fit(el.querySelector("textarea"));
+    } else if (el.matches(".theme")) {
+      showTheme(id, true);
+    } else if (el.matches(".source")) {
+      showPub(el.closest(".pub-group").dataset.pub);
+    } else if (el.matches("details.recipe")) {
+      el.open = true;
+    } else {
+      return;
+    }
+    el.scrollIntoView({ block: "start" });
   }
   window.addEventListener("hashchange", openFromHash);
   openFromHash();
@@ -821,21 +1002,6 @@ footer nav { display: flex; gap: 16px; flex-wrap: wrap; }
       if (area) area.value = JSON.stringify(JSON.parse(a.dataset.args), null, 2);
       setTimeout(openFromHash, 0);
     });
-  });
-
-  // Search among the tools.
-  var search = document.getElementById("tool-search"), noMatch = document.getElementById("no-match");
-  if (search) search.addEventListener("input", function () {
-    var words = search.value.toLowerCase().trim().split(/\\s+/).filter(Boolean), any = false;
-    document.querySelectorAll(".theme").forEach(function (theme) {
-      var shown = 0;
-      theme.querySelectorAll("details.tool").forEach(function (tool) {
-        var hit = words.every(function (w) { return tool.dataset.search.indexOf(w) !== -1; });
-        tool.hidden = !hit; if (hit) shown++;
-      });
-      theme.hidden = shown === 0; if (shown) any = true;
-    });
-    noMatch.hidden = any;
   });
 
   // The URL and body a tool call becomes over HTTP: path parameters filled in, then a JSON
@@ -865,18 +1031,32 @@ footer nav { display: flex; gap: 16px; flex-wrap: wrap; }
     return fetch(t.url);
   }
 
+  // The warning kinds to follow; the feed's address carries them.
+  var kinds = Array.prototype.slice.call(document.querySelectorAll(".kind"));
+  kinds.forEach(function (k) {
+    k.addEventListener("click", function () {
+      k.setAttribute("aria-pressed", String(k.getAttribute("aria-pressed") !== "true"));
+    });
+  });
+
   // Check the name resolves (the feed answers JSON errors) before offering the link.
   var feedForm = document.getElementById("feed-form");
   if (feedForm) feedForm.addEventListener("submit", function (e) {
     e.preventDefault();
     var name = document.getElementById("feed-name").value.trim();
     var result = document.getElementById("feed-result");
-    if (!name) return;
-    var button = feedForm.querySelector("button"); button.disabled = true;
-    // The Norwegian feed, to match the page; its own self link keeps ?lang=nb for the reader.
-    var url = "/v1/feeds/warnings/" + encodeURIComponent(name) + ".atom?lang=nb";
+    var chosen = kinds.filter(function (k) { return k.getAttribute("aria-pressed") === "true"; })
+      .map(function (k) { return k.dataset.kind; });
+    result.hidden = false; result.className = "err";
+    if (!name) { result.textContent = "Skriv inn en kommune først."; return; }
+    if (!chosen.length) { result.textContent = "Velg minst én type varsel."; return; }
+    var button = feedForm.querySelector('button[type="submit"]'); button.disabled = true;
+    result.className = ""; result.textContent = "Henter varslene …";
+    // The Norwegian feed, to match the page; its own self link keeps lang and kinds for the reader.
+    var url = "/v1/feeds/warnings/" + encodeURIComponent(name) + ".atom?lang=nb"
+      + (chosen.length < kinds.length ? "&kinds=" + chosen.join(",") : "");
     fetch(url).then(function (r) {
-      result.hidden = false; result.className = "small";
+      result.className = "";
       if (r.ok) return r.text().then(function (xml) {
         var doc = new DOMParser().parseFromString(xml, "application/xml");
         // The feed's own self link uses the municipality number, so it survives spelling.
@@ -894,15 +1074,15 @@ footer nav { display: flex; gap: 16px; flex-wrap: wrap; }
         box.querySelector("pre").textContent = full;
         var open = document.createElement("p");
         var a = document.createElement("a"); a.href = full; a.textContent = "Åpne feeden";
-        open.append(a);
+        open.style.marginTop = "10px"; open.append(a);
         result.append(p, box, open);
       });
       return r.json().then(function () {
-        result.className = "small err";
+        result.className = "err";
         result.textContent = "Fant ingen kommune som heter «" + name + "». Prøv navnet eller det firesifrede kommunenummeret.";
       });
     }).catch(function () {
-      result.hidden = false; result.className = "small err"; result.textContent = "Fikk ikke kontakt med tjenesten. Prøv igjen om litt.";
+      result.className = "err"; result.textContent = "Fikk ikke kontakt med tjenesten. Prøv igjen om litt.";
     }).finally(function () { button.disabled = false; });
   });
 
@@ -985,7 +1165,7 @@ footer nav { display: flex; gap: 16px; flex-wrap: wrap; }
           expand.textContent = expand.dataset.more;
         })
         .catch(function (e) { showError("Fikk ikke kontakt med tjenesten: " + e); })
-        .finally(function () { button.disabled = false; button.textContent = "Kjør"; });
+        .finally(function () { button.disabled = false; button.textContent = "▶ Kjør"; });
     });
   });
 })();
