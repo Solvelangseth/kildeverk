@@ -3,8 +3,32 @@
   "name": "io.github.Solvelangseth/kildeverk",
   "title": "Kildeverk",
   "description": "Live Norwegian public data: transit, SSB statistics, weather, roads, laws, with source and licence.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "websiteUrl": "https://kildeverk.fly.dev",
-  "repository": { "url": "https://github.com/Solvelangseth/Kildeverk", "source": "github" },
-  "remotes": [ { "type": "streamable-http", "url": "https://kildeverk.fly.dev/mcp" } ]
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/Solvelangseth/Kildeverk/main/icon.png",
+      "mimeType": "image/png",
+      "sizes": [
+        "256x256"
+      ]
+    },
+    {
+      "src": "https://raw.githubusercontent.com/Solvelangseth/Kildeverk/main/icon.svg",
+      "mimeType": "image/svg+xml",
+      "sizes": [
+        "any"
+      ]
+    }
+  ],
+  "repository": {
+    "url": "https://github.com/Solvelangseth/Kildeverk",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://kildeverk.fly.dev/mcp"
+    }
+  ]
 }
