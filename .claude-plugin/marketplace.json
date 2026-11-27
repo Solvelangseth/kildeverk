@@ -1,0 +1,13 @@
+{
+  "name": "kildeverk",
+  "owner": { "name": "Sølve Langseth", "url": "https://github.com/Solvelangseth" },
+  "metadata": { "description": "Kildeverk: Norwegian open public data as an MCP server." },
+  "plugins": [
+    {
+      "name": "kildeverk",
+      "source": "./",
+      "description": "Live Norwegian public data with source and licence on every answer.",
+      "category": "data"
+    }
+  ]
+}

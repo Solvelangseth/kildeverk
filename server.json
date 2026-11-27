@@ -1,0 +1,10 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Solvelangseth/kildeverk",
+  "title": "Kildeverk",
+  "description": "Live Norwegian public data: transit, SSB statistics, weather, roads, laws, with source and licence.",
+  "version": "0.2.0",
+  "websiteUrl": "https://kildeverk.fly.dev",
+  "repository": { "url": "https://github.com/Solvelangseth/Kildeverk", "source": "github" },
+  "remotes": [ { "type": "streamable-http", "url": "https://kildeverk.fly.dev/mcp" } ]
+}

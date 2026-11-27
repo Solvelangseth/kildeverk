@@ -1,0 +1,13 @@
+{
+  "name": "kildeverk",
+  "version": "0.2.0",
+  "description": "Live Norwegian public data for Claude: departures and vehicles, SSB statistics, weather, water, roads, ships, laws and registers, with source and licence on every answer.",
+  "author": { "name": "Sølve Langseth", "url": "https://github.com/Solvelangseth" },
+  "homepage": "https://kildeverk.fly.dev",
+  "repository": "https://github.com/Solvelangseth/Kildeverk",
+  "license": "MIT",
+  "keywords": ["norway", "open-data", "ssb", "entur", "public-data", "mcp"],
+  "mcpServers": {
+    "kildeverk": { "type": "http", "url": "https://kildeverk.fly.dev/mcp" }
+  }
+}
